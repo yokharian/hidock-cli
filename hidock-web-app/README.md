@@ -41,7 +41,38 @@ The HiDock Web Application is a cutting-edge React TypeScript web app that provi
 
 ## 🚀 Quick Start
 
-### Prerequisites
+**From the main project directory:**
+
+### **👤 End Users - Just Run the App**
+```bash
+# Option 1: Run automated setup
+python setup.py  # Choose option 1
+
+# Option 2: Manual setup
+cd hidock-web-app
+npm install
+npm run dev
+# Open: http://localhost:5173
+```
+
+### **👨‍💻 Developers - Full Setup**
+```bash
+python setup.py  # Choose option 2
+```
+
+**Running the Application:**
+```bash
+cd hidock-web-app
+npm run dev
+# Open: http://localhost:5173
+```
+
+**Requirements:**
+- Node.js 18+
+- Modern browser with WebUSB support (Chrome, Edge, Opera)
+- HTTPS connection (required for WebUSB)
+
+## Prerequisites
 
 **Browser Requirements:**
 

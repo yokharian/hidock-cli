@@ -108,35 +108,61 @@ The HiDock hardware is innovative, but users face challenges with official softw
 - **AI Integration:** Google GenAI processing
 - **Framework:** React 19 + TypeScript
 
-## **🛠️ Installation & Setup**
+## **🚀 Quick Start**
 
-### **Prerequisites**
+**Choose your setup method:**
 
-- **Python:** 3.8+ recommended
-- **libusb:** USB communication library
-  - **Linux:** `sudo apt-get install libusb-1.0-0-dev`
-  - **macOS:** `brew install libusb`
-  - **Windows:** libusb-1.0.dll (included) or Zadig driver setup
-- **HiDock Device:** H1, H1E, P1 variants supported
+### **👤 End Users - Just Use the Apps**
 
-### **Quick Start**
+**Want to use HiDock immediately? Pick your platform:**
 
+#### **🪟 Windows (Easiest)**
+```cmd
+# Double-click this file:
+setup-windows.bat
+```
+
+#### **🐧🍎 Linux/Mac (One Command)**  
 ```bash
-# 1. Clone repository
+chmod +x setup-unix.sh && ./setup-unix.sh
+```
+
+#### **🐍 Any Platform (Interactive)**
+```bash
 git clone https://github.com/sgeraldes/hidock-next.git
 cd hidock-next
+python setup.py
+# Choose option 1 (End User)
+```
 
-# 2. Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+### **👨‍💻 Developers - Contribute Code**
 
-# 3. Install desktop app dependencies
-pip install -r hidock-desktop-app/requirements.txt
+```bash
+git clone https://github.com/sgeraldes/hidock-next.git
+cd hidock-next
+python setup.py
+# Choose option 2 (Developer)
+```
 
-# 4. Run desktop application
+### **📱 After Setup**
+
+**Desktop App:**
+```bash
 cd hidock-desktop-app
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 python main.py
 ```
+
+**Web App:**
+```bash
+cd hidock-web-app
+npm run dev
+# Open: http://localhost:5173
+```
+
+> 📖 **Need help?** See [QUICK_START.md](QUICK_START.md) for detailed instructions  
+> 🛠️ **Developers:** See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines  
+> 📚 **Documentation:** [docs/](docs/) folder contains comprehensive guides
 
 ### **Optional: Local AI Setup**
 

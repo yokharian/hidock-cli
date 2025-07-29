@@ -2,6 +2,26 @@
 
 This guide provides detailed information for developers working on the HiDock Community Platform.
 
+## 🚀 Quick Start for Developers
+
+**New to the project?** Get started immediately:
+
+```bash
+git clone https://github.com/sgeraldes/hidock-next.git
+cd hidock-next
+python setup.py
+# Choose option 2 (Developer)
+```
+
+This automated setup handles:
+- ✅ Environment setup (Python virtual envs, Node.js dependencies)
+- ✅ Development tools (testing, linting, formatting)
+- ✅ Git workflow (branch creation, commit guidelines)
+- ✅ AI integration setup (optional API keys)
+- ✅ Project guidance (features to work on, documentation)
+
+**Manual setup?** See [SETUP.md](SETUP.md) for step-by-step instructions.
+
 ## Architecture Overview
 
 The HiDock Community Platform consists of two main applications:

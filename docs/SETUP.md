@@ -1,16 +1,67 @@
-# Development Setup Guide
+# Setup Guide
 
-This guide will help you set up your development environment for the HiDock Community Platform.
+This guide covers setup for **both end users and developers**.
+
+## 🎯 Choose Your Path
+
+### **👤 End Users - Just Use the Apps**
+
+**Want to use HiDock immediately? Choose your platform:**
+
+#### **🪟 Windows (Easiest)**
+1. Download or clone the repository
+2. **Double-click:** `setup-windows.bat`
+3. Follow the prompts
+4. Done! 🎉
+
+#### **🐧🍎 Linux/Mac (One Command)**
+```bash
+chmod +x setup-unix.sh && ./setup-unix.sh
+```
+
+#### **🐍 Any Platform (Interactive)**
+```bash
+python setup.py
+# Choose option 1 (End User)
+```
+
+### **👨‍💻 Developers - Contribute Code**
+
+```bash
+python setup.py
+# Choose option 2 (Developer)
+```
+
+## 🤔 What's the Difference?
+
+### **End User Setup:**
+- ✅ Installs Python dependencies for desktop app
+- ✅ Installs Node.js dependencies for web app
+- ✅ Basic environment checks
+- ❌ No git workflow setup
+- ❌ No testing tools
+- ❌ No development tools
+
+**Result:** You can run and use the HiDock apps immediately.
+
+### **Developer Setup:**
+- ✅ Everything from End User setup, plus:
+- ✅ Git configuration and branch workflow  
+- ✅ Testing frameworks and tools
+- ✅ Code formatting and linting tools
+- ✅ AI API key configuration
+- ✅ Development documentation access
+- ✅ Feature suggestion and guidance
+
+**Result:** Full development environment ready for code contributions.
 
 ## Prerequisites
-
-Before you begin, ensure you have the following installed:
 
 ### Required Software
 
 - **Python 3.8 or higher** - [Download Python](https://www.python.org/downloads/)
-- **Node.js 18 or higher** - [Download Node.js](https://nodejs.org/)
-- **Git** - [Download Git](https://git-scm.com/)
+- **Node.js 18 or higher** - [Download Node.js](https://nodejs.org/) _(for web app)_
+- **Git** - [Download Git](https://git-scm.com/) _(for developers)_
 
 ### System Dependencies
 

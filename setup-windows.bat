@@ -1,0 +1,95 @@
+@echo off
+REM HiDock Next - Simple Windows Setup
+REM Double-click this file to set up HiDock apps
+
+echo.
+echo ================================
+echo   HiDock Next - Quick Setup
+echo ================================
+echo.
+echo This will set up HiDock apps for immediate use.
+echo.
+pause
+
+echo.
+echo [1/4] Checking Python...
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Python not found!
+    echo Please install Python 3.8+ from https://python.org
+    echo Make sure to check "Add Python to PATH" during installation
+    pause
+    exit /b 1
+) else (
+    echo Python found!
+)
+
+echo.
+echo [2/4] Setting up Desktop App...
+cd hidock-desktop-app
+if not exist .venv (
+    echo Creating Python environment...
+    python -m venv .venv
+)
+
+echo Installing dependencies...
+.venv\Scripts\pip install --upgrade pip
+.venv\Scripts\pip install -r requirements.txt
+
+if errorlevel 1 (
+    echo.
+    echo WARNING: Some dependencies failed to install.
+    echo The app might still work, or you may need to install them manually.
+    echo Check TROUBLESHOOTING.md for help.
+    echo.
+) else (
+    echo Desktop app setup complete!
+)
+
+cd ..
+
+echo.
+echo [3/4] Checking Node.js for Web App...
+node --version >nul 2>&1
+if errorlevel 1 (
+    echo Node.js not found - skipping web app setup
+    echo Install Node.js 18+ from https://nodejs.org if you want the web app
+) else (
+    echo Node.js found! Setting up web app...
+    cd hidock-web-app
+    call npm install
+    if errorlevel 1 (
+        echo WARNING: Web app setup failed
+        echo You can try running "npm install" manually in hidock-web-app folder
+    ) else (
+        echo Web app setup complete!
+    )
+    cd ..
+)
+
+echo.
+echo [4/4] Setup Complete!
+echo ================================
+echo.
+echo HOW TO RUN:
+echo.
+echo Desktop App:
+echo   1. cd hidock-desktop-app
+echo   2. .venv\Scripts\activate
+echo   3. python main.py
+echo.
+echo Web App (if Node.js installed):
+echo   1. cd hidock-web-app  
+echo   2. npm run dev
+echo   3. Open: http://localhost:5173
+echo.
+echo FIRST TIME TIPS:
+echo - Configure AI providers in app Settings for transcription
+echo - Connect your HiDock device via USB
+echo - Check README.md and docs/TROUBLESHOOTING.md for help
+echo.
+echo NEED MORE? Run: python setup.py (comprehensive setup)
+echo.
+echo Enjoy using HiDock! 🎵
+echo.
+pause

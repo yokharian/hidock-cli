@@ -28,6 +28,35 @@ The HiDock Desktop Application is a full-featured Python desktop GUI for managin
 
 - **USB Protocol**: Direct device communication via pyusb/libusb
 - **Enhanced Detection**: Professional device selector with status indicators
+
+## 🚀 Quick Start
+
+**From the main project directory:**
+
+### **👤 End Users - Just Run the App**
+```bash
+# Option 1: Run automated setup
+python setup.py  # Choose option 1
+
+# Option 2: Manual setup
+cd hidock-desktop-app
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
+
+### **👨‍💻 Developers - Full Setup**
+```bash
+python setup.py  # Choose option 2
+```
+
+**Running the Application:**
+```bash
+cd hidock-desktop-app
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python main.py
+```
 - **Real-time Sync**: Live device information and storage monitoring
 - **Batch Operations**: Multi-file download, delete, and management
 

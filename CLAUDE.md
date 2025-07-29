@@ -58,12 +58,37 @@ The desktop application is the flagship component with advanced AI integration a
 - **Framework**: React 19 with TypeScript and Vite
 - **AI Integration**: Google GenAI for audio processing
 
+## Quick Setup
+
+**Get started immediately with the automated setup:**
+
+```bash
+# For end users (just run the apps):
+python setup.py  # Choose option 1
+
+# For developers (contribute code):
+python setup.py  # Choose option 2
+```
+
+**Or use platform-specific scripts:**
+
+```bash
+# Windows (double-click):
+setup-windows.bat
+
+# Linux/Mac:
+chmod +x setup-unix.sh && ./setup-unix.sh
+```
+
 ## Common Development Commands
 
 ### Desktop Application
 
 ```bash
 cd hidock-desktop-app
+
+# Activate environment (after setup)
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # Run the application
 python main.py
@@ -79,12 +104,6 @@ black .
 flake8 .
 isort .
 mypy .
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install development dependencies
-pip install -e .[dev]
 ```
 
 ### Web Application
@@ -109,9 +128,6 @@ npm run test:watch
 
 # Linting
 npm run lint
-
-# Install dependencies
-npm install
 ```
 
 ### Audio Insights Extractor
@@ -127,9 +143,6 @@ npm run build
 
 # Preview built application
 npm run preview
-
-# Install dependencies
-npm install
 ```
 
 ## Key Configuration Files
@@ -180,20 +193,21 @@ npm install
 
 ### Desktop Application - Multi-Provider Support
 
-The desktop application supports **11 different AI providers** through a unified interface:
+The desktop application supports **7 implemented AI providers** with **3 additional providers planned** through a unified interface:
 
-#### Cloud Providers (7)
-- **Google Gemini**: 7 models including gemini-2.5-flash, gemini-2.5-pro, gemini-2.5-lite
-- **OpenAI**: GPT-4o, Whisper-1 for transcription, GPT models for analysis
-- **Anthropic**: Claude 3.5 Sonnet, Haiku, Opus for text analysis
+#### Fully Implemented Providers (7)
+- **Google Gemini**: Complete implementation with multiple models (gemini-1.5-flash, gemini-pro)
+- **OpenAI**: Full GPT and Whisper integration for transcription and analysis
+- **Anthropic**: Claude models for text analysis
 - **OpenRouter**: Multi-provider access through single API
-- **Amazon Bedrock**: Enterprise AI models (mock implementation)
-- **Qwen**: Alibaba's multilingual models (mock implementation)
-- **DeepSeek**: Coding-specialized models (mock implementation)
-
-#### Local Providers (2)
 - **Ollama**: Local model serving with LLaMA, Mistral, CodeLlama support
 - **LM Studio**: GGUF model hosting with OpenAI-compatible API
+- **Mock Provider**: For development and testing without API keys
+
+#### Planned/Future Providers (3)
+- **Amazon Bedrock**: Enterprise AI models (referenced in imports, not implemented)
+- **Qwen**: Alibaba's multilingual models (mentioned in comments, not implemented)
+- **DeepSeek**: Coding-specialized models (mentioned in comments, not implemented)
 
 #### Features
 - **Unified Interface**: Single API for all providers through `ai_service.py`

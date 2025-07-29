@@ -30,6 +30,25 @@ This project adheres to a code of conduct that promotes a welcoming and inclusiv
 
 ### Development Setup
 
+**🚀 Quick Developer Setup:**
+
+```bash
+git clone https://github.com/sgeraldes/hidock-next.git
+cd hidock-next
+python scripts/setup-dev.py
+# Choose option 2 (Developer)
+```
+
+This automated setup will:
+- ✅ Create proper Python virtual environments
+- ✅ Install all dependencies (Python + Node.js)
+- ✅ Run tests to verify everything works
+- ✅ Set up Git workflow with feature branches
+- ✅ Configure AI API keys (optional)
+- ✅ Provide guided next steps
+
+**Manual Setup (Alternative):**
+
 1. **Clone the repository:**
 
    ```bash
@@ -40,9 +59,10 @@ This project adheres to a code of conduct that promotes a welcoming and inclusiv
 2. **Set up Python environment:**
 
    ```bash
+   cd hidock-desktop-app
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install -r hidock_desktop_app/requirements.txt
+   pip install -r requirements.txt
    ```
 
 3. **Set up web application:**

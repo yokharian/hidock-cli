@@ -13,7 +13,10 @@
       "Bash(git commit:*)",
       "Bash(npm run lint)",
       "Bash(npx eslint:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(npm install:*)",
+      "Bash(grep:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
