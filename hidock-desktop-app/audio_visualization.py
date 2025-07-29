@@ -10,14 +10,14 @@ This module provides audio visualization capabilities including:
 Requirements: 9.3, 9.1, 9.2
 """
 
-import os
-import threading
-import time
-from typing import List, Optional, Tuple
+# import os  # Commented out - imported again in _load_theme_icons function where needed
+# import threading  # Commented out - not used in current implementation
+# import time  # Commented out - not used in current implementation
+from typing import Optional  # Removed List, Tuple - not used
 
 import customtkinter as ctk
 import matplotlib.animation as animation
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt  # Commented out - not used, using Figure directly
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -720,8 +720,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
     def _load_theme_icons(self):
         """Load theme toggle icons"""
         try:
-            import os
-
+            import os  # Import moved here from top-level to avoid unused import
             from PIL import Image
 
             # Get the script directory and construct icon paths

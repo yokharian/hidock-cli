@@ -11,13 +11,13 @@ Requirements: 9.3, 3.1, 3.2
 """
 
 import os
-import sys
+# import sys  # Future: system-level audio processing
 
 import numpy as np
-import scipy.fft as fft
+# import scipy.fft as fft  # Future: frequency domain analysis
 import scipy.signal as signal
 from scipy.io import wavfile
-from scipy.ndimage import median_filter
+# from scipy.ndimage import median_filter  # Future: noise reduction
 
 try:
     import librosa
@@ -28,12 +28,13 @@ except ImportError:
     ADVANCED_AUDIO_AVAILABLE = False
     librosa = None
     sf = None
-import queue
-import tempfile
-import threading
+# import queue  # Future: threaded audio processing
+# import tempfile  # Future: temporary file management
+# import threading  # Future: background processing
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
+# from typing import Union  # Future: union type annotations
 
 try:
     import noisereduce as nr
@@ -43,9 +44,9 @@ except ImportError:
     NOISEREDUCE_AVAILABLE = False
 
 try:
-    import pydub
+    # import pydub  # Future: audio format conversion
     from pydub import AudioSegment
-    from pydub.effects import compress_dynamic_range, normalize
+    # from pydub.effects import compress_dynamic_range, normalize  # Future: audio effects
 
     PYDUB_AVAILABLE = True
 except ImportError:
@@ -157,7 +158,7 @@ class AudioEnhancer:
                 progress_callback(10, "Analyzing audio...")
 
             # Analyze audio characteristics
-            analysis = self._analyze_audio(audio_data, sample_rate)
+            _analysis = self._analyze_audio(audio_data, sample_rate)  # Future: use for adaptive processing
 
             if progress_callback:
                 progress_callback(20, "Applying noise reduction...")

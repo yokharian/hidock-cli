@@ -2,18 +2,19 @@
 Tests for device communication functionality.
 """
 import struct
-import threading
+# import threading  # Future: threaded device communication tests
 import time
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import Mock, patch
+# from unittest.mock import MagicMock, call  # Future: additional mock functionality
 
 import pytest
 import usb.core
 import usb.util
 
 from constants import (
-    CMD_DELETE_FILE,
+    # CMD_DELETE_FILE,  # Future: delete command tests
     CMD_GET_DEVICE_INFO,
-    CMD_GET_FILE_LIST,
+    # CMD_GET_FILE_LIST,  # Future: file list command tests
     CMD_TRANSFER_FILE,
     DEFAULT_PRODUCT_ID,
     DEFAULT_VENDOR_ID,
@@ -273,7 +274,7 @@ class TestHiDockJensenEnhanced:
     ):
         """Test USB timeout error handling in send command."""
         # Setup connected device
-        mock_device = self._setup_connected_device(
+        _mock_device = self._setup_connected_device(  # Future: may need for additional assertions
             mock_find, mock_find_desc, jensen_device
         )
 

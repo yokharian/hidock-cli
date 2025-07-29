@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 import tkinter
+import traceback
 from tkinter import filedialog, messagebox
 
 import customtkinter as ctk
@@ -422,11 +423,11 @@ class EventHandlersMixin:
             )
             context_menu.add_command(
                 label="Transcribe (Gemini)",
-                command=lambda: self._transcribe_selected_audio_gemini(file_iid),
+                command=lambda: self._transcribe_selected_audio_gemini(item_iid),
             )
         context_menu.add_command(
             label="Process Audio",
-            command=lambda: self._process_selected_audio(file_iid),
+            command=lambda: self._process_selected_audio(item_iid),
         )
 
         if (

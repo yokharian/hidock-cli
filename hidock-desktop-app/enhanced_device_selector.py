@@ -10,8 +10,8 @@ Requirements: 6.1, 6.2, 6.3
 
 import os
 import threading
-import tkinter
-from typing import Callable, Dict, List, Optional
+# import tkinter  # Commented out - not used, customtkinter is used instead
+from typing import Callable, List, Optional  # Removed Dict - not used
 
 import customtkinter as ctk
 from PIL import Image

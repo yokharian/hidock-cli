@@ -12,15 +12,21 @@ It is designed to be used asynchronously and supports multiple AI providers
 through a unified interface. Returns mock responses for development without API keys.
 """
 
-import base64
 import json
 import os
-import tempfile
 import wave
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict
+# import base64  # Future: base64 encoding for audio data
+# import tempfile  # Future: temporary file operations
+# from typing import Literal, Optional  # Future: enhanced type annotations
 
 from ai_service import ai_service
 from config_and_logger import logger
+
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
 
 # --- Constants ---
 TRANSCRIPTION_FAILED_DEFAULT_MSG = "Transcription failed or no content returned."
@@ -84,6 +90,12 @@ def _call_gemini_api(
             )
         return mock_response
 
+    if genai is None:
+        logger.error(
+            "GeminiAPI", "_call_gemini_api", "google.generativeai not available. Install with: pip install google-generativeai"
+        )
+        return None
+        
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -291,7 +303,7 @@ async def process_audio_file_for_insights(
     try:
         # Check if it's an HTA file and convert it first
         ext = os.path.splitext(audio_file_path)[1].lower()
-        original_file_path = audio_file_path
+        _original_file_path = audio_file_path  # Future: for cleanup/restore operations
         temp_wav_file = None
 
         if ext == ".hta":

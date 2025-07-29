@@ -8,8 +8,8 @@ for handling file operations such as downloading, deleting, and transcribing.
 import json
 import os
 import threading
-import time
-import tkinter
+# import time  # Commented out - not used in current implementation
+# import tkinter  # Commented out - not used directly, only tkinter.messagebox is used
 import traceback
 from tkinter import messagebox
 

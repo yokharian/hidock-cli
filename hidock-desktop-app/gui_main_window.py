@@ -14,20 +14,20 @@ and optional log pane.
 """
 
 import asyncio
-import json
+# import json  # Commented out - not used in current implementation
 import os
 import subprocess
 import sys
-import tempfile
+# import tempfile  # Commented out - not used in current implementation
 import threading
-import time
+# import time  # Commented out - not used in current implementation
 import tkinter
 import traceback
-from datetime import datetime
-from tkinter import filedialog, messagebox, ttk
+from datetime import datetime  # Only datetime is used, not datetime.datetime specifically
+from tkinter import messagebox, ttk  # Removed filedialog - not used
 
 import customtkinter as ctk
-import usb.core
+# import usb.core  # Commented out - not used in current implementation
 from PIL import Image, ImageTk, UnidentifiedImageError
 
 from audio_player_enhanced import EnhancedAudioPlayer
@@ -39,7 +39,7 @@ from config_and_logger import Logger, load_config, logger, save_config
 
 # Import from our other modules
 from constants import DEFAULT_PRODUCT_ID, DEFAULT_VENDOR_ID
-from ctk_custom_widgets import CTkBanner
+# from ctk_custom_widgets import CTkBanner  # Commented out - not used
 from desktop_device_adapter import DesktopDeviceAdapter
 from device_interface import DeviceManager
 from file_operations_manager import FileOperationsManager
@@ -48,7 +48,7 @@ from gui_actions_file import FileActionsMixin
 from gui_auxiliary import AuxiliaryMixin
 from gui_event_handlers import EventHandlersMixin
 from gui_treeview import TreeViewMixin
-from settings_window import SettingsDialog
+# from settings_window import SettingsDialog  # Commented out - not used directly
 from storage_management import StorageMonitor, StorageOptimizer
 from transcription_module import process_audio_file_for_insights
 
@@ -2441,7 +2441,7 @@ class HiDockToolGUI(
         """Check for missing dependencies and show user-friendly warnings."""
         try:
             import shutil
-            import subprocess
+            # subprocess already imported at module level - no need to import again
             from tkinter import messagebox
 
             # Check for ffmpeg

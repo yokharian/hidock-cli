@@ -5,12 +5,12 @@ This adapter wraps the existing HiDockJensen class to implement the unified
 IDeviceInterface, providing consistent API across platforms.
 """
 
-import asyncio
-import threading
+# import asyncio  # Commented out - async functions use async/await but don't use asyncio directly
+# import threading  # Commented out - not used in current implementation
 import time
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+# from pathlib import Path  # Commented out - not used, may be needed for future file operations
+from typing import Callable, Dict, List, Optional  # Removed Any - not used
 
 from config_and_logger import logger
 from constants import DEFAULT_PRODUCT_ID, DEFAULT_VENDOR_ID
@@ -20,7 +20,7 @@ from device_interface import (
     DeviceCapability,
     DeviceHealth,
     DeviceInfo,
-    DeviceModel,
+    # DeviceModel,  # Commented out - not used directly, but detect_device_model returns it
     IDeviceInterface,
     OperationProgress,
     OperationStatus,
