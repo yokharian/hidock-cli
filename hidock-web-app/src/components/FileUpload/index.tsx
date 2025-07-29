@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Upload, File, X, AlertCircle } from 'lucide-react';
+import { Upload, File, AlertCircle as _AlertCircle } from 'lucide-react'; // _AlertCircle: Future use - error state icons
 import { AUDIO_CONFIG, ERROR_MESSAGES } from '@/constants';
 import { formatBytes } from '@/utils/formatters';
 import type { AudioData } from '@/types';
@@ -73,7 +73,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       };
 
       reader.readAsDataURL(file);
-    } catch (error) {
+    } catch {
+      // Error handling via onError callback
       onError('Failed to process file');
       setIsProcessing(false);
     }

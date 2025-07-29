@@ -221,7 +221,8 @@ class GeminiService {
             speakers: Array.isArray(parsed.speakers) ? parsed.speakers : [],
           };
         }
-      } catch (parseError) {
+      } catch {
+        // Intentionally unused - error is logged but not processed further
         console.warn('Failed to parse JSON response, using fallback parsing');
       }
 

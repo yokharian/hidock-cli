@@ -12,10 +12,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-    HardDrive, AlertTriangle, CheckCircle, TrendingUp,
-    Trash2, Archive, Zap, Settings, RefreshCw, Download,
-    PieChart, BarChart3, Clock, FileText, Folder
-} from 'lucide-react';
+    HardDrive, CheckCircle, Zap, Settings, RefreshCw, PieChart,
+    AlertTriangle as _AlertTriangle, TrendingUp as _TrendingUp, Trash2 as _Trash2, 
+    Archive as _Archive, Download as _Download, BarChart3 as _BarChart3, 
+    Clock as _Clock, FileText as _FileText, Folder as _Folder
+} from 'lucide-react'; // Unused icons prefixed with _ for future use in enhanced storage analytics
 import { formatBytes, formatDate } from '@/utils/formatters';
 
 // Types

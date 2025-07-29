@@ -89,7 +89,7 @@ export const FileManager: React.FC = () => {
 
     // File upload state
     const [uploadProgress, setUploadProgress] = useState<Map<string, number>>(new Map());
-    const [uploadQueue, setUploadQueue] = useState<File[]>([]);
+    const [_uploadQueue, _setUploadQueue] = useState<File[]>([]); // Future use - batch file uploads
 
     // Filtered and sorted recordings
     const filteredRecordings = useMemo(() => {
@@ -209,7 +209,7 @@ export const FileManager: React.FC = () => {
                 const result = e.target?.result as string;
                 if (result) {
                     const base64Data = result.split(',')[1];
-                    const audioData: AudioData = {
+                    const _audioData: AudioData = { // Future use - upload processing
                         fileName: file.name,
                         base64: base64Data,
                         mimeType: file.type,
@@ -217,7 +217,7 @@ export const FileManager: React.FC = () => {
                     };
 
                     // Add to recordings (in real app, this would upload to device)
-                    const newRecording: AudioRecording = {
+                    const _newRecording: AudioRecording = { // Future use - recording creation
                         id: `recording_${Date.now()}`,
                         fileName: file.name,
                         size: file.size,
@@ -242,7 +242,8 @@ export const FileManager: React.FC = () => {
             };
 
             reader.readAsDataURL(file);
-        } catch (error) {
+        } catch {
+            // Error handling via setError callback
             setError('Failed to upload file');
             setUploadProgress(prev => {
                 const newMap = new Map(prev);

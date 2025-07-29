@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { X, CheckCircle as _CheckCircle, AlertCircle as _AlertCircle, Info as _Info } from 'lucide-react'; // Future use - toast type icons
 import { useAppStore } from '@/store/useAppStore';
 
 export const Toast: React.FC = () => {

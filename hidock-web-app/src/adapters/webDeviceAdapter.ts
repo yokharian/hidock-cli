@@ -364,7 +364,8 @@ export class WebDeviceAdapter implements IDeviceInterface {
     async testConnection(): Promise<boolean> {
         try {
             return await deviceService.testConnection();
-        } catch (error) {
+        } catch {
+            // Error is caught but not processed for testConnection
             return false;
         }
     }

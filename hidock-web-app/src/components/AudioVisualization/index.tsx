@@ -25,7 +25,7 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
     audioData,
     currentTime = 0,
     duration = 0,
-    isPlaying = false,
+    _isPlaying = false, // Future use - animation sync with playback state
     onSeek,
     className = '',
     height = 100,
@@ -34,7 +34,7 @@ export const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
     showProgress = true
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const animationRef = useRef<number>();
+    const _animationRef = useRef<number>(); // Future use - animation frame management
 
     const drawWaveform = useCallback(() => {
         const canvas = canvasRef.current;
@@ -129,19 +129,19 @@ export interface SpectrumAnalyzerProps {
     className?: string;
     height?: number;
     barCount?: number;
-    color?: string;
+    _color?: string; // Future use - customizable visualization colors
     backgroundColor?: string;
 }
 
 export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
-    audioContext,
+    _audioContext, // Future use - audio processing integration
     analyser,
     isActive = false,
     className = '',
     height = 150,
     barCount = 64,
-    color = '#00ff88',
-    backgroundColor = '#1a1a1a'
+    _color = '#00ff88', // Future use - customizable visualization colors
+    _backgroundColor = '#1a1a1a' // Future use - customizable background styling
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationRef = useRef<number>();

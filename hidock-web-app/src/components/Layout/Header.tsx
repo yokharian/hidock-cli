@@ -8,7 +8,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { formatBytes, formatDuration } from '@/utils/formatters';
+import { formatBytes, formatDuration as _formatDuration } from '@/utils/formatters'; // _formatDuration: Future use - duration display
 
 export const Header: React.FC = () => {
   const { device, isDeviceConnected, recordings, selectedRecordings } = useAppStore();

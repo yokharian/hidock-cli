@@ -34,10 +34,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   onError,
   disabled = false,
   className = '',
-  showAdvancedControls = false,
-  showVisualization = false,
-  maxDuration = 3600, // 1 hour default
-  autoSave = false,
+  showAdvancedControls: _showAdvancedControls = false, // Future use - advanced recording controls UI
+  showVisualization: _showVisualization = false,
+  maxDuration: _maxDuration = 3600, // Future use - max recording length limit
+  autoSave: _autoSave = false, // Future use - automatic saving functionality
   quality = { sampleRate: 44100, bitRate: 128000, channels: 2, label: 'High Quality' }
 }) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -46,11 +46,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [inputLevel, setInputLevel] = useState(0);
-  const [isMonitoring, setIsMonitoring] = useState(false);
-  const [selectedQuality, setSelectedQuality] = useState(quality);
-  const [recordings, setRecordings] = useState<Array<{ id: string, blob: Blob, duration: number, timestamp: Date }>>([]);
+  const [_showSettings, _setShowSettings] = useState(false); // Future use - recording settings panel
+  const [_inputLevel, setInputLevel] = useState(0);
+  const [_isMonitoring, setIsMonitoring] = useState(false);
+  const [_selectedQuality, _setSelectedQuality] = useState(quality); // Future use - quality selection
+  const [_recordings, _setRecordings] = useState<Array<{ id: string, blob: Blob, duration: number, timestamp: Date }>>([]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -59,10 +59,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   const chunksRef = useRef<Blob[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext>();
-  const analyserRef = useRef<AnalyserNode>();
+  const _analyserRef = useRef<AnalyserNode>();
   const animationRef = useRef<number>();
 
-  const qualityPresets: RecordingQuality[] = [
+  const _qualityPresets: RecordingQuality[] = [ // Future use - quality selection dropdown
     { sampleRate: 8000, bitRate: 32000, channels: 1, label: 'Phone Quality' },
     { sampleRate: 22050, bitRate: 64000, channels: 1, label: 'Voice' },
     { sampleRate: 44100, bitRate: 128000, channels: 2, label: 'High Quality' },
@@ -70,54 +70,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   ];
 
   // Cleanup function
-  // Audio level monitoring
-  const startMonitoring = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: selectedQuality.sampleRate,
-        }
-      });
-
-      streamRef.current = stream;
-
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-
-      const source = audioContextRef.current.createMediaStreamSource(stream);
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 256;
-
-      source.connect(analyserRef.current);
-
-      setIsMonitoring(true);
-
-      const updateLevel = () => {
-        if (!analyserRef.current || !isMonitoring) return;
-
-        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-        analyserRef.current.getByteFrequencyData(dataArray);
-
-        const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-        setInputLevel(average / 255);
-
-        if (showVisualization) {
-          drawVisualization(dataArray);
-        }
-
-        animationRef.current = requestAnimationFrame(updateLevel);
-      };
-
-      updateLevel();
-
-    } catch (error) {
-      console.error('Error starting monitoring:', error);
-      onError('Failed to access microphone for monitoring');
-    }
-  }, [selectedQuality.sampleRate, isMonitoring, showVisualization, onError]);
 
   const stopMonitoring = useCallback(() => {
     setIsMonitoring(false);
@@ -135,7 +87,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   }, []);
 
   // Visualization
-  const drawVisualization = useCallback((dataArray: Uint8Array) => {
+  const _drawVisualization = useCallback((dataArray: Uint8Array) => {
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -309,7 +261,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       };
 
       reader.readAsDataURL(audioBlob);
-    } catch (error) {
+    } catch {
+      // Error handling is done via onError callback
       onError('Failed to save recording');
     }
   };

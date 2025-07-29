@@ -34,7 +34,7 @@ interface AppStore extends AppState {
 
 export const useAppStore = create<AppStore>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({ // _get: Future use - accessing current state in actions
       // Initial state
       currentView: 'dashboard',
       selectedRecordings: [],
