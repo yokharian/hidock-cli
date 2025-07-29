@@ -76,13 +76,46 @@ node --version
 # Linux: Use NodeSource repositories
 ```
 
+### pygame Installation Issues (Windows)
+
+#### Problem: pygame fails to install with compilation errors
+
+```bash
+# Error: ModuleNotFoundError: No module named 'setuptools._distutils.msvccompiler'
+# Error: Getting requirements to build wheel did not run successfully
+
+# Solution 1: Install pre-compiled binary only
+pip install pygame --only-binary=:all:
+
+# Solution 2: Force reinstall with no cache
+pip install pygame --force-reinstall --no-cache-dir --only-binary=:all:
+
+# Solution 3: Use specific pygame version
+pip install pygame==2.5.2 --only-binary=:all:
+
+# Solution 4: Install prerequisites first
+pip install --upgrade setuptools wheel
+pip install pygame --only-binary=:all:
+```
+
+#### Problem: pygame still fails after binary installation
+
+```bash
+# Alternative: Install from conda-forge
+conda install pygame -c conda-forge
+
+# Or: Skip pygame for now (audio features won't work)
+# Comment out pygame in requirements.txt temporarily
+```
+
 ## Desktop Application Issues
 
 ### Problem: Application won't start
 
 1. **Check Python version:**
    ```bash
-   python --version  # Should be 3.8 or higher
+   python --version  # Should be 3.12 for optimal compatibility
+   # Windows: py -0 to see all versions, py -3.12 to use specific version
    ```
 
 2. **Verify all dependencies installed:**

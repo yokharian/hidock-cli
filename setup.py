@@ -33,8 +33,9 @@ def run_command(command, cwd=None, check=True):
 def check_python_version():
     """Check if Python version is compatible."""
     version = sys.version_info
-    if version.major != 3 or version.minor < 8:
-        print(f"Python 3.8+ required, found {version.major}.{version.minor}")
+    if version.major != 3 or version.minor < 12:
+        print(f"Python 3.12 required for optimal compatibility, found {version.major}.{version.minor}")
+        print("Some packages (like librosa/numba) may not work with other versions")
         sys.exit(1)
     print(f"✓ Python {version.major}.{version.minor}.{version.micro}")
 
@@ -383,23 +384,24 @@ def setup_python_env():
         activate_script = "hidock-desktop-app/.venv/bin/activate"
         pip_cmd = ".venv/bin/pip"
 
-    print("Installing Python dependencies...")
+    print("Upgrading pip and installing build tools...")
     
-    # Upgrade pip first
-    result = run_command(f"{pip_cmd} install --upgrade pip", cwd=desktop_dir, check=False)
+    # Upgrade pip using the recommended method
+    if platform.system() == "Windows":
+        python_cmd = ".venv\\Scripts\\python"
+    else:
+        python_cmd = ".venv/bin/python"
+    
+    result = run_command(f"{python_cmd} -m pip install --upgrade pip setuptools wheel", cwd=desktop_dir, check=False)
     if result.returncode != 0:
         print("⚠️  Failed to upgrade pip (continuing anyway)")
     
-    # Install requirements
+    # Install requirements - same for all platforms
+    print("Installing dependencies (this may take a few minutes)...")
     result = run_command(f"{pip_cmd} install -r requirements.txt", cwd=desktop_dir, check=False)
     if result.returncode != 0:
-        print("❌ Failed to install Python dependencies!")
-        print("Common solutions:")
-        print("• Check internet connection")
-        print("• Try: pip install --upgrade setuptools wheel")
-        print("• For pygame issues on Windows: pip install pygame --only-binary=all")
-        print("• Manual install: cd hidock-desktop-app && .venv/Scripts/pip install -r requirements.txt")
-        print("• Check TROUBLESHOOTING.md for platform-specific issues")
+        print("❌ Failed to install dependencies!")
+        print("Check your internet connection and try again.")
         return False
 
     print("✓ Python environment ready")

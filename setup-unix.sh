@@ -31,8 +31,9 @@ fi
 
 # Check Python version
 PYTHON_VERSION=$($PYTHON_CMD --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
-if [ "$(printf '%s\n' "3.8" "$PYTHON_VERSION" | sort -V | head -n1)" != "3.8" ]; then
-    echo "❌ ERROR: Python 3.8+ required, found $PYTHON_VERSION"
+if [ "$(printf '%s\n' "3.12" "$PYTHON_VERSION" | sort -V | head -n1)" != "3.12" ]; then
+    echo "❌ ERROR: Python 3.12 required for optimal compatibility, found $PYTHON_VERSION"
+    echo "Some packages may not work with other versions"
     exit 1
 fi
 
@@ -46,43 +47,54 @@ if [ ! -d ".venv" ]; then
     $PYTHON_CMD -m venv .venv
 fi
 
-echo "Installing dependencies..."
+echo "Upgrading pip and installing dependencies..."
 source .venv/bin/activate
-pip install --upgrade pip
+python -m pip install --upgrade pip setuptools wheel
+echo "Installing dependencies (this may take a few minutes)..."
 pip install -r requirements.txt || {
     echo ""
-    echo "⚠️  WARNING: Some dependencies failed to install."
-    echo "The app might still work, or you may need to install them manually."
-    echo "Check TROUBLESHOOTING.md for help."
+    echo "❌ ERROR: Failed to install dependencies!"
+    echo "Check your internet connection and try again."
     echo ""
+    exit 1
 }
 
 echo "✅ Desktop app setup complete!"
 cd ..
 
-# Check Node.js for Web App
+# Check Node.js for Web Apps
 echo ""
-echo "[3/4] Checking Node.js for Web App..."
+echo "[3/4] Checking Node.js for Web Apps..."
 if command -v node &> /dev/null; then
     NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
     if [ "$NODE_VERSION" -ge 18 ]; then
-        echo "✓ Node.js found! Setting up web app..."
+        echo "✓ Node.js found! Setting up web apps..."
+        
+        echo "Setting up HiDock Web App..."
         cd hidock-web-app
         npm install || {
             echo "⚠️  WARNING: Web app setup failed"
-            echo "You can try running 'npm install' manually in hidock-web-app folder"
         }
         echo "✅ Web app setup complete!"
         cd ..
+        
+        echo "Setting up Audio Insights Extractor..."
+        cd audio-insights-extractor
+        npm install || {
+            echo "⚠️  WARNING: Audio Insights Extractor setup failed"
+        }
+        echo "✅ Audio Insights Extractor setup complete!"
+        cd ..
+        
         WEB_APP_READY=true
     else
         echo "⚠️  Node.js version $NODE_VERSION found, but 18+ required"
-        echo "Update Node.js if you want the web app"
+        echo "Update Node.js if you want the web apps"
         WEB_APP_READY=false
     fi
 else
-    echo "ℹ️  Node.js not found - skipping web app setup"
-    echo "Install Node.js 18+ from https://nodejs.org if you want the web app"
+    echo "ℹ️  Node.js not found - skipping web apps setup"
+    echo "Install Node.js 18+ from https://nodejs.org if you want the web apps"
     WEB_APP_READY=false
 fi
 
