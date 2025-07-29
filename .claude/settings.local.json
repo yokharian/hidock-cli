@@ -17,7 +17,12 @@
       "Bash(npm install:*)",
       "Bash(grep:*)",
       "Bash(node:*)",
-      "Bash(pre-commit run:*)"
+      "Bash(pre-commit run:*)",
+      "Bash(if [ -d .venv ])",
+      "Bash(then .venv/Scripts/python -m flake8 --exclude=.venv --max-line-length=120 ai_service.py audio_player_enhanced.py)",
+      "Bash(.venv/bin/python -m flake8:*)",
+      "Bash(else echo \"No .venv found\")",
+      "Bash(fi)"
     ],
     "deny": []
   }

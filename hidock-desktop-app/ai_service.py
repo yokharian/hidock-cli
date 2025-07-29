@@ -301,7 +301,8 @@ class OpenAIProvider(AIProvider):
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are an AI assistant that analyzes text and provides structured insights in JSON format.",
+                        "content": ("You are an AI assistant that analyzes text and provides "
+                                    "structured insights in JSON format."),
                     },
                     {
                         "role": "user",
@@ -399,7 +400,8 @@ class AnthropicProvider(AIProvider):
         )
         return {
             "success": False,
-            "error": "Claude doesn't support direct audio transcription. Please use another provider for transcription.",
+            "error": ("Claude doesn't support direct audio transcription. "
+                      "Please use another provider for transcription."),
             "provider": "anthropic",
         }
 
@@ -514,7 +516,8 @@ class OpenRouterProvider(AIProvider):
         )
         return {
             "success": False,
-            "error": "OpenRouter has limited audio transcription support. Please use OpenAI or Gemini for transcription.",
+            "error": ("OpenRouter has limited audio transcription support. "
+                      "Please use OpenAI or Gemini for transcription."),
             "provider": "openrouter",
         }
 
@@ -635,7 +638,8 @@ class OllamaProvider(AIProvider):
         )
         return {
             "success": False,
-            "error": "Ollama doesn't support direct audio transcription. Please use OpenAI Whisper or Gemini for transcription.",
+            "error": ("Ollama doesn't support direct audio transcription. "
+                      "Please use OpenAI Whisper or Gemini for transcription."),
             "provider": "ollama",
         }
 
@@ -748,7 +752,8 @@ class LMStudioProvider(AIProvider):
         )
         return {
             "success": False,
-            "error": "LM Studio doesn't support direct audio transcription. Please use OpenAI Whisper or Gemini for transcription.",
+            "error": ("LM Studio doesn't support direct audio transcription. "
+                      "Please use OpenAI Whisper or Gemini for transcription."),
             "provider": "lmstudio",
         }
 

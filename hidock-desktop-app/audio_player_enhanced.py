@@ -1028,7 +1028,8 @@ class EnhancedAudioPlayer:
                 logger.info(
                     "EnhancedAudioPlayer",
                     "_create_speed_adjusted_audio",
-                    f"Successfully created speed-adjusted audio at {speed}x: {temp_file} ({os.path.getsize(temp_file)} bytes)",
+                    f"Successfully created speed-adjusted audio at {speed}x: {temp_file} "
+                    f"({os.path.getsize(temp_file)} bytes)",
                 )
                 return True
             else:
