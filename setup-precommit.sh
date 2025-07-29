@@ -33,6 +33,7 @@ fi
 echo ""
 echo "Installing git hooks..."
 pre-commit install
+pre-commit install --hook-type pre-push
 
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to install git hooks!"

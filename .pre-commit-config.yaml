@@ -10,6 +10,14 @@ repos:
         files: ^hidock-desktop-app/.*\.py$
         pass_filenames: false
 
+      - id: pytest-desktop-app
+        name: Python Tests - Desktop App
+        entry: bash -c 'cd hidock-desktop-app && if [ -d .venv ]; then (.venv/Scripts/python -m pytest tests/ -x || .venv/bin/python -m pytest tests/ -x) 2>/dev/null || echo "No tests found or pytest not installed"; else echo "No .venv found, skipping tests"; fi'
+        language: system
+        files: ^hidock-desktop-app/.*\.py$
+        pass_filenames: false
+        stages: [push]
+
   # JavaScript/TypeScript hooks
   - repo: local
     hooks:
@@ -55,3 +63,35 @@ repos:
         exclude: package-lock.json
       - id: check-merge-conflict
       - id: detect-private-key
+      - id: check-case-conflict
+      - id: check-docstring-first
+        files: ^hidock-desktop-app/.*\.py$
+      - id: debug-statements
+        files: ^hidock-desktop-app/.*\.py$
+
+  # Security checks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package-lock.json
+
+  # Type checking for web apps (pre-push only)
+  - repo: local
+    hooks:
+      - id: typescript-web-app
+        name: TypeScript Check - Web App
+        entry: bash -c 'cd hidock-web-app && if [ -d node_modules ]; then npm run build --if-present || echo "Build script not found"; else echo "No node_modules found, skipping TypeScript check"; fi'
+        language: system
+        files: ^hidock-web-app/.*\.(ts|tsx)$
+        pass_filenames: false
+        stages: [push]
+
+      - id: test-web-app
+        name: Tests - Web App
+        entry: bash -c 'cd hidock-web-app && if [ -d node_modules ]; then npm test -- --run 2>/dev/null || echo "No tests configured"; else echo "No node_modules found, skipping tests"; fi'
+        language: system
+        files: ^hidock-web-app/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [push]

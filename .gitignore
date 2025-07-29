@@ -92,3 +92,6 @@ Desktop.ini
 
 
 ACCEPTANCE_CRITERIA.md
+
+# Pre-commit secrets detection
+.secrets.baseline
