@@ -16,10 +16,8 @@ Each provider supports audio transcription and text analysis capabilities.
 
 import base64
 import json
-import os
-import wave
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 from config_and_logger import logger
 

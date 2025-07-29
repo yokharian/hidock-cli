@@ -12,21 +12,13 @@ Requirements: 9.3, 9.1, 9.2
 
 import os
 import queue
-import struct
-import sys
-import tempfile
 import threading
-import time
 import wave
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, Dict, List, Optional, Tuple
 
-import customtkinter as ctk
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from scipy import signal
 from scipy.io import wavfile
 
 try:

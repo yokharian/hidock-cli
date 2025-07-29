@@ -110,7 +110,7 @@ export const generateMockAudioUrl = (recordingId: string): string => {
   return `data:audio/wav;base64,${btoa(`mock-audio-data-${recordingId}`)}`;
 };
 
-export const getMockInsights = (transcription: string) => {
+export const getMockInsights = (_transcription: string) => {
   return {
     summary: 'This is a mock summary of the transcribed content for demonstration purposes.',
     keyPoints: [

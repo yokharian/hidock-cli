@@ -281,9 +281,9 @@ describe('DeviceService WebUSB Implementation', () => {
 
         it('should get recordings list', async () => {
             // Set up specific mock for getRecordings call (sequence should be 4 after connection setup)
-            let getRecordingsCallCount = 0;
+            let _getRecordingsCallCount = 0;
             mockUSBDevice.transferIn.mockImplementation(() => {
-                getRecordingsCallCount++;
+                _getRecordingsCallCount++;
 
                 // File list response - proper format expected by parseFileListResponse
                 const fileName = 'test.wav';
@@ -404,7 +404,7 @@ describe('DeviceService WebUSB Implementation', () => {
 
             try {
                 await (deviceService as any).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO);
-            } catch (error) {
+            } catch (_error) {
                 // Expected to fail
             }
 
