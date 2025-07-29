@@ -65,7 +65,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(initialVolume);
   const [isMuted, setIsMuted] = useState(false);
-  const [isLooping, setIsLooping] = useState(loop);
+  const [isLooping, _setIsLooping] = useState(loop);
   const [isLoading, setIsLoading] = useState(false);
   const [currentSpeed, setCurrentSpeed] = useState(playbackSpeed);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -93,7 +93,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
     try {
       if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioContextRef.current = new (window.AudioContext || (window as AudioContext & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext || AudioContext)();
       }
 
       if (!sourceRef.current) {
@@ -330,15 +330,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     setCurrentSpeed(speed);
     onSpeedChange?.(speed);
   }, [disabled, onSpeedChange]);
-
-  const toggleLoop = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || disabled) return;
-
-    const newLoopState = !isLooping;
-    audio.loop = newLoopState;
-    setIsLooping(newLoopState);
-  }, [isLooping, disabled]);
 
   const cycleRepeatMode = useCallback(() => {
     if (disabled) return;

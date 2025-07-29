@@ -362,7 +362,7 @@ export const StorageManager: React.FC = () => {
                                     <span className="text-slate-100 font-medium">{analytics.duplicateFiles.length}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-slate-400">Old Files (>30 days)</span>
+                                    <span className="text-slate-400">Old Files (&gt;30 days)</span>
                                     <span className="text-slate-100 font-medium">{analytics.ageDistribution.old}</span>
                                 </div>
                             </div>

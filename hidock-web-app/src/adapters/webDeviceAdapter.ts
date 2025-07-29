@@ -64,7 +64,7 @@ export class WebDeviceAdapter implements IDeviceInterface {
         }
     }
 
-    async connect(deviceId?: string, autoRetry = true): Promise<DeviceInfo> {
+    async connect(deviceId?: string): Promise<DeviceInfo> {
         try {
             let hidockDevice;
 
@@ -284,7 +284,7 @@ export class WebDeviceAdapter implements IDeviceInterface {
         }
     }
 
-    async syncTime(targetTime?: Date): Promise<void> {
+    async syncTime(): Promise<void> {
         if (!this.isConnected()) {
             throw new Error('No device connected');
         }

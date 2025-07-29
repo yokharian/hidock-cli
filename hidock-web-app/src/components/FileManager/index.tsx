@@ -93,7 +93,7 @@ export const FileManager: React.FC = () => {
 
     // Filtered and sorted recordings
     const filteredRecordings = useMemo(() => {
-        let filtered = recordings.filter(recording => {
+        const filtered = recordings.filter(recording => {
             // Search filter
             if (filter.search && !recording.fileName.toLowerCase().includes(filter.search.toLowerCase())) {
                 return false;
