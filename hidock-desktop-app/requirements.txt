@@ -1,7 +1,7 @@
 pyusb
 customtkinter
 Pillow
-pygame
+pygame>=2.5.0  # Use recent version with Windows wheel support
 google-generativeai
 numpy
 scipy

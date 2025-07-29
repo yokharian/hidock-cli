@@ -51,10 +51,20 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt || {
     echo ""
-    echo "⚠️  WARNING: Some dependencies failed to install."
-    echo "The app might still work, or you may need to install them manually."
-    echo "Check TROUBLESHOOTING.md for help."
+    echo "❌ ERROR: Critical dependencies failed to install!"
+    echo "HiDock desktop app requires ALL dependencies (especially pygame for audio)."
+    echo "The app will NOT work without these dependencies."
     echo ""
+    echo "Common solutions:"
+    echo "• Check internet connection"
+    echo "• Install system audio libraries:"
+    echo "  Ubuntu/Debian: sudo apt install python3-dev libasound2-dev"
+    echo "  CentOS/RHEL: sudo dnf install python3-devel alsa-lib-devel" 
+    echo "  macOS: brew install portaudio (if needed)"
+    echo ""
+    echo "Check TROUBLESHOOTING.md for platform-specific solutions."
+    echo ""
+    exit 1
 }
 
 echo "✅ Desktop app setup complete!"

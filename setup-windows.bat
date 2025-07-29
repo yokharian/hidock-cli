@@ -33,18 +33,53 @@ if not exist .venv (
 )
 
 echo Installing dependencies...
-.venv\Scripts\pip install --upgrade pip
-.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\pip install --upgrade pip setuptools wheel
+
+echo Installing core dependencies...
+.venv\Scripts\pip install pyusb customtkinter Pillow google-generativeai numpy scipy pydub matplotlib librosa
+
+echo Installing pygame (CRITICAL for HiDock audio features)...
+.venv\Scripts\pip install pygame>=2.5.0 --only-binary=:all:
 
 if errorlevel 1 (
     echo.
-    echo WARNING: Some dependencies failed to install.
-    echo The app might still work, or you may need to install them manually.
-    echo Check TROUBLESHOOTING.md for help.
-    echo.
-) else (
-    echo Desktop app setup complete!
+    echo WARNING: pygame installation failed. Trying alternative approaches...
+    
+    echo Strategy 1: Force reinstall with no cache...
+    .venv\Scripts\pip install pygame --force-reinstall --no-cache-dir --only-binary=:all:
+    
+    if errorlevel 1 (
+        echo Strategy 2: Trying specific pygame version...
+        .venv\Scripts\pip install pygame==2.5.2 --only-binary=:all:
+        
+        if errorlevel 1 (
+            echo Strategy 3: Final attempt with latest pygame...
+            .venv\Scripts\pip install pygame --only-binary=:all:
+            
+            if errorlevel 1 (
+                echo.
+                echo ERROR: ALL pygame installation strategies failed!
+                echo pygame is MANDATORY for HiDock desktop app (audio playback).
+                echo The app will NOT work without pygame.
+                echo.
+                echo Manual installation required:
+                echo   1. .venv\Scripts\activate
+                echo   2. pip install --upgrade setuptools wheel
+                echo   3. pip install pygame --force-reinstall --only-binary=:all:
+                echo.
+                echo Or install Visual Studio Build Tools from:
+                echo https://visualstudio.microsoft.com/visual-cpp-build-tools/
+                echo.
+                echo Check TROUBLESHOOTING.md for more solutions.
+                echo.
+                pause
+                exit /b 1
+            )
+        )
+    )
 )
+
+echo Desktop app setup complete!
 
 cd ..
 

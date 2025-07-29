@@ -390,17 +390,68 @@ def setup_python_env():
     if result.returncode != 0:
         print("⚠️  Failed to upgrade pip (continuing anyway)")
     
-    # Install requirements
-    result = run_command(f"{pip_cmd} install -r requirements.txt", cwd=desktop_dir, check=False)
-    if result.returncode != 0:
-        print("❌ Failed to install Python dependencies!")
-        print("Common solutions:")
-        print("• Check internet connection")
-        print("• Try: pip install --upgrade setuptools wheel")
-        print("• For pygame issues on Windows: pip install pygame --only-binary=all")
-        print("• Manual install: cd hidock-desktop-app && .venv/Scripts/pip install -r requirements.txt")
-        print("• Check TROUBLESHOOTING.md for platform-specific issues")
-        return False
+    # Install requirements with better Windows pygame handling
+    if platform.system() == "Windows":
+        print("Installing dependencies with Windows optimizations...")
+        # Install setuptools and wheel first
+        run_command(f"{pip_cmd} install --upgrade setuptools wheel", cwd=desktop_dir, check=False)
+        
+        # Install most dependencies normally
+        result = run_command(f"{pip_cmd} install pyusb customtkinter Pillow google-generativeai numpy scipy pydub matplotlib librosa", cwd=desktop_dir, check=False)
+        
+        # Handle pygame separately with multiple strategies (CRITICAL for HiDock)
+        print("Installing pygame (CRITICAL for audio playback)...")
+        pygame_result = run_command(f"{pip_cmd} install pygame>=2.5.0 --only-binary=:all:", cwd=desktop_dir, check=False)
+        
+        if pygame_result.returncode != 0:
+            print("⚠️  pygame installation failed, trying alternative approaches...")
+            
+            # Strategy 2: Force reinstall with no cache
+            pygame_result = run_command(f"{pip_cmd} install pygame --force-reinstall --no-cache-dir --only-binary=:all:", cwd=desktop_dir, check=False)
+            
+            if pygame_result.returncode != 0:
+                # Strategy 3: Try specific version known to work
+                print("⚠️  Trying specific pygame version...")
+                pygame_result = run_command(f"{pip_cmd} install pygame==2.5.2 --only-binary=:all:", cwd=desktop_dir, check=False)
+                
+                if pygame_result.returncode != 0:
+                    # Strategy 4: Try without version constraint
+                    print("⚠️  Final attempt with latest pygame...")
+                    pygame_result = run_command(f"{pip_cmd} install pygame --only-binary=:all:", cwd=desktop_dir, check=False)
+            
+        # Install dev dependencies
+        run_command(f"{pip_cmd} install pytest>=7.0.0 pytest-cov>=4.0.0 pytest-mock>=3.10.0 pytest-asyncio>=0.21.0 black>=23.0.0 flake8>=6.0.0 isort>=5.12.0 pylint>=2.17.0 mypy>=1.0.0", cwd=desktop_dir, check=False)
+        
+        if result.returncode != 0:
+            print("❌ Failed to install core Python dependencies!")
+            print("Setup cannot continue. Check internet connection and try again.")
+            return False
+        elif pygame_result.returncode != 0:
+            print("❌ CRITICAL: pygame installation failed!")
+            print("pygame is MANDATORY for HiDock desktop app (audio playback)")
+            print("The app will NOT work without pygame.")
+            print("Solutions:")
+            print("• Try: pip install pygame --force-reinstall --only-binary=:all:")
+            print("• Install Visual Studio Build Tools if needed")
+            print("• Check TROUBLESHOOTING.md for Windows-specific solutions")
+            return False
+    else:
+        # Standard installation for Linux/Mac
+        result = run_command(f"{pip_cmd} install -r requirements.txt", cwd=desktop_dir, check=False)
+        if result.returncode != 0:
+            print("❌ CRITICAL: Failed to install Python dependencies!")
+            print("All dependencies (especially pygame) are MANDATORY for HiDock audio functionality.")
+            print("The desktop app will NOT work without these dependencies.")
+            print("")
+            print("Common solutions:")
+            print("• Check internet connection")
+            print("• Install system audio libraries:")
+            print("  Ubuntu/Debian: sudo apt install python3-dev libasound2-dev")
+            print("  CentOS/RHEL: sudo dnf install python3-devel alsa-lib-devel")
+            print("  macOS: brew install portaudio (if needed)")
+            print("• Try: pip install --upgrade setuptools wheel")
+            print("• Check TROUBLESHOOTING.md for platform-specific solutions")
+            return False
 
     print("✓ Python environment ready")
     print(f"  Activate with: {activate_script}")
