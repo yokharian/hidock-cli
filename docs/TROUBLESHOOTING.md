@@ -114,7 +114,8 @@ conda install pygame -c conda-forge
 
 1. **Check Python version:**
    ```bash
-   python --version  # Should be 3.8 or higher
+   python --version  # Should be 3.12 for optimal compatibility
+   # Windows: py -0 to see all versions, py -3.12 to use specific version
    ```
 
 2. **Verify all dependencies installed:**

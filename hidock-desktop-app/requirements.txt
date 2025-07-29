@@ -1,7 +1,7 @@
 pyusb
 customtkinter
 Pillow
-pygame>=2.5.0  # Use recent version with Windows wheel support
+pygame
 google-generativeai
 numpy
 scipy
@@ -10,12 +10,12 @@ matplotlib
 librosa
 
 # Development and testing dependencies
-pytest>=7.0.0
-pytest-cov>=4.0.0
-pytest-mock>=3.10.0
-pytest-asyncio>=0.21.0
-black>=23.0.0
-flake8>=6.0.0
-isort>=5.12.0
-pylint>=2.17.0
-mypy>=1.0.0
+pytest
+pytest-cov
+pytest-mock
+pytest-asyncio
+black
+flake8
+isort
+pylint
+mypy
