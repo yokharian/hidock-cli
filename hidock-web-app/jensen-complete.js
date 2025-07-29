@@ -1,13 +1,13 @@
 /**
  * @fileoverview
  * HiDock Jensen Protocol Implementation - Complete Documented Version
- * 
+ *
  * This file contains the complete implementation of the Jensen protocol used by HiDock devices.
  * It provides WebUSB communication capabilities for HiDock H1, H1E, and P1 devices.
- * 
+ *
  * The Jensen protocol is a custom binary protocol that uses specific packet structures
  * for communication with HiDock hardware devices over USB.
- * 
+ *
  * This is a fully documented and expanded version of the original minified jensen.js,
  * with detailed explanations of all magic numbers, protocol structures, and operations.
  */
@@ -18,29 +18,29 @@
 const HIDOCK_CONSTANTS = {
     // USB Vendor and Product IDs
     VENDOR_ID: 0x10E6,  // 4310 in decimal - HiDock's USB Vendor ID
-    
+
     // Product IDs for different HiDock models
     PRODUCT_IDS: {
         H1: 45068,   // 0xB00C - HiDock H1 model
-        H1E: 45069,  // 0xB00D - HiDock H1E model  
+        H1E: 45069,  // 0xB00D - HiDock H1E model
         P1: 45070    // 0xB00E - HiDock P1 model
     },
-    
+
     // USB Configuration
     USB_CONFIG_VALUE: 1,
     USB_INTERFACE_NUMBER: 0,
     USB_ALTERNATE_SETTING: 0,
-    
+
     // USB Endpoints
     ENDPOINT_OUT: 1,  // Endpoint for sending data to device
     ENDPOINT_IN: 2,   // Endpoint for receiving data from device
-    
+
     // Protocol Magic Numbers
     PACKET_SYNC_BYTES: [0x12, 0x34], // Packet synchronization bytes
     MAX_BUFFER_SIZE: 51200,           // 50KB - Maximum read buffer size
     MAX_PACKET_SIZE: 102400,          // 100KB - Maximum packet size for processing
     RECEIVE_TIMEOUT: 100,             // 100ms - Receive loop timeout
-    
+
     // Logger Configuration
     MAX_LOG_ENTRIES: 15000,  // Maximum number of log entries to keep
 };
@@ -55,26 +55,26 @@ const COMMAND_CODES = {
     GET_DEVICE_INFO: 1,           // Get device information (firmware, serial, etc.)
     GET_DEVICE_TIME: 2,           // Get current device time
     SET_DEVICE_TIME: 3,           // Set device time
-    
+
     // File Operations
     GET_FILE_LIST: 4,             // Get list of files on device
     TRANSFER_FILE: 5,             // Transfer/download file from device
     GET_FILE_COUNT: 6,            // Get total number of files
     DELETE_FILE: 7,               // Delete file from device
-    
+
     // Firmware Operations
     REQUEST_FIRMWARE_UPGRADE: 8,   // Request firmware upgrade
     FIRMWARE_UPLOAD: 9,           // Upload firmware data
-    
+
     // Device Testing/Debug
     DEVICE_MSG_TEST: 10,          // Device message test
     BNC_DEMO_TEST: 10,            // BNC demo test (same as device msg test)
-    
+
     // Settings Management
     GET_SETTINGS: 11,             // Get device settings
     SET_SETTINGS: 12,             // Set device settings
     GET_FILE_BLOCK: 13,           // Get file block (streaming)
-    
+
     // Storage Management
     GET_CARD_INFO: 16,            // Get storage card information
     FORMAT_CARD: 17,              // Format storage card
@@ -82,23 +82,23 @@ const COMMAND_CODES = {
     RESTORE_FACTORY_SETTINGS: 19, // Restore factory settings
     SEND_MEETING_SCHEDULE: 20,    // Send meeting schedule information
     READ_FILE_PART: 21,           // Read part of a file
-    
+
     // Tone/Audio Updates
     REQUEST_TONE_UPDATE: 22,      // Request tone update
     UPDATE_TONE: 23,              // Update tone data
     REQUEST_UAC_UPDATE: 24,       // Request UAC (USB Audio Class) update
     UPDATE_UAC: 25,               // Update UAC data
-    
+
     // Realtime Features
     GET_REALTIME_SETTINGS: 32,    // Get realtime settings
     CONTROL_REALTIME: 33,         // Control realtime operations
     GET_REALTIME_DATA: 34,        // Get realtime data
-    
+
     // Bluetooth Operations (P1 model only)
     BLUETOOTH_SCAN: 4097,         // 0x1001 - Scan for Bluetooth devices
     BLUETOOTH_CMD: 4098,          // 0x1002 - Bluetooth command
     BLUETOOTH_STATUS: 4099,       // 0x1003 - Get Bluetooth status
-    
+
     // Factory/Testing Commands
     FACTORY_RESET: 61451,         // 0xF00B - Factory reset
     TEST_SN_WRITE: 61447,         // 0xF007 - Test serial number write
@@ -215,7 +215,7 @@ class JensenLogger {
         };
 
         this.messages.push(logEntry);
-        
+
         if (this.consoleOutput) {
             this._print(logEntry);
         }
@@ -353,7 +353,7 @@ class KeyboardShortcutBuilder {
      */
     build(reportId = 3, reserved = 0) {
         let modifiers = reserved;
-        
+
         // Build modifier byte
         if (this.control) modifiers |= 0x01;  // Left Ctrl
         if (this.shift) modifiers |= 0x02;    // Left Shift
@@ -382,7 +382,7 @@ class KeyboardShortcutBuilder {
 /**
  * Create modifier-only keyboard report
  * @param {boolean} ctrl - Control key pressed
- * @param {boolean} shift - Shift key pressed  
+ * @param {boolean} shift - Shift key pressed
  * @param {boolean} alt - Alt key pressed
  * @param {boolean} gui - GUI key pressed
  * @returns {number[]} 2-byte modifier report
@@ -411,7 +411,7 @@ const MEETING_SHORTCUTS = {
             ...createModifierReport(false, true),  // Shift modifier
             ...new KeyboardShortcutBuilder().build(4, 1),  // Custom report
             ...new KeyboardShortcutBuilder().withAlt().withKey("Q").build(),  // Alt+Q
-            ...new KeyboardShortcutBuilder().build(4, 16), // Custom report  
+            ...new KeyboardShortcutBuilder().build(4, 16), // Custom report
             ...EMPTY_BYTES,
         ],
         Mac: [
@@ -426,12 +426,12 @@ const MEETING_SHORTCUTS = {
             ...EMPTY_BYTES, ...EMPTY_BYTES, ...EMPTY_BYTES, ...EMPTY_BYTES
         ],
     },
-    
+
     teams: {
         Windows: [
             ...createModifierReport(),
             ...new KeyboardShortcutBuilder().withControl().withShift().withKey("A").build(), // Ctrl+Shift+A
-            ...new KeyboardShortcutBuilder().withControl().withShift().withKey("H").build(), // Ctrl+Shift+H  
+            ...new KeyboardShortcutBuilder().withControl().withShift().withKey("H").build(), // Ctrl+Shift+H
             ...new KeyboardShortcutBuilder().withControl().withShift().withKey("D").build(), // Ctrl+Shift+D
             ...new KeyboardShortcutBuilder().withControl().withShift().withKey("M").build(), // Ctrl+Shift+M
         ],
@@ -555,13 +555,13 @@ class JensenPacket {
     /**
      * Build the final packet bytes for transmission
      * Jensen Protocol Packet Structure:
-     * 
+     *
      * Bytes 0-1:   Sync bytes (0x12, 0x34)
      * Bytes 2-3:   Command ID (16-bit big-endian)
-     * Bytes 4-7:   Sequence ID (32-bit big-endian) 
+     * Bytes 4-7:   Sequence ID (32-bit big-endian)
      * Bytes 8-11:  Body length (32-bit big-endian)
      * Bytes 12+:   Body data
-     * 
+     *
      * @returns {Uint8Array} Complete packet ready for transmission
      */
     make() {
@@ -624,18 +624,18 @@ class Jensen {
     constructor(logger) {
         // Logger for debug/error tracking
         this.logger = logger || new JensenLogger();
-        
+
         // USB Device connection
         this.device = null;
         this.model = "unknown";
         this.versionCode = null;
         this.versionNumber = null;
         this.serialNumber = null;
-        
+
         // Connection state
         this.isConnectedFlag = false;
         this.isStopConnectionCheck = false;
-        
+
         // Protocol state
         this.sequenceId = 0;
         this.receiveBuffer = new Uint8Array(0);
@@ -643,7 +643,7 @@ class Jensen {
         this.pendingCommands = [];          // Queue of commands to send
         this.currentCommand = null;         // Currently executing command
         this.connectionCheckTimer = null;
-        
+
         // Device settings cache
         this.deviceBehaviorSettings = {
             autoRecord: null,
@@ -651,21 +651,21 @@ class Jensen {
             bluetoothTone: null,
             notificationSound: null,
         };
-        
+
         // Receive processing
         this.decodeTimeout = 0;
         this.timewait = 1;  // Time to wait between operations
-        
+
         // File transfer state
         this.fileLength = 0;
         this.fileReadBytes = 0;
         this.onFileRecvHandler = null;
-        
+
         // Callbacks
         this.ondisconnect = null;
         this.onconnect = null;
         this.onreceive = null;
-        
+
         // Initialize command handlers
         this._initializeCommandHandlers();
     }
@@ -694,7 +694,7 @@ class Jensen {
      */
     async connect() {
         this.logger.debug("jensen", "connect", "Requesting device access");
-        
+
         if (await this.tryconnect()) {
             return;
         }
@@ -721,20 +721,20 @@ class Jensen {
      */
     async tryconnect(silent = false) {
         await this.disconnect();
-        
+
         const devices = await navigator.usb.getDevices();
-        
+
         for (const device of devices) {
             if (device.productName && device.productName.indexOf("HiDock") > -1) {
                 this.logger.debug("jensen", "tryconnect", `Detected: ${device.productName}`);
-                
+
                 await device.open();
                 this.device = device;
                 await this._setupDevice(silent);
                 return true;
             }
         }
-        
+
         this.logger.debug("jensen", "tryconnect", "No HiDock device found");
         return false;
     }
@@ -755,13 +755,13 @@ class Jensen {
             await this.device.selectConfiguration(HIDOCK_CONSTANTS.USB_CONFIG_VALUE);
             await this.device.claimInterface(HIDOCK_CONSTANTS.USB_INTERFACE_NUMBER);
             await this.device.selectAlternateInterface(
-                HIDOCK_CONSTANTS.USB_INTERFACE_NUMBER, 
+                HIDOCK_CONSTANTS.USB_INTERFACE_NUMBER,
                 HIDOCK_CONSTANTS.USB_ALTERNATE_SETTING
             );
 
             // Determine device model from Product ID
             this.model = this._getModelFromProductId(this.device.productId);
-            
+
         } catch (error) {
             this.logger.error("jensen", "setup", `Setup failed: ${error.message}`);
         }
@@ -773,7 +773,7 @@ class Jensen {
 
         this.currentCommand = null;
         this.isConnectedFlag = false;
-        
+
         this.logger.debug("jensen", "setup", "WebUSB connection setup complete");
 
         // Trigger connect callback
@@ -814,7 +814,7 @@ class Jensen {
             if (!this.device?.opened) {
                 try {
                     clearTimeout(this.connectionCheckTimer);
-                    
+
                     // Clean up test audio element if it exists
                     const testAudio = document.getElementById("test_audio");
                     if (testAudio) {
@@ -857,7 +857,7 @@ class Jensen {
      */
     async disconnect() {
         this.logger.info("jensen", "disconnect", "Disconnecting from device");
-        
+
         try {
             if (this.device) {
                 await this.device.close();
@@ -865,7 +865,7 @@ class Jensen {
         } catch (error) {
             this.logger.error("jensen", "disconnect", `Error closing device: ${error.message}`);
         }
-        
+
         this.device = null;
         this.isConnectedFlag = false;
     }
@@ -881,17 +881,17 @@ class Jensen {
         // Set sequence ID and callbacks
         packet.sequence(this.sequenceId++);
         packet.onprogress = progressCallback;
-        
+
         if (timeout) {
             packet.expireAfter(timeout);
         }
 
         // Add to command queue
         this.pendingCommands.push(packet);
-        
+
         // Start processing queue
         this._processCommandQueue();
-        
+
         // Return promise that will be resolved when response arrives
         return this._createCommandPromise(packet, timeout);
     }
@@ -909,10 +909,10 @@ class Jensen {
         while (this.pendingCommands.length > 0) {
             const packet = this.pendingCommands.shift();
             const currentTime = new Date().getTime();
-            
+
             // Skip expired commands
             if (packet.expireTime > 0 && packet.expireTime < currentTime) {
-                this.logger.info("jensen", "sendNext", 
+                this.logger.info("jensen", "sendNext",
                     `Expired: cmd-${packet.command}-${packet.index}, ${COMMAND_NAMES[packet.command]}`);
                 continue;
             }
@@ -930,17 +930,17 @@ class Jensen {
     async _sendCommand(packet) {
         const packetBytes = packet.make();
         this.currentCommand = `cmd-${packet.command}-${packet.index}`;
-        
-        this.logger.debug("jensen", "sendNext", 
+
+        this.logger.debug("jensen", "sendNext",
             `Command: ${COMMAND_NAMES[packet.command]}, data bytes: ${packetBytes.byteLength}`);
 
         // Set timing - file transfers need longer waits
-        this.timewait = (packet.command === COMMAND_CODES.TRANSFER_FILE || 
+        this.timewait = (packet.command === COMMAND_CODES.TRANSFER_FILE ||
                         packet.command === COMMAND_CODES.GET_FILE_BLOCK) ? 1000 : 10;
 
         try {
             await this.device.transferOut(HIDOCK_CONSTANTS.ENDPOINT_OUT, packetBytes);
-            
+
             // Report progress if callback provided
             if (packet.onprogress) {
                 packet.onprogress(1, 1);
@@ -963,7 +963,7 @@ class Jensen {
      */
     _createCommandPromise(packet, timeout) {
         const commandKey = `cmd-${packet.command}-${packet.index}`;
-        
+
         const timeoutHandle = timeout ? setTimeout(() => {
             this._timeoutCommand(commandKey);
         }, timeout * 1000) : null;
@@ -991,7 +991,7 @@ class Jensen {
         const expectedPrefix = this.currentCommand.substring(0, this.currentCommand.lastIndexOf("-"));
         const actualPrefix = `cmd-${commandId}`;
 
-        this.logger.debug("jensen", "trigger", 
+        this.logger.debug("jensen", "trigger",
             `Trigger - ${expectedPrefix} <---> ${actualPrefix}`);
 
         if (expectedPrefix !== actualPrefix) {
@@ -1002,11 +1002,11 @@ class Jensen {
         // Find and resolve the pending promise
         if (this.currentCommand in this.pendingPromises) {
             const promise = this.pendingPromises[this.currentCommand];
-            
+
             if (promise.timeout) {
                 clearTimeout(promise.timeout);
             }
-            
+
             promise.resolve(response);
             delete this.pendingPromises[this.currentCommand];
             this.currentCommand = null;
@@ -1021,7 +1021,7 @@ class Jensen {
      */
     _timeoutCommand(commandKey) {
         this.logger.debug("jensen", "timeout", `Timeout ${commandKey}`);
-        
+
         if (commandKey in this.pendingPromises) {
             this.pendingPromises[commandKey].resolve(null);
             delete this.pendingPromises[commandKey];
@@ -1053,10 +1053,10 @@ class Jensen {
 
         try {
             const result = await this.device.transferIn(
-                HIDOCK_CONSTANTS.ENDPOINT_IN, 
+                HIDOCK_CONSTANTS.ENDPOINT_IN,
                 HIDOCK_CONSTANTS.MAX_BUFFER_SIZE
             );
-            
+
             this._processReceivedData(result);
         } catch (error) {
             this.logger.error("jensen", "receive", `Receive error: ${error.message}`);
@@ -1070,18 +1070,18 @@ class Jensen {
     _processReceivedData(result) {
         // Accumulate bytes transferred
         const bytesReceived = result.data?.byteLength || 0;
-        
+
         // Add to receive buffer
         this.receiveBuffer = this._appendToBuffer(this.receiveBuffer, result.data);
-        
+
         // Continue receiving
         this._receiveData();
-        
+
         // Clear existing decode timeout and set new one
         if (this.decodeTimeout) {
             clearTimeout(this.decodeTimeout);
         }
-        
+
         this.decodeTimeout = setTimeout(() => {
             this._decodeReceivedData();
         }, this.timewait);
@@ -1102,7 +1102,7 @@ class Jensen {
      */
     _appendToBuffer(buffer, newData) {
         if (!newData) return buffer;
-        
+
         const combined = new Uint8Array(buffer.length + newData.byteLength);
         combined.set(buffer);
         combined.set(new Uint8Array(newData), buffer.length);
@@ -1124,11 +1124,11 @@ class Jensen {
         }
 
         let parseOffset = 0;
-        
+
         // Process all complete packets in buffer
         while (true) {
             let packet = null;
-            
+
             try {
                 packet = this._parsePacket(processingBuffer, parseOffset, bufferLength);
             } catch (error) {
@@ -1142,12 +1142,12 @@ class Jensen {
 
             parseOffset += packet.length;
             const response = packet.message;
-            
+
             // Log received packet (except file transfer data)
             if (response.id !== COMMAND_CODES.TRANSFER_FILE) {
                 const commandName = COMMAND_NAMES[response.id] || "unknown";
                 const bodyLength = response.body?.byteLength || 0;
-                
+
                 // Show first 32 bytes of response for debugging
                 const debugBytes = [];
                 for (let i = 0; i < Math.min(bodyLength, 32); i++) {
@@ -1155,7 +1155,7 @@ class Jensen {
                     debugBytes.push("0" + byte.toString(16).replace(/^0(\w{2})$/gi, "$1"));
                 }
 
-                this.logger.debug("jensen", "receive", 
+                this.logger.debug("jensen", "receive",
                     `Recv: ${commandName}, seq: ${response.sequence}, ` +
                     `data bytes: ${bodyLength}, data: ${debugBytes.join(" ")}`);
             }
@@ -1168,7 +1168,7 @@ class Jensen {
                 }
             } catch (error) {
                 this._triggerCommandCompletion(error, response.id);
-                this.logger.error("jensen", "receive", 
+                this.logger.error("jensen", "receive",
                     `Recv: ${COMMAND_NAMES[response.id]}, seq: ${response.sequence}, error: ${error.message}`);
             }
 
@@ -1188,7 +1188,7 @@ class Jensen {
                 }
                 this._triggerCommandCompletion(null, commandId);
             }
-            
+
             // Clear buffer on parse error
             this.receiveBuffer = new Uint8Array(0);
         } else {
@@ -1212,20 +1212,20 @@ class Jensen {
      */
     _parsePacket(buffer, offset, length) {
         const remainingBytes = length - offset;
-        
+
         // Need at least 12 bytes for header
         if (remainingBytes < 12) {
             return null;
         }
 
         // Check sync bytes
-        if (buffer[offset] !== HIDOCK_CONSTANTS.PACKET_SYNC_BYTES[0] || 
+        if (buffer[offset] !== HIDOCK_CONSTANTS.PACKET_SYNC_BYTES[0] ||
             buffer[offset + 1] !== HIDOCK_CONSTANTS.PACKET_SYNC_BYTES[1]) {
             throw new Error("Invalid packet header - sync bytes not found");
         }
 
         let headerOffset = 2;
-        
+
         // Parse command ID (16-bit big-endian)
         const commandId = this._read16BitBigEndian(buffer, offset + headerOffset);
         headerOffset += 2;
@@ -1250,7 +1250,7 @@ class Jensen {
         // Extract body data
         const body = buffer.slice(offset + headerOffset, offset + headerOffset + bodyLength);
 
-        this.logger.debug("jensen", "parsePacket", 
+        this.logger.debug("jensen", "parsePacket",
             `CMD: ${commandId}, Seq: ${sequenceId}, BodyLen: ${bodyLength}`);
 
         return {
@@ -1290,13 +1290,13 @@ class Jensen {
      */
     to_bcd(decimalString) {
         const bcdBytes = [];
-        
+
         for (let i = 0; i < decimalString.length; i += 2) {
             const highNibble = (decimalString.charCodeAt(i) - 48) & 0xFF;
             const lowNibble = (decimalString.charCodeAt(i + 1) - 48) & 0xFF;
             bcdBytes.push((highNibble << 4) | lowNibble);
         }
-        
+
         return bcdBytes;
     }
 
@@ -1307,13 +1307,13 @@ class Jensen {
      */
     from_bcd(...bcdBytes) {
         let result = "";
-        
+
         for (const byte of bcdBytes) {
             const maskedByte = byte & 0xFF;
             result += ((maskedByte >> 4) & 0x0F).toString();
             result += (maskedByte & 0x0F).toString();
         }
-        
+
         return result;
     }
 
@@ -1348,9 +1348,9 @@ class Jensen {
     async setTime(date, timeout) {
         const timeString = formatDateToBCD(date);
         const bcdBytes = this.to_bcd(timeString);
-        
+
         return this.send(
-            new JensenPacket(COMMAND_CODES.SET_DEVICE_TIME).body(bcdBytes), 
+            new JensenPacket(COMMAND_CODES.SET_DEVICE_TIME).body(bcdBytes),
             timeout
         );
     }
@@ -1371,7 +1371,7 @@ class Jensen {
      */
     async listFiles() {
         const cacheKey = "filelist";
-        
+
         // Return null if already processing
         if (this[cacheKey] != null) {
             return null;
@@ -1402,18 +1402,18 @@ class Jensen {
             }
 
             jensenInstance[cacheKey].push(response.body);
-            
+
             // Parse accumulated file data
             const files = this._parseFileListData(jensenInstance[cacheKey]);
             const expectedCount = fileCountResponse ? fileCountResponse.count : -1;
-            
+
             // Check if we have all files
             if ((fileCountResponse && files.length >= fileCountResponse.count) ||
                 (expectedCount > -1 && files.length >= expectedCount)) {
                 jensenInstance[cacheKey] = null;
                 return files.filter(file => !!file.time);
             }
-            
+
             return undefined; // Continue receiving
         });
 
@@ -1438,8 +1438,8 @@ class Jensen {
         }
 
         // Check for header with total file count
-        if (allBytes.length >= 6 && 
-            (allBytes[0] & 0xFF) === 0xFF && 
+        if (allBytes.length >= 6 &&
+            (allBytes[0] & 0xFF) === 0xFF &&
             (allBytes[1] & 0xFF) === 0xFF) {
             totalFileCount = ((allBytes[2] & 0xFF) << 24) |
                            ((allBytes[3] & 0xFF) << 16) |
@@ -1452,10 +1452,10 @@ class Jensen {
         while (parseOffset < allBytes.length) {
             const fileInfo = this._parseFileEntry(allBytes, parseOffset);
             if (!fileInfo) break;
-            
+
             files.push(fileInfo.file);
             parseOffset = fileInfo.nextOffset;
-            
+
             if (totalFileCount !== -1 && files.length >= totalFileCount) {
                 break;
             }
@@ -1517,10 +1517,10 @@ class Jensen {
         const createTime = this._parseFilenameDate(filename);
 
         const formatTime = (num) => num > 9 ? num.toString() : "0" + num;
-        
+
         let createDate = "";
         let createTimeStr = "";
-        
+
         if (createTime) {
             createDate = `${createTime.getFullYear()}/${formatTime(createTime.getMonth() + 1)}/${formatTime(createTime.getDate())}`;
             createTimeStr = `${formatTime(createTime.getHours())}:${formatTime(createTime.getMinutes())}:${formatTime(createTime.getSeconds())}`;
@@ -1611,7 +1611,7 @@ class Jensen {
         for (let i = 0; i < filename.length; i++) {
             filenameBytes.push(filename.charCodeAt(i));
         }
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.DELETE_FILE).body(filenameBytes),
             timeout
@@ -1634,7 +1634,7 @@ class Jensen {
             throw new Error("Parameter 'length' must greater than zero");
         }
 
-        this.logger.info("jensen", "streaming", 
+        this.logger.info("jensen", "streaming",
             `File download start. filename: ${filename}, length: ${fileLength}`);
 
         const filenameBytes = [];
@@ -1650,9 +1650,9 @@ class Jensen {
             if (response != null) {
                 receivedBytes += response.body.length || response.body.byteLength;
                 dataCallback(response.body);
-                
+
                 this.logger.info("jensen", "streaming length", `${fileLength} ${receivedBytes}`);
-                
+
                 if (receivedBytes >= fileLength) {
                     this.logger.info("jensen", "streaming", "File download finish.");
                     return "OK";
@@ -1673,11 +1673,11 @@ class Jensen {
      */
     async getSettings(timeout) {
         // Check firmware version compatibility
-        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") && 
+        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") &&
             this.versionNumber < 327714) {
             return { autoRecord: false, autoPlay: false };
         }
-        
+
         return this.send(new JensenPacket(COMMAND_CODES.GET_SETTINGS), timeout);
     }
 
@@ -1688,11 +1688,11 @@ class Jensen {
      * @returns {Promise} Promise resolving to operation result
      */
     setAutoRecord(enabled, timeout) {
-        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") && 
+        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") &&
             this.versionNumber < 327714) {
             return { result: false };
         }
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.SET_SETTINGS).body([0, 0, 0, enabled ? 1 : 2]),
             timeout
@@ -1706,11 +1706,11 @@ class Jensen {
      * @returns {Promise} Promise resolving to operation result
      */
     setAutoPlay(enabled, timeout) {
-        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") && 
+        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") &&
             this.versionNumber < 327714) {
             return { result: false };
         }
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.SET_SETTINGS).body([0, 0, 0, 0, 0, 0, 0, enabled ? 1 : 2]),
             timeout
@@ -1724,11 +1724,11 @@ class Jensen {
      * @returns {Promise} Promise resolving to operation result
      */
     setNotification(enabled, timeout) {
-        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") && 
+        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") &&
             this.versionNumber < 327714) {
             return { result: false };
         }
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.SET_SETTINGS).body([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, enabled ? 1 : 2]),
             timeout
@@ -1744,14 +1744,14 @@ class Jensen {
     setBluetoothPromptPlay(enabled, timeout) {
         const isCompatible = (this.model === "hidock-h1e" && this.versionNumber >= 393476) ||
                             (this.model === "hidock-h1" && this.versionNumber >= 327940);
-        
+
         if (!isCompatible) {
             return { result: false };
         }
-        
+
         const bodyBytes = new Array(16).fill(0);
         bodyBytes[15] = enabled ? 2 : 1;
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.SET_SETTINGS).body(bodyBytes),
             timeout
@@ -1764,11 +1764,11 @@ class Jensen {
      * @returns {Promise} Promise resolving to card info
      */
     getCardInfo(timeout) {
-        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") && 
+        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") &&
             this.versionNumber < 327733) {
             return null;
         }
-        
+
         return this.send(new JensenPacket(COMMAND_CODES.GET_CARD_INFO), timeout);
     }
 
@@ -1778,11 +1778,11 @@ class Jensen {
      * @returns {Promise} Promise resolving to operation result
      */
     formatCard(timeout) {
-        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") && 
+        if ((this.model === "hidock-h1" || this.model === "hidock-h1e") &&
             this.versionNumber < 327733) {
             return null;
         }
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.FORMAT_CARD).body([1, 2, 3, 4]),
             timeout
@@ -1797,11 +1797,11 @@ class Jensen {
     async factoryReset(timeout) {
         const isCompatible = (this.model === "hidock-h1" || this.model === "hidock-h1e") &&
                             this.versionNumber >= 327705;
-        
+
         if (!isCompatible) {
             return null;
         }
-        
+
         return this.send(new JensenPacket(COMMAND_CODES.FACTORY_RESET), timeout);
     }
 
@@ -1813,13 +1813,13 @@ class Jensen {
     sendScheduleInfo(schedules) {
         if (Array.isArray(schedules) && schedules.length) {
             let scheduleBytes = [];
-            
+
             for (const schedule of schedules) {
                 // Default to empty 34-byte array
                 let platformBytes = new Array(34).fill(0);
-                
+
                 // Get platform-specific shortcuts if available
-                if (MEETING_SHORTCUTS[schedule.platform] && 
+                if (MEETING_SHORTCUTS[schedule.platform] &&
                     MEETING_SHORTCUTS[schedule.platform][schedule.os]) {
                     platformBytes = MEETING_SHORTCUTS[schedule.platform][schedule.os];
                 }
@@ -1827,7 +1827,7 @@ class Jensen {
                 // Convert dates to BCD format
                 let startDateBytes = new Array(8).fill(0);
                 let endDateBytes = new Array(8).fill(0);
-                
+
                 if (schedule.startDate && schedule.endDate) {
                     const startBCD = hexStringToBytes(formatDateToBCD(schedule.startDate));
                     const endBCD = hexStringToBytes(formatDateToBCD(schedule.endDate));
@@ -1838,12 +1838,12 @@ class Jensen {
                 const reservedBytes = [0, 0];
                 scheduleBytes = scheduleBytes.concat([
                     ...startDateBytes,
-                    ...endDateBytes, 
+                    ...endDateBytes,
                     ...reservedBytes,
                     ...platformBytes
                 ]);
             }
-            
+
             return this.send(new JensenPacket(COMMAND_CODES.SEND_MEETING_SCHEDULE).body(scheduleBytes));
         } else {
             // Send empty schedule (clear all)
@@ -1865,7 +1865,7 @@ class Jensen {
         if (this.model !== "hidock-p1") {
             return null;
         }
-        
+
         return this.send(new JensenPacket(COMMAND_CODES.BLUETOOTH_SCAN), timeout);
     }
 
@@ -1905,7 +1905,7 @@ class Jensen {
         if (this.model !== "hidock-p1") {
             return null;
         }
-        
+
         return this.send(
             new JensenPacket(COMMAND_CODES.BLUETOOTH_CMD).body([1]),
             timeout
@@ -1921,7 +1921,7 @@ class Jensen {
         if (this.model !== "hidock-p1") {
             return null;
         }
-        
+
         return this.send(new JensenPacket(COMMAND_CODES.BLUETOOTH_STATUS), timeout);
     }
 
@@ -2031,7 +2031,7 @@ class Jensen {
         // Delete file response handler
         Jensen.registerHandler(COMMAND_CODES.DELETE_FILE, (response) => {
             let result = "failed";
-            
+
             switch (response.body[0]) {
                 case 0: result = "success"; break;
                 case 1: result = "not-exists"; break;
@@ -2044,7 +2044,7 @@ class Jensen {
         // Card info response handler
         Jensen.registerHandler(COMMAND_CODES.GET_CARD_INFO, (response) => {
             let offset = 0;
-            
+
             return {
                 used: ((response.body[offset++] & 0xFF) << 24) |
                       ((response.body[offset++] & 0xFF) << 16) |
@@ -2071,7 +2071,7 @@ class Jensen {
             for (let i = 0; i < deviceCount; i++) {
                 const nameLength = ((response.body[offset++] & 0xFF) << 8) | (response.body[offset++] & 0xFF);
                 const nameBytes = new Uint8Array(nameLength);
-                
+
                 for (let j = 0; j < nameLength; j++) {
                     nameBytes[j] = response.body[offset++] & 0xFF;
                 }
@@ -2096,7 +2096,7 @@ class Jensen {
             if (response.body.length === 0) {
                 return { status: "disconnected" };
             }
-            
+
             if (response.body[0] === 1) {
                 return { status: "disconnected" };
             }
@@ -2203,13 +2203,13 @@ Jensen.registerHandler = function(commandId, handler) {
 export { Jensen as J };
 
 // Export other utilities for advanced use
-export { 
-    JensenLogger, 
-    JensenPacket, 
-    JensenResponse, 
-    COMMAND_CODES, 
-    COMMAND_NAMES, 
+export {
+    JensenLogger,
+    JensenPacket,
+    JensenResponse,
+    COMMAND_CODES,
+    COMMAND_NAMES,
     HIDOCK_CONSTANTS,
     formatDateToBCD,
-    hexStringToBytes 
+    hexStringToBytes
 };

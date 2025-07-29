@@ -6,14 +6,14 @@ import { formatBytes, formatDuration, formatDate } from '@/utils/formatters';
 import type { AudioRecording } from '@/types';
 
 export const Recordings: React.FC = () => {
-  const { 
-    recordings, 
-    selectedRecordings, 
-    toggleRecordingSelection, 
+  const {
+    recordings,
+    selectedRecordings,
+    toggleRecordingSelection,
     setSelectedRecordings,
     updateRecording
   } = useAppStore();
-  
+
   const [playingRecording, setPlayingRecording] = useState<AudioRecording | null>(null);
 
   const handleSelectAll = () => {
@@ -66,7 +66,7 @@ export const Recordings: React.FC = () => {
             Manage your HiDock audio recordings
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <button
             onClick={handleSelectAll}
@@ -74,14 +74,14 @@ export const Recordings: React.FC = () => {
           >
             {selectedRecordings.length === recordings.length ? 'Deselect All' : 'Select All'}
           </button>
-          
+
           {selectedRecordings.length > 0 && (
             <>
               <button className="btn-primary flex items-center space-x-2">
                 <Download className="w-4 h-4" />
                 <span>Download ({selectedRecordings.length})</span>
               </button>
-              
+
               <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2">
                 <Trash2 className="w-4 h-4" />
                 <span>Delete ({selectedRecordings.length})</span>
@@ -140,7 +140,7 @@ export const Recordings: React.FC = () => {
                         className="rounded border-slate-500 bg-slate-700 text-primary-600 focus:ring-primary-500"
                       />
                     </div>
-                    
+
                     <div className="col-span-4">
                       <div className="flex items-center space-x-3">
                         <Music className="w-4 h-4 text-primary-400 flex-shrink-0" />
@@ -155,50 +155,50 @@ export const Recordings: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="col-span-2">
                       <span className="text-slate-300">{formatDuration(recording.duration)}</span>
                     </div>
-                    
+
                     <div className="col-span-2">
                       <span className="text-slate-300">{formatBytes(recording.size)}</span>
                     </div>
-                    
+
                     <div className="col-span-2">
                       <span className="text-slate-400 text-sm">{formatDate(recording.dateCreated)}</span>
                     </div>
-                    
+
                     <div className="col-span-1">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(recording.status)}`}>
                         {recording.status.replace('_', ' ')}
                       </span>
                     </div>
                   </div>
-                  
+
                   {/* Action Buttons */}
                   <div className="mt-3 flex items-center space-x-2">
-                    <button 
+                    <button
                       onClick={() => handlePlayRecording(recording)}
                       className="p-1 hover:bg-slate-600 rounded text-slate-400 hover:text-slate-200"
                       title="Play/Stop"
                     >
                       <Play className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       className="p-1 hover:bg-slate-600 rounded text-slate-400 hover:text-slate-200"
                       title="Download"
                     >
                       <Download className="w-4 h-4" />
                     </button>
                     {recording.transcription && (
-                      <button 
+                      <button
                         className="p-1 hover:bg-slate-600 rounded text-slate-400 hover:text-slate-200"
                         title="View Transcription"
                       >
                         <FileText className="w-4 h-4" />
                       </button>
                     )}
-                    <button 
+                    <button
                       className="p-1 hover:bg-slate-600 rounded text-red-400 hover:text-red-300"
                       title="Delete"
                     >
@@ -225,7 +225,7 @@ export const Recordings: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <AudioPlayer
               src={getMockAudioUrl(playingRecording)}
               title={playingRecording.fileName}

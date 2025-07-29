@@ -1,6 +1,6 @@
 /**
  * Unified Device Interface Abstraction for HiDock Community Platform (Web)
- * 
+ *
  * This module provides a common interface for device operations in the web application,
  * enabling consistent device management, model detection, capability reporting,
  * storage monitoring, and health diagnostics.
@@ -116,7 +116,7 @@ export type HealthCallback = (health: DeviceHealth) => void;
 
 /**
  * Abstract interface for HiDock device operations.
- * 
+ *
  * This interface defines the common operations that must be implemented
  * by device services to ensure consistent behavior across platforms.
  */

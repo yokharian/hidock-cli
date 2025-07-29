@@ -1,6 +1,6 @@
 /**
  * Web Device Adapter - Implements the unified device interface for WebUSB
- * 
+ *
  * This adapter wraps the existing deviceService to implement the unified
  * IDeviceInterface, providing consistent API across platforms.
  */

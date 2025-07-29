@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  Headphones, 
-  Music, 
-  MessageSquare, 
+import {
+  Headphones,
+  Music,
+  MessageSquare,
   HardDrive,
   TrendingUp,
   Clock,
@@ -36,8 +36,8 @@ export const Dashboard: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold">Welcome to HiDock Community</h1>
             <p className="text-white/80">
-              {isDeviceConnected 
-                ? `Connected to ${device?.name || 'HiDock Device'}` 
+              {isDeviceConnected
+                ? `Connected to ${device?.name || 'HiDock Device'}`
                 : 'Connect your HiDock device to get started'
               }
             </p>
@@ -95,18 +95,18 @@ export const Dashboard: React.FC = () => {
             <HardDrive className="w-5 h-5" />
             <span>Device Status</span>
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-slate-400 text-sm">Device Model</p>
               <p className="text-slate-100 font-medium">{device.model}</p>
             </div>
-            
+
             <div>
               <p className="text-slate-400 text-sm">Serial Number</p>
               <p className="text-slate-100 font-medium">{device.serialNumber}</p>
             </div>
-            
+
             <div>
               <p className="text-slate-400 text-sm">Firmware</p>
               <p className="text-slate-100 font-medium">{device.firmwareVersion}</p>
@@ -122,10 +122,10 @@ export const Dashboard: React.FC = () => {
               </p>
             </div>
             <div className="w-full bg-slate-700 rounded-full h-2">
-              <div 
+              <div
                 className="bg-primary-500 h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${(device.storageInfo.usedSpace / device.storageInfo.totalCapacity) * 100}%` 
+                style={{
+                  width: `${(device.storageInfo.usedSpace / device.storageInfo.totalCapacity) * 100}%`
                 }}
               />
             </div>
@@ -140,10 +140,10 @@ export const Dashboard: React.FC = () => {
             <TrendingUp className="w-5 h-5" />
             <span>Recent Recordings</span>
           </h2>
-          
+
           <div className="space-y-3">
             {recentRecordings.map((recording) => (
-              <div 
+              <div
                 key={recording.id}
                 className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors"
               >
@@ -156,10 +156,10 @@ export const Dashboard: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    recording.status === 'downloaded' 
+                    recording.status === 'downloaded'
                       ? 'bg-green-600/20 text-green-400'
                       : recording.status === 'transcribed'
                       ? 'bg-blue-600/20 text-blue-400'

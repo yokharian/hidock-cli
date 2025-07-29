@@ -55,29 +55,29 @@ Offset | Size | Field | Description
 ```javascript
 const HIDOCK_CONSTANTS = {
   VENDOR_ID: 0x10E6,  // 4310 in decimal - HiDock's USB Vendor ID
-  
+
   // Product IDs for different HiDock models
   PRODUCT_IDS: {
     H1: 45068,   // 0xB00C - HiDock H1 model
-    H1E: 45069,  // 0xB00D - HiDock H1E model  
+    H1E: 45069,  // 0xB00D - HiDock H1E model
     P1: 45070    // 0xB00E - HiDock P1 model
   },
-  
+
   // USB Configuration
   USB_CONFIG_VALUE: 1,
   USB_INTERFACE_NUMBER: 0,
   USB_ALTERNATE_SETTING: 0,
-  
+
   // USB Endpoints
   ENDPOINT_OUT: 1,  // Endpoint for sending data to device
   ENDPOINT_IN: 2,   // Endpoint for receiving data from device
-  
+
   // Protocol Magic Numbers
   PACKET_SYNC_BYTES: [0x12, 0x34], // Packet synchronization bytes
   MAX_BUFFER_SIZE: 51200,           // 50KB - Maximum read buffer size
   MAX_PACKET_SIZE: 102400,          // 100KB - Maximum packet size for processing
   RECEIVE_TIMEOUT: 100,             // 100ms - Receive loop timeout
-  
+
   // Logger Configuration
   MAX_LOG_ENTRIES: 15000,  // Maximum number of log entries to keep
 };
@@ -167,38 +167,38 @@ const PROTOCOL_CONSTANTS = {
     // Packet sync bytes - must be present at start of every packet
     SYNC_BYTE_1: 0x12,
     SYNC_BYTE_2: 0x34,
-    
+
     // Packet structure sizes
     HEADER_SIZE: 12,                    // Bytes: sync(2) + cmd(2) + seq(4) + len(4)
     MIN_PACKET_SIZE: 12,               // Minimum valid packet size
     MAX_PACKET_SIZE: 102400,           // 100KB maximum packet size
     MAX_BUFFER_SIZE: 51200,            // 50KB USB transfer buffer
-    
+
     // Protocol timing
     RECEIVE_TIMEOUT: 100,              // 100ms between receive attempts
     FILE_TRANSFER_WAIT: 1000,          // 1000ms wait for file transfers
     COMMAND_WAIT: 10,                  // 10ms wait for regular commands
-    
+
     // USB endpoint addresses
     ENDPOINT_OUT: 1,                   // Host to device endpoint
     ENDPOINT_IN: 2,                    // Device to host endpoint
-    
+
     // Device identification
     USB_VENDOR_ID: 0x10E6,            // HiDock USB Vendor ID (4310 decimal)
-    
+
     // File processing constants
     MAX_LOG_ENTRIES: 15000,           // Maximum log entries in circular buffer
     FILE_LIST_HEADER_SIZE: 6,         // Size of file list header (if present)
     FILE_ENTRY_MIN_SIZE: 23,          // Minimum file entry size
     SIGNATURE_SIZE: 16,               // File signature size in bytes
-    
+
     // Format constants
     BCD_DATETIME_SIZE: 7,             // BCD date/time: YYYYMMDDHHMMSS
     WAV_HEADER_SIZE: 44,              // Standard WAV file header size
     MEETING_SCHEDULE_ENTRY_SIZE: 52,  // Size of single meeting schedule entry
     MEETING_SHORTCUT_SIZE: 34,        // Size of keyboard shortcut data
     MEETING_DATE_SIZE: 8,             // BCD date size with padding
-    
+
     // Factory reset/format magic bytes
     FACTORY_RESET_MAGIC: [0x01, 0x02, 0x03, 0x04], // Magic bytes for destructive operations
 };
@@ -227,18 +227,18 @@ const HID_CONSTANTS = {
     MODIFIER_LEFT_SHIFT: 0x02,         // Left Shift key
     MODIFIER_LEFT_ALT:   0x04,         // Left Alt key
     MODIFIER_LEFT_GUI:   0x08,         // Left Windows/Cmd key
-    
+
     // Key scan codes (USB HID Usage Table)
     KEY_A: 4,   KEY_B: 5,   KEY_C: 6,   KEY_D: 7,   KEY_E: 8,   KEY_F: 9,
     KEY_G: 10,  KEY_H: 11,  KEY_I: 12,  KEY_J: 13,  KEY_K: 14,  KEY_L: 15,
     KEY_M: 16,  KEY_N: 17,  KEY_O: 18,  KEY_P: 19,  KEY_Q: 20,  KEY_R: 21,
     KEY_S: 22,  KEY_T: 23,  KEY_U: 24,  KEY_V: 25,  KEY_W: 26,  KEY_X: 27,
     KEY_Y: 28,  KEY_Z: 27,  // Note: Z reuses X's scan code in original implementation
-    
+
     KEY_ENTER: 40,
-    KEY_ESCAPE: 41,  
+    KEY_ESCAPE: 41,
     KEY_SPACE: 44,
-    
+
     // HID report structure: [ReportID, Modifiers, Key1, Key2, 0, 0, 0, 0]
     REPORT_SIZE: 8,
     REPORT_ID_KEYBOARD: 3,             // Default keyboard report ID
@@ -250,21 +250,21 @@ const HID_CONSTANTS = {
 ```javascript
 const DEVICE_MODELS = {
     // Product ID mappings
-    0xB00C: { 
-        model: "hidock-h1",  
-        name: "HiDock H1",  
+    0xB00C: {
+        model: "hidock-h1",
+        name: "HiDock H1",
         bluetooth: false,
         description: "Basic recording device"
     },
-    0xB00D: { 
-        model: "hidock-h1e", 
-        name: "HiDock H1E", 
+    0xB00D: {
+        model: "hidock-h1e",
+        name: "HiDock H1E",
         bluetooth: false,
         description: "Enhanced recording device"
     },
-    0xB00E: { 
-        model: "hidock-p1",  
-        name: "HiDock P1",  
+    0xB00E: {
+        model: "hidock-p1",
+        name: "HiDock P1",
         bluetooth: true,
         description: "Pro model with Bluetooth"
     },
@@ -417,7 +417,7 @@ Configure device behavior settings.
 await jensen.setAutoRecord(true, 5);
 // Returns: { result: "success" | "failed" }
 
-// Recording notification ("start recording" prompt) on/off  
+// Recording notification ("start recording" prompt) on/off
 await jensen.setNotification(true, 5);
 // Returns: { result: "success" | "failed" }
 
@@ -456,7 +456,7 @@ const settingsBody = [
     0, 0, 0, notification ? 1 : 2,      // Bytes 8-11: Recording notification prompt
     autoTranscribe ? 1 : 2,             // Byte 12: Auto-transcription (needs verification)
     0,                                  // Byte 13: Reserved
-    0,                                  // Byte 14: Reserved  
+    0,                                  // Byte 14: Reserved
     bluetoothPrompt ? 2 : 1             // Byte 15: Bluetooth audio prompt (1=enabled, 2=disabled)
 ];
 
@@ -754,14 +754,14 @@ const settings = await jensen.getSettings(5);
 console.log("Current audio settings:", settings);
 
 // The SET_SETTINGS command controls audio format, but specific byte positions
-// for audio format selection are not fully documented. 
+// for audio format selection are not fully documented.
 // You may need to experiment with different byte values:
 
 // Example: Try setting different audio quality modes
 // (These are hypothetical - actual bytes may vary)
 await jensen.send(new JensenPacket(COMMAND_CODES.SET_SETTINGS).body([
     0, 0, 0, 0,           // Unknown settings
-    0, 0, 0, 0,           // Auto-record/auto-play settings  
+    0, 0, 0, 0,           // Auto-record/auto-play settings
     0, 0, 0, 0,           // Notification settings
     0x01,                 // Possible audio format selector (mono=0x01, stereo=0x02?)
     0x02,                 // Possible quality selector (MPEG=0x01, PCM=0x02?)
@@ -1111,23 +1111,23 @@ Jensen.registerHandler(COMMAND_CODES.GET_FILE_LIST, (response, jensenInstance) =
 
     // Accumulate this chunk
     jensenInstance[cacheKey].push(response.body);
-    
+
     // Parse accumulated data
     const files = this._parseFileListData(jensenInstance[cacheKey]);
     const expectedCount = fileCountResponse ? fileCountResponse.count : -1;
-    
+
     // Check completion
     if (files.length >= expectedCount) {
         return files.filter(file => !!file.time); // Complete - return files
     }
-    
+
     return undefined; // Continue receiving - CRITICAL for flow control
 });
 ```
 
 **Key Success Factors:**
 - **Continuation Signal**: `return undefined` tells device to continue sending
-- **Completion Detection**: Return actual data when complete  
+- **Completion Detection**: Return actual data when complete
 - **No Timeouts**: Device communication is immediate, no artificial delays
 
 ### Desktop Implementation: Handler-Style Adaptation
@@ -1138,28 +1138,28 @@ The desktop version was redesigned to mimic the web's handler approach:
 # Desktop handler-style implementation - OPTIMIZED (hidock_device.py lines ~1254-1290)
 def file_list_handler(response_data):
     nonlocal file_list_chunks, expected_file_count
-    
+
     if not response_data or len(response_data) == 0:
         return []  # Complete - empty response signals end
-    
+
     # Accumulate this chunk (like web version)
     file_list_chunks.append(response_data)
-    
+
     # Parse accumulated file data
     files = self._parse_file_list_chunks(file_list_chunks)
-    
+
     # Get expected count from first chunk header if available
     if expected_file_count is None and file_list_chunks:
         first_chunk = file_list_chunks[0]
         if len(first_chunk) >= 6 and first_chunk[0] == 0xFF and first_chunk[1] == 0xFF:
             expected_file_count = struct.unpack(">I", first_chunk[2:6])[0]
             logger.debug(f"Expected file count from header: {expected_file_count}")
-    
+
     # Check completion
     if expected_file_count and len(files) >= expected_file_count:
         logger.debug(f"File list complete: {len(files)}/{expected_file_count} files")
         return files  # Complete - return final file list
-    
+
     logger.debug(f"Continue receiving: {len(files)}/{expected_file_count or '?'} files")
     return None  # Continue receiving (equivalent to web's "undefined")
 
@@ -1167,7 +1167,7 @@ def file_list_handler(response_data):
 final_files = None
 while final_files is None:
     response = self._receive_response(seq_id, timeout_ms=1000)  # Reduced timeout
-    
+
     if response and response["id"] == CMD_GET_FILE_LIST:
         result = file_list_handler(response["body"])
         if result is not None:
@@ -1205,7 +1205,7 @@ def get_card_info(self):
 
 **Protected Operations (hidock_device.py collision prevention):**
 - `get_card_info()` - Storage information requests
-- `get_file_count()` - File count queries  
+- `get_file_count()` - File count queries
 - `get_recording_file()` - Active recording status checks
 - `delete_file()` - File deletion operations
 - `format_card()` - Storage formatting operations
@@ -1224,16 +1224,16 @@ def protected_operation(self):
 **GUI-Level Collision Prevention (gui_main_window.py and gui_actions_device.py):**
 ```python
 # Status update thread collision prevention (gui_main_window.py ~line 1180)
-if (hasattr(self.device_manager.device_interface, 'jensen_device') and 
-    hasattr(self.device_manager.device_interface.jensen_device, 'is_file_list_streaming') and 
+if (hasattr(self.device_manager.device_interface, 'jensen_device') and
+    hasattr(self.device_manager.device_interface.jensen_device, 'is_file_list_streaming') and
     self.device_manager.device_interface.jensen_device.is_file_list_streaming()):
     card_info = None  # Skip storage info request during streaming
 else:
     card_info = self.device_manager.device_interface.get_storage_info()
-    
+
 # Recording status check collision prevention (gui_actions_device.py ~line 890)
-if (hasattr(self.device_manager.device_interface, 'jensen_device') and 
-    hasattr(self.device_manager.device_interface.jensen_device, 'is_file_list_streaming') and 
+if (hasattr(self.device_manager.device_interface, 'jensen_device') and
+    hasattr(self.device_manager.device_interface.jensen_device, 'is_file_list_streaming') and
     self.device_manager.device_interface.jensen_device.is_file_list_streaming()):
     logger.debug("GUI", "_check_recording_status_periodically", "Skipping recording check during file list streaming")
     return
@@ -1289,14 +1289,14 @@ Added comprehensive collision prevention at the desktop adapter level to stop co
 ```python
 # Desktop adapter collision prevention (desktop_device_adapter.py)
 async def get_storage_info(self) -> StorageInfo:
-    if (hasattr(self.jensen_device, 'is_file_list_streaming') and 
+    if (hasattr(self.jensen_device, 'is_file_list_streaming') and
         self.jensen_device.is_file_list_streaming()):
         # Return cached/fallback values during streaming to avoid collisions
         return StorageInfo(total_capacity=8*1024*1024*1024, used_space=0, ...)
     # ... proceed with normal operation ...
 
 async def get_current_recording_filename(self) -> Optional[str]:
-    if (hasattr(self.jensen_device, 'is_file_list_streaming') and 
+    if (hasattr(self.jensen_device, 'is_file_list_streaming') and
         self.jensen_device.is_file_list_streaming()):
         # Return None during streaming to avoid collisions
         return None
@@ -1312,18 +1312,18 @@ def file_list_handler(response_data):
     if not response_data or len(response_data) == 0:
         logger.info("Empty response received, completing file list")
         return self._parse_file_list_chunks(file_list_chunks) if file_list_chunks else []
-    
+
     file_list_chunks.append(response_data)
     logger.debug(f"Accumulated chunk {len(file_list_chunks)}, size: {len(response_data)} bytes")
-    
+
     files = self._parse_file_list_chunks(file_list_chunks)
     files_parsed = len(files)
     logger.debug(f"Parsed {files_parsed}/{expected_file_count or '?'} files so far")
-    
+
     if expected_file_count is not None and files_parsed >= expected_file_count:
         logger.info(f"Received all {expected_file_count} files, completing")
         return files
-    
+
     logger.debug(f"Continue receiving: need {(expected_file_count or 0) - files_parsed} more files")
     return None
 ```

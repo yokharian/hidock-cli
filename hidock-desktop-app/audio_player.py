@@ -8,6 +8,7 @@ import tkinter
 from tkinter import messagebox
 
 import customtkinter as ctk
+
 from config_and_logger import logger
 
 try:

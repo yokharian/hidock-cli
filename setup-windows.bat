@@ -59,7 +59,7 @@ if %errorlevel% neq 0 (
     echo Install Node.js 18+ from https://nodejs.org if you want the web apps
 ) else (
     echo Node.js found! Setting up web apps...
-    
+
     echo Setting up HiDock Web App...
     cd hidock-web-app
     call npm install
@@ -69,7 +69,7 @@ if %errorlevel% neq 0 (
         echo Web app setup complete!
     )
     cd ..
-    
+
     echo Setting up Audio Insights Extractor...
     cd audio-insights-extractor
     call npm install
@@ -93,7 +93,7 @@ echo   2. .venv\Scripts\activate
 echo   3. python main.py
 echo:
 echo Web App (if Node.js installed):
-echo   1. cd hidock-web-app  
+echo   1. cd hidock-web-app
 echo   2. npm run dev
 echo   3. Open: http://localhost:5173
 echo:

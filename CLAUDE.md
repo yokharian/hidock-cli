@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 HiDock Next is a multi-platform application suite for managing HiDock recording devices locally with comprehensive AI-powered transcription and analysis capabilities. The project includes three main applications:
 
 - **Desktop Application** (Python): Full-featured GUI application with 11 AI provider support
-- **Web Application** (React/TypeScript): Modern browser-based interface with AI transcription  
+- **Web Application** (React/TypeScript): Modern browser-based interface with AI transcription
 - **Audio Insights Extractor** (React/TypeScript): Standalone audio analysis tool
 
 ## Architecture
@@ -22,7 +22,7 @@ The desktop application is the flagship component with advanced AI integration a
   - `gui_main_window.py` - Main application window with AI transcription panels and advanced controls
   - `settings_window.py` - Comprehensive settings with multi-provider AI configuration
   - `gui_*.py` files - Modular GUI components (treeview, actions, event handlers, auxiliary functions)
-- **Device Communication**: 
+- **Device Communication**:
   - `hidock_device.py` - USB device interface using pyusb/libusb
   - `enhanced_device_selector.py` - Professional device selection UI with status indicators
 - **Configuration**: `config_and_logger.py` - Centralized config and logging with encryption support
@@ -31,7 +31,7 @@ The desktop application is the flagship component with advanced AI integration a
 #### AI Integration Layer
 - **Unified AI Service**: `ai_service.py` - Central service managing 11 AI providers
   - **Cloud Providers**: Google Gemini, OpenAI, Anthropic, OpenRouter, Amazon Bedrock, Qwen, DeepSeek
-  - **Local Providers**: Ollama, LM Studio  
+  - **Local Providers**: Ollama, LM Studio
   - **Mock Providers**: Development and testing support
 - **Transcription Module**: `transcription_module.py` - Multi-provider audio transcription and analysis
 - **HTA Converter**: `hta_converter.py` - Proprietary audio format conversion utility
@@ -184,7 +184,7 @@ npm run preview
 ### File Formats
 
 - **Audio**: `.hda`, `.hta` (HiDock proprietary formats), `.wav`, `.mp3`, `.flac`, `.m4a`
-- **Conversion**: 
+- **Conversion**:
   - **HTA Converter**: Proprietary format to WAV conversion
   - **Audio Processing**: pygame for playback, matplotlib for visualization
 - **Storage**: Local downloads to user-configured directory with automatic conversion

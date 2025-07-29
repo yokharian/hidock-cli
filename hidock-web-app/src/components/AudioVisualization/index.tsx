@@ -1,6 +1,6 @@
 /**
  * Audio Visualization Components for Web Application
- * 
+ *
  * Provides waveform and spectrum visualization for audio playback and recording
  * Requirements: 8.2, 8.3, 9.3
  */

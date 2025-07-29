@@ -115,7 +115,7 @@ export const AudioInput: React.FC<AudioInputProps> = ({ onAudioReady, disabled }
             setError("Error processing recorded audio.");
           };
           reader.readAsDataURL(audioBlob);
-          
+
           // Stop microphone tracks
           stream.getTracks().forEach(track => track.stop());
         };
@@ -137,7 +137,7 @@ export const AudioInput: React.FC<AudioInputProps> = ({ onAudioReady, disabled }
       setIsRecording(false);
     }
   };
-  
+
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -146,7 +146,7 @@ export const AudioInput: React.FC<AudioInputProps> = ({ onAudioReady, disabled }
 
   return (
     <div className="space-y-6">
-      <div 
+      <div
         className={`p-6 border-2 border-dashed border-slate-600 rounded-lg text-center cursor-pointer hover:border-sky-500 transition-colors duration-300 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={!disabled ? triggerFileInput : undefined}
         onDragOver={!disabled ? handleDragOver : undefined}

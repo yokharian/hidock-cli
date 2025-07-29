@@ -18,7 +18,7 @@ namespace eval ttk::theme::azure-light {
         }
 
         load_images [file join [file dirname [info script]] light]
-        
+
         array set colors {
             -fg             "#000000"
             -bg             "#ffffff"
@@ -32,7 +32,7 @@ namespace eval ttk::theme::azure-light {
             Button.button -children {
                 Button.padding -children {
                     Button.label -side left -expand true
-                } 
+                }
             }
         }
 
@@ -40,7 +40,7 @@ namespace eval ttk::theme::azure-light {
             Toolbutton.button -children {
                 Toolbutton.padding -children {
                     Toolbutton.label -side left -expand true
-                } 
+                }
             }
         }
 
@@ -66,7 +66,7 @@ namespace eval ttk::theme::azure-light {
             AccentButton.button -children {
                 AccentButton.padding -children {
                     AccentButton.label -side left -expand true
-                } 
+                }
             }
         }
 
@@ -92,7 +92,7 @@ namespace eval ttk::theme::azure-light {
             ToggleButton.button -children {
                 ToggleButton.padding -children {
                     ToggleButton.label -side left -expand true
-                } 
+                }
             }
         }
 
@@ -127,13 +127,13 @@ namespace eval ttk::theme::azure-light {
                 Combobox.arrow -sticky nsew
             }
         }
-        
+
         ttk::style layout TSpinbox {
             Spinbox.field -sticky nsew -children {
                 Spinbox.padding -expand true -sticky nswe -children {
                     Spinbox.textarea -sticky nswe
                 }
-                
+
             }
             Spinbox.button -side right -sticky ns -children {
                 null -side right -children {
@@ -142,7 +142,7 @@ namespace eval ttk::theme::azure-light {
                 }
             }
         }
-        
+
         ttk::style layout Horizontal.TSeparator {
             Horizontal.separator -sticky nswe
         }
@@ -150,13 +150,13 @@ namespace eval ttk::theme::azure-light {
         ttk::style layout Vertical.TSeparator {
             Vertical.separator -sticky nswe
         }
-        
+
         ttk::style layout Horizontal.Tick.TScale {
             Horizontal.TickScale.trough -sticky ew -children {
                 Horizontal.TickScale.slider -sticky w
             }
         }
-        
+
         ttk::style layout Vertical.Tick.TScale {
             Vertical.TickScale.trough -sticky ns -children {
                 Vertical.TickScale.slider -sticky n
@@ -165,7 +165,7 @@ namespace eval ttk::theme::azure-light {
 
         ttk::style layout Card.TFrame {
             Card.field {
-                Card.padding -expand 1 
+                Card.padding -expand 1
             }
         }
 
@@ -229,7 +229,7 @@ namespace eval ttk::theme::azure-light {
                 disabled $I(rect-basic) \
                 pressed $I(rect-basic) \
                 active $I(button-hover) \
-            ] -border 4 -sticky ewns 
+            ] -border 4 -sticky ewns
 
         ttk::style element create Menubutton.indicator \
             image [list $I(down) \
@@ -246,7 +246,7 @@ namespace eval ttk::theme::azure-light {
                 disabled $I(rect-basic) \
                 pressed $I(rect-basic) \
                 active $I(button-hover) \
-            ] -border 4 -sticky ewns 
+            ] -border 4 -sticky ewns
 
         ttk::style element create OptionMenu.indicator \
             image [list $I(down) \
@@ -371,18 +371,18 @@ namespace eval ttk::theme::azure-light {
                 pressed $I(circle-hover) \
                 active $I(circle-hover) \
             ] -sticky {}
-            
+
         # Tickscale
         ttk::style element create Horizontal.TickScale.trough image $I(scale-hor) \
             -border 5 -padding 0
-        
+
         ttk::style element create Horizontal.TickScale.slider \
             image [list $I(tick-hor-accent) \
                 disabled $I(tick-hor-basic) \
                 pressed $I(tick-hor-hover) \
                 active $I(tick-hor-hover) \
             ] -sticky {}
-            
+
         ttk::style element create Vertical.TickScale.trough image $I(scale-vert) \
             -border 5 -padding 0
 
@@ -422,7 +422,7 @@ namespace eval ttk::theme::azure-light {
             {readonly hover} $colors(-selectbg) \
             {readonly focus} $colors(-selectbg) \
         ]
-            
+
         ttk::style map TCombobox -selectforeground [list \
             {!focus} $colors(-selectfg) \
             {readonly hover} $colors(-selectfg) \
@@ -450,7 +450,7 @@ namespace eval ttk::theme::azure-light {
                  {readonly focus} $I(combo-button-hover) \
                  {readonly hover} $I(combo-button-hover)
             ] -border 5 -padding {2 6 6 6}
-            
+
         ttk::style element create Combobox.arrow image $I(down) \
             -width 15 -sticky e
 
@@ -476,7 +476,7 @@ namespace eval ttk::theme::azure-light {
                 pressed $I(down-accent) \
                 active $I(down-accent) \
             ] -border 4 -width 15 -sticky e
-            
+
         ttk::style element create Spinbox.button \
             image [list $I(combo-button-basic) \
                  {!readonly focus} $I(combo-button-focus) \
@@ -500,7 +500,7 @@ namespace eval ttk::theme::azure-light {
         # Labelframe
         ttk::style element create Labelframe.border image $I(card) \
             -border 5 -padding 4 -sticky news
-        
+
         # Notebook
         ttk::style element create Notebook.client \
             image $I(notebook) -border 5
@@ -519,7 +519,7 @@ namespace eval ttk::theme::azure-light {
             image [list $I(tree-basic) \
                 pressed $I(tree-pressed)
             ] -border 5 -padding 4 -sticky ewns
-        
+
         ttk::style element create Treeitem.indicator \
             image [list $I(right) \
                 user2 $I(empty) \

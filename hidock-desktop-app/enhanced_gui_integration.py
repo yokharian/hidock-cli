@@ -16,6 +16,7 @@ from tkinter import filedialog, messagebox
 from typing import Optional
 
 import customtkinter as ctk
+
 from audio_player_enhanced import (
     AudioProcessor,
     AudioTrack,
@@ -248,9 +249,7 @@ class EnhancedPlaybackControlsFrame(ctk.CTkFrame):
         """Toggle mute"""
         try:
             self.audio_player.toggle_mute()
-            self.mute_button.configure(
-                text="🔇" if self.audio_player.is_muted else "🔊"
-            )
+            self.mute_button.configure(text="🔇" if self.audio_player.is_muted else "🔊")
         except RuntimeError as e:
             logger.error(
                 "EnhancedPlaybackControlsFrame",
@@ -408,9 +407,7 @@ class EnhancedPlaybackControlsFrame(ctk.CTkFrame):
             self.volume_slider.set(self.audio_player.volume)
 
             # Update mute button
-            self.mute_button.configure(
-                text="🔇" if self.audio_player.is_muted else "🔊"
-            )
+            self.mute_button.configure(text="🔇" if self.audio_player.is_muted else "🔊")
 
             # Update repeat mode
             repeat_map = {

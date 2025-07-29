@@ -45,7 +45,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
     try {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         const result = e.target?.result as string;
         if (!result) {
@@ -55,7 +55,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         }
 
         const base64Data = result.split(',')[1]; // Remove data URL prefix
-        
+
         const audioData: AudioData = {
           fileName: file.name,
           base64: base64Data,
@@ -105,7 +105,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     if (disabled) return;
 
     const files = Array.from(e.dataTransfer.files);
-    const audioFile = files.find(file => 
+    const audioFile = files.find(file =>
       AUDIO_CONFIG.SUPPORTED_FORMATS.includes(file.type)
     );
 
@@ -122,7 +122,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200
           ${isDragOver && !disabled
-            ? 'border-primary-400 bg-primary-400/10' 
+            ? 'border-primary-400 bg-primary-400/10'
             : 'border-slate-600 hover:border-slate-500'
           }
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -162,8 +162,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 <p>Maximum size: {formatBytes(AUDIO_CONFIG.MAX_FILE_SIZE)}</p>
               </div>
             </div>
-            <label 
-              htmlFor="file-upload" 
+            <label
+              htmlFor="file-upload"
               className="btn-primary inline-flex items-center space-x-2 cursor-pointer"
             >
               <File className="w-4 h-4" />

@@ -30,7 +30,7 @@ interface GeminiInlineData {
 
 // This discriminated union type represents a single part of the content sent to Gemini.
 // It's equivalent to the non-exported 'Part' type within the @google/genai SDK.
-type GeminiPart = 
+type GeminiPart =
   | { inlineData: GeminiInlineData; text?: never; } // A part with inline data (e.g., audio, image)
   | { text: string; inlineData?: never; };          // A part with text
 
@@ -45,7 +45,7 @@ export const transcribeAudioWithGemini = async (
   promptText: string = "Transcribe this audio recording."
 ): Promise<string> => {
   if (!API_KEY) throw new Error("Gemini API Key is not configured.");
-  
+
   const audioPart: GeminiPart = {
     inlineData: {
       mimeType: mimeType,
@@ -96,7 +96,7 @@ export const extractInsightsFromText = async (
     });
 
     let jsonStr = response.text.trim();
-    
+
     // Remove Markdown code fences if present
     const fenceRegex = /^```(\w*)?\s*\n?(.*?)\n?\s*```$/s;
     const match = jsonStr.match(fenceRegex);

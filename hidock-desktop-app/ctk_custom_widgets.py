@@ -10,8 +10,10 @@ Currently includes CTkBanner.
 import os
 import sys  # For platform-specific transparency
 import tkinter  # ADDED: For tkinter.TclError
+
 import customtkinter as ctk
 from PIL import Image
+
 from config_and_logger import logger
 
 # --- Constants for CTkBanner ---
@@ -20,7 +22,10 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 ICON_DIR = os.path.join(CURRENT_PATH, "icons")
 
 ICON_PATH = {
-    "close": (os.path.join(ICON_DIR, "close_black.png"), os.path.join(ICON_DIR, "close_white.png")),
+    "close": (
+        os.path.join(ICON_DIR, "close_black.png"),
+        os.path.join(ICON_DIR, "close_white.png"),
+    ),
     "info": os.path.join(ICON_DIR, "info.png"),
     "warning": os.path.join(ICON_DIR, "warning.png"),
     "error": os.path.join(ICON_DIR, "error.png"),
@@ -45,10 +50,10 @@ LINK_BTN = {
 def calculate_toplevel_position(
     root, frame_width, frame_height, horizontal, vertical, padx=10, pady=10
 ):
-    '''
+    """
     Calculates x, y coordinates for placing a Toplevel window relative
     to its root/master window based on horizontal and vertical alignment.
-    '''
+    """
     root.update_idletasks()  # Ensure root window dimensions are up-to-date
     root_width = root.winfo_width()
     root_height = root.winfo_height()
@@ -133,7 +138,9 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
         if sys.platform.startswith("win"):
             # For Windows, fg_color of the Toplevel itself can be made transparent.
             # The content_frame will provide the visible background.
-            self.transparent_color_for_toplevel = self._apply_appearance_mode(self.cget("fg_color"))
+            self.transparent_color_for_toplevel = self._apply_appearance_mode(
+                self.cget("fg_color")
+            )
             self.attributes("-transparentcolor", self.transparent_color_for_toplevel)
         elif sys.platform.startswith("darwin"):  # macOS
             self.attributes("-transparent", True)
@@ -157,9 +164,15 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
 
         self.content_frame.grid_propagate(False)
         self.content_frame.grid_columnconfigure(0, weight=1)  # Title label column
-        self.content_frame.grid_columnconfigure(1, weight=0)  # Close button column (fixed width)
-        self.content_frame.grid_rowconfigure(0, weight=1)  # Title row (takes most space)
-        self.content_frame.grid_rowconfigure(1, weight=0)  # Progress bar row (fixed height)
+        self.content_frame.grid_columnconfigure(
+            1, weight=0
+        )  # Close button column (fixed width)
+        self.content_frame.grid_rowconfigure(
+            0, weight=1
+        )  # Title row (takes most space)
+        self.content_frame.grid_rowconfigure(
+            1, weight=0
+        )  # Progress bar row (fixed height)
 
         # self.event = None # Not used with only a close button
         self._auto_dismiss_timer = None
@@ -178,7 +191,9 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
             single_part = parts[0].lower()  # Normalize to lowercase
             if single_part in ["top", "bottom"]:
                 self.vertical = single_part
-                self.horizontal = "center"  # Default horizontal if only vertical is given
+                self.horizontal = (
+                    "center"  # Default horizontal if only vertical is given
+                )
             elif single_part in ["left", "right"]:
                 self.vertical = "center"  # Default vertical if only horizontal is given
                 self.horizontal = single_part
@@ -195,16 +210,22 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
                 self.horizontal = "center"
         else:  # Fallback for malformed side (e.g. too many parts or empty)
             logger.warning(
-                "CTkBanner", "__init__", f"Malformed side value '{side}'. Defaulting to top_center."
+                "CTkBanner",
+                "__init__",
+                f"Malformed side value '{side}'. Defaulting to top_center.",
             )
             self.vertical = "top"
             self.horizontal = "center"
 
         icon_file = ICON_PATH.get(state.lower())
         if isinstance(icon_file, tuple):  # For icons with light/dark variants
-            self.icon = ctk.CTkImage(Image.open(icon_file[0]), Image.open(icon_file[1]), (24, 24))
+            self.icon = ctk.CTkImage(
+                Image.open(icon_file[0]), Image.open(icon_file[1]), (24, 24)
+            )
         elif icon_file and os.path.exists(icon_file):
-            self.icon = ctk.CTkImage(Image.open(icon_file), Image.open(icon_file), (24, 24))
+            self.icon = ctk.CTkImage(
+                Image.open(icon_file), Image.open(icon_file), (24, 24)
+            )
         else:  # Fallback icon
             self.icon = ctk.CTkImage(
                 Image.open(ICON_PATH["info"]), Image.open(ICON_PATH["info"]), (24, 24)
@@ -217,7 +238,9 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
             and os.path.exists(close_icon_paths[1])
         ):
             self.close_icon = ctk.CTkImage(
-                Image.open(close_icon_paths[0]), Image.open(close_icon_paths[1]), (20, 20)
+                Image.open(close_icon_paths[0]),
+                Image.open(close_icon_paths[1]),
+                (20, 20),
             )
         else:
             self.close_icon = None  # No close icon if paths are invalid
@@ -267,7 +290,9 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
             self.content_frame, height=self.progress_bar_height, corner_radius=0
         )  # Flat bar
         self.progress_bar.set(0)  # Start empty
-        self.progress_bar.grid(row=1, column=0, columnspan=2, sticky="sew", padx=5, pady=(0, 5))
+        self.progress_bar.grid(
+            row=1, column=0, columnspan=2, sticky="sew", padx=5, pady=(0, 5)
+        )
 
         self.update_position()  # Initial positioning
         self.bind_configure()  # Call to store the binding ID
@@ -298,7 +323,9 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
             # Calculate absolute screen coordinates for the banner
             absolute_x = master_x + relative_x
             absolute_y = master_y + relative_y
-            self.geometry(f"{self.banner_width}x{self.banner_height}+{absolute_x}+{absolute_y}")
+            self.geometry(
+                f"{self.banner_width}x{self.banner_height}+{absolute_x}+{absolute_y}"
+            )
             self.update_idletasks()
 
     def _initiate_dismissal(self):
@@ -382,12 +409,15 @@ class CTkBanner(ctk.CTkToplevel):  # MODIFIED: Inherit from CTkToplevel
                 self._current_alpha = current_alpha
                 if self.winfo_exists():
                     self.after(
-                        self.FADE_ANIMATION_DURATION_MS // self.FADE_ANIMATION_STEPS, _step_fade
+                        self.FADE_ANIMATION_DURATION_MS // self.FADE_ANIMATION_STEPS,
+                        _step_fade,
                     )
 
         if self.winfo_exists():
             _step_fade()
-        elif on_complete:  # If window destroyed before animation, still call on_complete
+        elif (
+            on_complete
+        ):  # If window destroyed before animation, still call on_complete
             on_complete()
 
     def _update_auto_dismiss_progress(self, current_time_ms=0):

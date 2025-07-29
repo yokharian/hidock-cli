@@ -46,7 +46,7 @@ python setup.py
 
 ### **Developer Setup:**
 - ✅ Everything from End User setup, plus:
-- ✅ Git configuration and branch workflow  
+- ✅ Git configuration and branch workflow
 - ✅ Testing frameworks and tools
 - ✅ Code formatting and linting tools
 - ✅ AI API key configuration

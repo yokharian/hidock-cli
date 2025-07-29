@@ -52,7 +52,7 @@ python main.py
    ```bash
    # Single file executable
    pyinstaller --onefile --windowed --name "HiDock Next" main.py
-   
+
    # Directory distribution (faster startup)
    pyinstaller --windowed --name "HiDock Next" main.py
    ```
@@ -110,7 +110,7 @@ python main.py
    ```bash
    # Ubuntu/Debian
    sudo apt-get install libusb-1.0-0-dev
-   
+
    # CentOS/RHEL
    sudo yum install libusb1-devel
    ```
@@ -140,7 +140,7 @@ python main.py
    ```bash
    # Create production environment file
    cp .env.example .env.production
-   
+
    # Edit environment variables
    VITE_APP_NAME="HiDock Community"
    VITE_APP_VERSION="1.0.0"
@@ -187,10 +187,10 @@ python main.py
    ```bash
    # Install Netlify CLI
    npm install -g netlify-cli
-   
+
    # Build project
    npm run build
-   
+
    # Deploy
    netlify deploy --prod --dir=dist
    ```
@@ -217,11 +217,11 @@ python main.py
    ```yaml
    # .github/workflows/deploy.yml
    name: Deploy to GitHub Pages
-   
+
    on:
      push:
        branches: [ main ]
-   
+
    jobs:
      deploy:
        runs-on: ubuntu-latest
@@ -252,23 +252,23 @@ python main.py
    server {
        listen 443 ssl http2;
        server_name your-domain.com;
-       
+
        ssl_certificate /path/to/certificate.crt;
        ssl_certificate_key /path/to/private.key;
-       
+
        root /path/to/hidock-web-app/dist;
        index index.html;
-       
+
        # Handle client-side routing
        location / {
            try_files $uri $uri/ /index.html;
        }
-       
+
        # Security headers
        add_header X-Frame-Options DENY;
        add_header X-Content-Type-Options nosniff;
        add_header X-XSS-Protection "1; mode=block";
-       
+
        # Caching for static assets
        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
            expires 1y;

@@ -3,11 +3,11 @@ import { useAppStore } from '@/store/useAppStore';
 import { deviceService } from '@/services/deviceService';
 
 export const useDeviceConnection = () => {
-  const { 
-    device, 
-    isDeviceConnected, 
-    setDevice, 
-    setError, 
+  const {
+    device,
+    isDeviceConnected,
+    setDevice,
+    setError,
     setLoading,
     recordings,
     setRecordings
@@ -16,15 +16,15 @@ export const useDeviceConnection = () => {
   const connectDevice = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const connectedDevice = await deviceService.requestDevice();
       setDevice(connectedDevice);
-      
+
       // Load recordings after successful connection
       const deviceRecordings = await deviceService.getRecordings();
       setRecordings(deviceRecordings);
-      
+
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to connect device');
     } finally {
@@ -44,7 +44,7 @@ export const useDeviceConnection = () => {
 
   const refreshRecordings = useCallback(async () => {
     if (!isDeviceConnected) return;
-    
+
     setLoading(true);
     try {
       const deviceRecordings = await deviceService.getRecordings();
@@ -58,20 +58,20 @@ export const useDeviceConnection = () => {
 
   const downloadRecording = useCallback(async (recordingId: string) => {
     if (!isDeviceConnected) return;
-    
+
     try {
       const audioData = await deviceService.downloadRecording(recordingId);
       // Handle the downloaded audio data
       console.log('Downloaded recording:', recordingId, audioData);
-      
+
       // Update recording status
-      const updatedRecordings = recordings.map(rec => 
-        rec.id === recordingId 
+      const updatedRecordings = recordings.map(rec =>
+        rec.id === recordingId
           ? { ...rec, status: 'downloaded' as const }
           : rec
       );
       setRecordings(updatedRecordings);
-      
+
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to download recording');
     }
@@ -79,14 +79,14 @@ export const useDeviceConnection = () => {
 
   const deleteRecording = useCallback(async (recordingId: string) => {
     if (!isDeviceConnected) return;
-    
+
     try {
       await deviceService.deleteRecording(recordingId);
-      
+
       // Remove recording from state
       const updatedRecordings = recordings.filter(rec => rec.id !== recordingId);
       setRecordings(updatedRecordings);
-      
+
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to delete recording');
     }
@@ -94,12 +94,12 @@ export const useDeviceConnection = () => {
 
   const formatDevice = useCallback(async () => {
     if (!isDeviceConnected) return;
-    
+
     setLoading(true);
     try {
       await deviceService.formatDevice();
       setRecordings([]);
-      
+
       // Refresh device info
       if (device) {
         const updatedDevice = { ...device };
@@ -107,7 +107,7 @@ export const useDeviceConnection = () => {
         updatedDevice.storageInfo.fileCount = 0;
         setDevice(updatedDevice);
       }
-      
+
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to format device');
     } finally {
@@ -117,7 +117,7 @@ export const useDeviceConnection = () => {
 
   const syncTime = useCallback(async () => {
     if (!isDeviceConnected) return;
-    
+
     try {
       await deviceService.syncTime();
     } catch (error) {
@@ -135,7 +135,7 @@ export const useDeviceConnection = () => {
             // Try to reconnect to the first available device
             const connectedDevice = await deviceService.connectToDevice(devices[0]);
             setDevice(connectedDevice);
-            
+
             const deviceRecordings = await deviceService.getRecordings();
             setRecordings(deviceRecordings);
           }

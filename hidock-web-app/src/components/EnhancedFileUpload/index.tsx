@@ -1,6 +1,6 @@
 /**
  * Enhanced File Upload Component with Advanced Features
- * 
+ *
  * Features:
  * - Drag-and-drop with visual feedback
  * - Multiple file upload with queue management
@@ -8,7 +8,7 @@
  * - File validation and error handling
  * - Preview and metadata extraction
  * - Batch operations and retry mechanisms
- * 
+ *
  * Requirements addressed: 2.1, 2.2, 2.3, 8.1, 8.2, 8.3
  */
 

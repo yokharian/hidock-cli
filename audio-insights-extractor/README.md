@@ -269,12 +269,12 @@ describe('AudioInput', () => {
     const mockFile = new File(['audio'], 'test.wav', {
       type: 'audio/wav'
     });
-    
+
     render(<AudioInput onFileSelect={jest.fn()} />);
-    
+
     const input = screen.getByLabelText(/upload audio/i);
     fireEvent.change(input, { target: { files: [mockFile] } });
-    
+
     expect(screen.getByText('test.wav')).toBeInTheDocument();
   });
 });

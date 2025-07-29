@@ -21,7 +21,7 @@ export const InsightsDisplay: React.FC<InsightsDisplayProps> = ({ insights }) =>
   return (
     <div className="mt-4 p-4 bg-slate-700 rounded-lg shadow">
       <h3 className="text-lg font-semibold text-slate-200 mb-3">Insights:</h3>
-      
+
       <InsightItem title="Summary">
         <p className="text-slate-300 text-sm">{insights.summary}</p>
       </InsightItem>

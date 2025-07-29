@@ -87,7 +87,7 @@ const App: React.FC = () => {
     setCurrentStep('initial');
     setError(null);
   };
-  
+
   if (!apiKeyExists && currentStep === 'error') {
      return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-100">
@@ -151,7 +151,7 @@ const App: React.FC = () => {
             Transcribe Audio
           </button>
         )}
-        
+
         {/* Step 2: Transcription */}
         {(currentStep === 'transcribed' || currentStep === 'analyzing' || currentStep === 'analyzed') && transcription && (
           <section className="bg-slate-800 p-6 rounded-xl shadow-xl transition-all duration-500 ease-in-out">
@@ -186,7 +186,7 @@ const App: React.FC = () => {
             <InsightsDisplay insights={insights} />
           </section>
         )}
-        
+
         {/* Reset Button - Shown if something has been processed or an error occurred */}
         {(currentStep !== 'initial' && currentStep !== 'audio_ready') && (
            <button

@@ -1,12 +1,12 @@
 /**
  * Enhanced File Management Interface for HiDock Web Application
- * 
+ *
  * This component provides comprehensive file management capabilities including:
  * - Drag-and-drop file upload with validation and progress indication
  * - File list with sorting, filtering, and batch selection
  * - File operation controls with confirmation dialogs and progress tracking
  * - Mobile-responsive interface with touch-friendly controls
- * 
+ *
  * Requirements addressed: 2.1, 2.2, 2.3, 2.4, 2.5, 8.1, 8.2, 8.3, 8.4
  */
 

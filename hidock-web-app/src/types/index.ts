@@ -29,15 +29,15 @@ export interface AudioRecording {
   insights?: InsightData;
 }
 
-export type RecordingStatus = 
-  | 'on_device' 
-  | 'downloading' 
-  | 'downloaded' 
-  | 'playing' 
-  | 'transcribing' 
-  | 'transcribed' 
-  | 'analyzing' 
-  | 'analyzed' 
+export type RecordingStatus =
+  | 'on_device'
+  | 'downloading'
+  | 'downloaded'
+  | 'playing'
+  | 'transcribing'
+  | 'transcribed'
+  | 'analyzing'
+  | 'analyzed'
   | 'error';
 
 // Audio Data Types

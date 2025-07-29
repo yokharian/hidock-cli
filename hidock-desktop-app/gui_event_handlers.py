@@ -12,6 +12,7 @@ import tkinter
 from tkinter import filedialog, messagebox
 
 import customtkinter as ctk
+
 from config_and_logger import logger
 
 
@@ -280,14 +281,18 @@ class EventHandlersMixin:
                 self.log_frame.grid(row=3, column=0, sticky="nsew", padx=5, pady=(5, 0))
             self.main_content_frame.grid_rowconfigure(0, weight=3)
             self.main_content_frame.grid_rowconfigure(1, weight=0)  # Panels toolbar
-            self.main_content_frame.grid_rowconfigure(2, weight=0)  # Transcription panel
+            self.main_content_frame.grid_rowconfigure(
+                2, weight=0
+            )  # Transcription panel
             self.main_content_frame.grid_rowconfigure(3, weight=1)  # Log panel
         else:
             if self.log_frame.winfo_ismapped():
                 self.log_frame.grid_forget()
             self.main_content_frame.grid_rowconfigure(0, weight=1)
             self.main_content_frame.grid_rowconfigure(1, weight=0)  # Panels toolbar
-            self.main_content_frame.grid_rowconfigure(2, weight=0)  # Transcription panel
+            self.main_content_frame.grid_rowconfigure(
+                2, weight=0
+            )  # Transcription panel
             self.main_content_frame.grid_rowconfigure(3, weight=0)  # Log panel
 
     def toggle_logs(self):  # Identical to original logic

@@ -22,31 +22,31 @@ The main interface for communicating with HiDock hardware devices.
 class HiDockDevice:
     def __init__(self, vendor_id=0x1234, product_id=0x5678):
         """Initialize device with USB identifiers"""
-        
+
     def connect(self) -> bool:
         """Connect to the HiDock device"""
-        
+
     def disconnect(self) -> bool:
         """Disconnect from the device"""
-        
+
     def is_connected(self) -> bool:
         """Check if device is connected"""
-        
+
     def get_device_info(self) -> Dict[str, Any]:
         """Get device information and status"""
-        
+
     def list_recordings(self) -> List[Recording]:
         """List all recordings on the device"""
-        
+
     def download_recording(self, recording_id: int) -> bytes:
         """Download a recording from the device"""
-        
+
     def delete_recording(self, recording_id: int) -> bool:
         """Delete a recording from the device"""
-        
+
     def format_storage(self) -> bool:
         """Format device storage (WARNING: Deletes all data)"""
-        
+
     def sync_time(self) -> bool:
         """Synchronize device time with system time"""
 ```
@@ -87,13 +87,13 @@ Unified interface for all AI providers.
 class AIService:
     def configure_provider(self, provider_name: str, config: Dict[str, Any]) -> bool:
         """Configure an AI provider with API keys and settings"""
-        
+
     def get_available_providers(self) -> List[str]:
         """Get list of available AI providers"""
-        
+
     def transcribe_audio(self, audio_file_path: str, provider: str = None, language: str = "auto") -> Dict[str, Any]:
         """Transcribe audio file using specified or default provider"""
-        
+
     def analyze_text(self, text: str, provider: str = None, analysis_type: str = "insights") -> Dict[str, Any]:
         """Analyze text using specified or default provider"""
 ```
@@ -148,25 +148,25 @@ class AIService:
 class AudioPlayer:
     def load(self, file_path: str) -> bool:
         """Load audio file for playback"""
-        
+
     def play(self) -> bool:
         """Start audio playback"""
-        
+
     def pause(self) -> bool:
         """Pause audio playback"""
-        
+
     def stop(self) -> bool:
         """Stop audio playback"""
-        
+
     def set_position(self, position: float) -> bool:
         """Set playback position (0.0 to 1.0)"""
-        
+
     def set_speed(self, speed: float) -> bool:
         """Set playback speed (0.25 to 2.0)"""
-        
+
     def get_duration(self) -> float:
         """Get audio duration in seconds"""
-        
+
     def get_position(self) -> float:
         """Get current playback position (0.0 to 1.0)"""
 ```
@@ -183,13 +183,13 @@ interface DeviceService {
     requestDevice(): Promise<USBDevice>;
     connectToDevice(device: USBDevice): Promise<ConnectionResult>;
     disconnectDevice(): Promise<void>;
-    
+
     // Device Operations
     getDeviceInfo(): Promise<DeviceInfo>;
     listRecordings(): Promise<Recording[]>;
     downloadRecording(recordingId: number): Promise<ArrayBuffer>;
     deleteRecording(recordingId: number): Promise<boolean>;
-    
+
     // Status
     isConnected(): boolean;
     getConnectionStatus(): ConnectionStatus;
@@ -271,19 +271,19 @@ interface AppStore {
     device: DeviceInfo | null;
     deviceStatus: ConnectionStatus;
     recordings: Recording[];
-    
+
     // UI State
     selectedRecording: Recording | null;
     isLoading: boolean;
     error: string | null;
-    
+
     // Actions
     connectDevice: () => Promise<void>;
     disconnectDevice: () => void;
     loadRecordings: () => Promise<void>;
     selectRecording: (recording: Recording) => void;
     deleteRecording: (recordingId: number) => Promise<void>;
-    
+
     // Settings
     settings: AppSettings;
     updateSettings: (settings: Partial<AppSettings>) => void;
@@ -411,19 +411,19 @@ class AIProvider(ABC):
     @abstractmethod
     def configure(self, config: Dict[str, Any]) -> bool:
         """Configure the provider with API keys and settings"""
-        
+
     @abstractmethod
     def is_available(self) -> bool:
         """Check if provider is available and configured"""
-        
+
     @abstractmethod
     def transcribe_audio(self, audio_file_path: str, language: str = "auto") -> Dict[str, Any]:
         """Transcribe audio file"""
-        
+
     @abstractmethod
     def analyze_text(self, text: str, analysis_type: str = "insights") -> Dict[str, Any]:
         """Analyze text content"""
-        
+
     def _mock_response(self, response_type: str) -> Dict[str, Any]:
         """Generate mock response for testing"""
 ```
@@ -480,13 +480,13 @@ class ErrorCodes:
     DEVICE_NOT_FOUND = "DEVICE_NOT_FOUND"
     DEVICE_BUSY = "DEVICE_BUSY"
     PERMISSION_DENIED = "PERMISSION_DENIED"
-    
+
     # AI Errors
     API_KEY_INVALID = "API_KEY_INVALID"
     QUOTA_EXCEEDED = "QUOTA_EXCEEDED"
     UNSUPPORTED_FORMAT = "UNSUPPORTED_FORMAT"
     FILE_TOO_LARGE = "FILE_TOO_LARGE"
-    
+
     # General Errors
     INVALID_INPUT = "INVALID_INPUT"
     NETWORK_ERROR = "NETWORK_ERROR"
@@ -524,10 +524,10 @@ from cryptography.fernet import Fernet
 class SecureConfig:
     def store_api_key(self, provider: str, api_key: str) -> bool:
         """Store encrypted API key"""
-        
+
     def get_api_key(self, provider: str) -> str:
         """Retrieve and decrypt API key"""
-        
+
     def delete_api_key(self, provider: str) -> bool:
         """Delete stored API key"""
 ```
@@ -554,15 +554,15 @@ if device.connect():
     recordings = device.list_recordings()
     if recordings:
         audio_data = device.download_recording(recordings[0].id)
-        
+
         # Save and transcribe
         with open("recording.hda", "wb") as f:
             f.write(audio_data)
-        
+
         ai_service = AIService()
         ai_service.configure_provider("gemini", {"api_key": "your_key"})
         result = ai_service.transcribe_audio("recording.hda")
-        
+
         if result["success"]:
             print(f"Transcription: {result['transcription']}")
 ```
@@ -576,7 +576,7 @@ const deviceService = new DeviceService();
 try {
     const device = await deviceService.requestDevice();
     const result = await deviceService.connectToDevice(device);
-    
+
     if (result.success) {
         const recordings = await deviceService.listRecordings();
         console.log(`Found ${recordings.length} recordings`);

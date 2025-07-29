@@ -210,11 +210,11 @@ describe('DeviceService WebUSB Implementation', () => {
         beforeEach(async () => {
             // Setup proper device connection mock sequence
             let callCount = 0;
-            
+
             // Mock the connection sequence: device info, storage info, then file list
             mockUSBDevice.transferIn.mockImplementation(() => {
                 callCount++;
-                
+
                 if (callCount === 1) {
                     // Device info response - proper packet format
                     const deviceInfoBody = new Array(32).fill(0x00);
@@ -258,7 +258,7 @@ describe('DeviceService WebUSB Implementation', () => {
                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Skip 6 bytes
                         ...new Array(16).fill(0x00), // Signature (16 bytes)
                     ]);
-                    
+
                     const mockFileListResponse = new Uint8Array([
                         0x12, 0x34, // Sync bytes
                         0x00, 0x00, // Command ID: 0 (big endian)
@@ -275,7 +275,7 @@ describe('DeviceService WebUSB Implementation', () => {
             });
 
             mockUSBDevice.transferOut.mockResolvedValue({ status: 'ok', bytesWritten: 12 });
-            
+
             await deviceService.requestDevice();
         });
 
@@ -284,25 +284,25 @@ describe('DeviceService WebUSB Implementation', () => {
             let getRecordingsCallCount = 0;
             mockUSBDevice.transferIn.mockImplementation(() => {
                 getRecordingsCallCount++;
-                
+
                 // File list response - proper format expected by parseFileListResponse
                 const fileName = 'test.wav';
                 const fileNameBytes = new TextEncoder().encode(fileName);
-                
+
                 const fileListBody = new Uint8Array([
                     // Optional header with file count
                     0xFF, 0xFF, // Header prefix
                     0x00, 0x00, 0x00, 0x01, // Number of files: 1 (big endian)
-                    
+
                     // File entry
                     0x02, // File version
                     0x00, 0x00, fileNameBytes.length, // Filename length (3 bytes, big endian)
                     ...fileNameBytes, // Filename
-                    0x00, 0x00, 0x10, 0x00, // File size: 4096 bytes (big endian) 
+                    0x00, 0x00, 0x10, 0x00, // File size: 4096 bytes (big endian)
                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Skip 6 bytes
                     ...new Array(16).fill(0x00), // Signature (16 bytes)
                 ]);
-                
+
                 const mockFileListResponse = new Uint8Array([
                     0x12, 0x34, // Sync bytes
                     0x00, 0x00, // Command ID: 0 (big endian)
@@ -311,7 +311,7 @@ describe('DeviceService WebUSB Implementation', () => {
                     ...fileListBody, // File list data
                     0x56, 0x78, // Checksum (2 bytes)
                 ]);
-                
+
                 return Promise.resolve({
                     status: 'ok',
                     data: new DataView(mockFileListResponse.buffer)
@@ -332,11 +332,11 @@ describe('DeviceService WebUSB Implementation', () => {
             // Mock successful download with proper response sequence
             const fileData = new Uint8Array([1, 2, 3, 4, 5]);
             let downloadCallCount = 0;
-            
+
             // Reset mock for this specific test
             mockUSBDevice.transferIn.mockImplementation(() => {
                 downloadCallCount++;
-                
+
                 if (downloadCallCount === 1) {
                     // Download start response with proper packet format
                     const downloadStartResponse = new Uint8Array([

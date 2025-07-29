@@ -8,6 +8,7 @@ from datetime import datetime
 from tkinter import ttk
 
 import customtkinter as ctk
+
 from config_and_logger import logger
 
 
@@ -105,14 +106,14 @@ class TreeViewMixin:
         has_real_files = any(
             not child.startswith("loading_") for child in existing_children
         )
-        
+
         if not has_real_files:
             # No real files shown yet, display loading indicators
             self.file_tree.delete(*existing_children)
-            
+
             loading_messages = [
                 "🔄 Loading files from device...",
-                "📡 Fetching file information...", 
+                "📡 Fetching file information...",
                 "⏳ Please wait...",
             ]
 
@@ -145,24 +146,29 @@ class TreeViewMixin:
             return
         selected_iids = self.file_tree.selection()
         scroll_pos = self.file_tree.yview()
-        
+
         # Remove any loading indicators, but preserve real files if doing an update
         children_to_remove = [
-            child for child in self.file_tree.get_children() 
+            child
+            for child in self.file_tree.get_children()
             if child.startswith("loading_")
         ]
         for child in children_to_remove:
             self.file_tree.delete(child)
-            
+
         # Only clear all if we're doing a full refresh (not an update)
-        if not hasattr(self, '_is_incremental_update') or not self._is_incremental_update:
+        if (
+            not hasattr(self, "_is_incremental_update")
+            or not self._is_incremental_update
+        ):
             remaining_children = [
-                child for child in self.file_tree.get_children() 
+                child
+                for child in self.file_tree.get_children()
                 if not child.startswith("loading_")
             ]
             for child in remaining_children:
                 self.file_tree.delete(child)
-        
+
         self.displayed_files_details = files_data
         for i, file_info in enumerate(files_data):
             tags = []
@@ -271,7 +277,6 @@ class TreeViewMixin:
             and self.treeview_sort_column
             and self.treeview_sort_column != "status"
         ):
-
             # Re-sort the data to maintain order
             sorted_files = self._sort_files_data(
                 self.displayed_files_details,

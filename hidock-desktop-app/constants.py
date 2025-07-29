@@ -11,7 +11,7 @@ ease of modification.
 # constants.py
 
 # --- USB Device Constants ---
-DEFAULT_VENDOR_ID = 0x10D6   # Actions Semiconductor
+DEFAULT_VENDOR_ID = 0x10D6  # Actions Semiconductor
 DEFAULT_PRODUCT_ID = 0xB00D  # The PID for HiDock H1E as a default
 
 # Target endpoints
@@ -27,8 +27,8 @@ CMD_TRANSFER_FILE = 5  # Streaming
 CMD_GET_FILE_COUNT = 6
 CMD_DELETE_FILE = 7
 CMD_GET_FILE_BLOCK = 13  # Not currently used in this script's logic, but defined
-CMD_GET_SETTINGS = 11       # For autoRecord, autoPlay, etc.
-CMD_SET_SETTINGS = 12       # For autoRecord, autoPlay, etc.
+CMD_GET_SETTINGS = 11  # For autoRecord, autoPlay, etc.
+CMD_SET_SETTINGS = 12  # For autoRecord, autoPlay, etc.
 CMD_GET_CARD_INFO = 16
 CMD_FORMAT_CARD = 17
 CMD_GET_RECORDING_FILE = 18

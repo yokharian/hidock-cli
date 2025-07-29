@@ -216,8 +216,10 @@ class DesktopDeviceAdapter(IDeviceInterface):
 
         try:
             # Check if file list streaming is in progress to avoid command collisions
-            if (hasattr(self.jensen_device, 'is_file_list_streaming') and 
-                self.jensen_device.is_file_list_streaming()):
+            if (
+                hasattr(self.jensen_device, "is_file_list_streaming")
+                and self.jensen_device.is_file_list_streaming()
+            ):
                 # Return cached/fallback values during streaming to avoid collisions
                 total_capacity = 8 * 1024 * 1024 * 1024  # 8GB fallback
                 used_space = 0
@@ -291,11 +293,13 @@ class DesktopDeviceAdapter(IDeviceInterface):
 
         try:
             # Check if file list streaming is in progress to avoid command collisions
-            if (hasattr(self.jensen_device, 'is_file_list_streaming') and 
-                self.jensen_device.is_file_list_streaming()):
+            if (
+                hasattr(self.jensen_device, "is_file_list_streaming")
+                and self.jensen_device.is_file_list_streaming()
+            ):
                 # Return None during streaming to avoid collisions
                 return None
-                
+
             # This is a lightweight command to check for an active recording
             recording_info = self.jensen_device.get_recording_file()
             if not recording_info or not recording_info.get("name"):

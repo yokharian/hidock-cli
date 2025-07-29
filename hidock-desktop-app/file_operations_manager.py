@@ -216,9 +216,9 @@ class FileMetadataCache:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
-                INSERT OR REPLACE INTO file_metadata 
-                (filename, size, duration, date_created, device_path, local_path, 
-                 checksum, file_type, transcription_status, last_accessed, 
+                INSERT OR REPLACE INTO file_metadata
+                (filename, size, duration, date_created, device_path, local_path,
+                 checksum, file_type, transcription_status, last_accessed,
                  download_count, tags, cache_timestamp)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
@@ -350,8 +350,8 @@ class FileOperationsManager:
                 if operation.status == FileOperationStatus.CANCELLED:
                     logger.info(
                         "FileOpsManager",
-                        "_worker_thread", 
-                        f"Skipping cancelled operation {operation.operation_id}"
+                        "_worker_thread",
+                        f"Skipping cancelled operation {operation.operation_id}",
                     )
                     self.operation_queue.task_done()
                     continue
@@ -377,7 +377,7 @@ class FileOperationsManager:
                 logger.info(
                     "FileOpsManager",
                     "_execute_operation",
-                    f"Operation {operation.operation_id} was cancelled before execution"
+                    f"Operation {operation.operation_id} was cancelled before execution",
                 )
                 return
 
@@ -395,7 +395,7 @@ class FileOperationsManager:
                 logger.info(
                     "FileOpsManager",
                     "_execute_operation",
-                    f"Operation {operation.operation_id} was cancelled during execution"
+                    f"Operation {operation.operation_id} was cancelled during execution",
                 )
                 return
 
@@ -799,7 +799,7 @@ class FileOperationsManager:
         if operation_id in self.active_operations:
             operation = self.active_operations[operation_id]
             operation.status = FileOperationStatus.CANCELLED
-            
+
             # Clean up partial downloads
             if operation.operation_type == FileOperationType.DOWNLOAD:
                 partial_file_path = self.download_dir / operation.filename
@@ -809,15 +809,15 @@ class FileOperationsManager:
                         logger.info(
                             "FileOpsManager",
                             "cancel_operation",
-                            f"Cleaned up partial download: {partial_file_path}"
+                            f"Cleaned up partial download: {partial_file_path}",
                         )
                     except Exception as e:
                         logger.warning(
                             "FileOpsManager",
                             "cancel_operation",
-                            f"Failed to clean up partial download {partial_file_path}: {e}"
+                            f"Failed to clean up partial download {partial_file_path}: {e}",
                         )
-            
+
             logger.info(
                 "FileOpsManager",
                 "cancel_operation",

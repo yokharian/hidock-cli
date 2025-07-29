@@ -69,7 +69,7 @@ if command -v node &> /dev/null; then
     NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
     if [ "$NODE_VERSION" -ge 18 ]; then
         echo "✓ Node.js found! Setting up web apps..."
-        
+
         echo "Setting up HiDock Web App..."
         cd hidock-web-app
         npm install || {
@@ -77,7 +77,7 @@ if command -v node &> /dev/null; then
         }
         echo "✅ Web app setup complete!"
         cd ..
-        
+
         echo "Setting up Audio Insights Extractor..."
         cd audio-insights-extractor
         npm install || {
@@ -85,7 +85,7 @@ if command -v node &> /dev/null; then
         }
         echo "✅ Audio Insights Extractor setup complete!"
         cd ..
-        
+
         WEB_APP_READY=true
     else
         echo "⚠️  Node.js version $NODE_VERSION found, but 18+ required"

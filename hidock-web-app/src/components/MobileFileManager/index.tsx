@@ -1,12 +1,12 @@
 /**
  * Mobile-Responsive File Manager Component
- * 
+ *
  * Optimized for touch interfaces and mobile devices with:
  * - Touch-friendly controls and gestures
  * - Responsive layout that adapts to screen size
  * - Swipe actions for file operations
  * - Mobile-optimized dialogs and modals
- * 
+ *
  * Requirements addressed: 8.1, 8.2, 8.3, 8.4
  */
 

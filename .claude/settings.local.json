@@ -16,7 +16,8 @@
       "Bash(git fetch:*)",
       "Bash(npm install:*)",
       "Bash(grep:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(pre-commit run:*)"
     ],
     "deny": []
   }

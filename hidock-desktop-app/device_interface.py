@@ -629,9 +629,9 @@ class DeviceManager:
         }
 
         if DeviceCapability.HEALTH_MONITORING in self._capabilities:
-            diagnostics["health_status"] = (
-                await self.device_interface.get_device_health()
-            )
+            diagnostics[
+                "health_status"
+            ] = await self.device_interface.get_device_health()
 
         return diagnostics
 

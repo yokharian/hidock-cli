@@ -15,6 +15,7 @@ from datetime import datetime
 from tkinter import messagebox
 
 import usb.core
+
 from config_and_logger import logger
 from ctk_custom_widgets import CTkBanner
 from file_operations_manager import FileMetadata
@@ -190,7 +191,7 @@ class DeviceActionsMixin:
                 # Update UI to show connected state immediately
                 self.after(0, self._show_connected_state)
                 # Show cached files immediately if available, then refresh
-                if hasattr(self, '_show_cached_files_if_available'):
+                if hasattr(self, "_show_cached_files_if_available"):
                     self.after(50, self._show_cached_files_if_available)
                 # Load file list with proper delay to ensure cached display completes
                 self.after(300, self.refresh_file_list_gui)
@@ -370,16 +371,16 @@ class DeviceActionsMixin:
         Heavily optimized to minimize file system operations and logging.
         """
         # Get download directory once
-        download_dir = getattr(self, 'download_directory', None)
+        download_dir = getattr(self, "download_directory", None)
         if not download_dir or not os.path.exists(download_dir):
             return
-            
+
         # Get all files in download directory once
         try:
             downloaded_files = set(os.listdir(download_dir))
         except (OSError, PermissionError):
             return
-        
+
         # Batch process files - minimal logging
         found_count = 0
         for f_info in files:
@@ -395,25 +396,25 @@ class DeviceActionsMixin:
                 # Skip the isfile check for performance - trust the directory listing
                 f_info.local_path = local_filepath
                 found_count += 1
-        
+
         # Single summary log instead of per-file logging
         if found_count > 0:
             logger.debug(
                 "GUI",
-                "_update_downloaded_file_status", 
-                f"Found {found_count} downloaded files"
+                "_update_downloaded_file_status",
+                f"Found {found_count} downloaded files",
             )
 
     def _show_connected_state(self):
         """Update UI to show connected state without waiting for file list."""
         try:
-            if hasattr(self, 'update_status_bar'):
+            if hasattr(self, "update_status_bar"):
                 self.update_status_bar(
                     connection_status="Status: Connected",
-                    progress_text="Loading files..."
+                    progress_text="Loading files...",
                 )
             # Update any other UI elements that need to show connected state
-            if hasattr(self, '_update_menu_states'):
+            if hasattr(self, "_update_menu_states"):
                 self._update_menu_states()
         except Exception as e:
             logger.warning("GUI", "_show_connected_state", f"Error updating UI: {e}")
@@ -421,11 +422,16 @@ class DeviceActionsMixin:
     def _show_cached_files_if_available(self):
         """Show cached files immediately if available to improve perceived performance."""
         try:
-            cached_files = self.file_operations_manager.metadata_cache.get_all_metadata()
+            cached_files = (
+                self.file_operations_manager.metadata_cache.get_all_metadata()
+            )
             if cached_files:
-                logger.info("GUI", "_show_cached_files_if_available", 
-                           f"Showing {len(cached_files)} cached files")
-                
+                logger.info(
+                    "GUI",
+                    "_show_cached_files_if_available",
+                    f"Showing {len(cached_files)} cached files",
+                )
+
                 # Convert cached files to GUI format - optimized with list comprehension
                 files_dict = [
                     {
@@ -445,22 +451,28 @@ class DeviceActionsMixin:
                         "time": f_info.date_created,
                         "version": "⟳",  # Refreshing indicator
                         "original_index": i + 1,
-                        "gui_status": "Cached" if not f_info.local_path else "Downloaded",
+                        "gui_status": "Cached"
+                        if not f_info.local_path
+                        else "Downloaded",
                         "local_path": f_info.local_path,
                         "checksum": f_info.checksum,
                     }
                     for i, f_info in enumerate(cached_files)
                 ]
-                
+
                 # Update GUI with cached data
                 sorted_files = self._apply_saved_sort_state_to_tree_and_ui(files_dict)
                 self._populate_treeview_from_data(sorted_files)
                 self.update_status_bar(
                     connection_status="Status: Connected",
-                    progress_text=f"Showing {len(cached_files)} cached files, refreshing..."
+                    progress_text=f"Showing {len(cached_files)} cached files, refreshing...",
                 )
         except Exception as e:
-            logger.warning("GUI", "_show_cached_files_if_available", f"Error showing cached files: {e}")
+            logger.warning(
+                "GUI",
+                "_show_cached_files_if_available",
+                f"Error showing cached files: {e}",
+            )
 
     def _refresh_file_list_thread(self):  # Identical to original logic, uses self.after
         """Threaded method to refresh the file list in the GUI."""
@@ -474,24 +486,26 @@ class DeviceActionsMixin:
                 recording_info = asyncio.run(
                     self.device_manager.device_interface.get_recordings()
                 )
-                
+
                 # Get storage info after file list to avoid command conflicts
                 card_info = asyncio.run(
                     self.device_manager.device_interface.get_storage_info()
                 )
-                
+
                 # Check cache to see how many files we had before
-                cached_files = self.file_operations_manager.metadata_cache.get_all_metadata()
+                cached_files = (
+                    self.file_operations_manager.metadata_cache.get_all_metadata()
+                )
                 cached_count = len(cached_files)
-                
+
                 # If we got fresh data from device, decide how to handle it
                 if recording_info:
                     if len(recording_info) >= cached_count:
                         # Device returned complete data, update cache fully
                         logger.info(
-                            "GUI", 
-                            "_refresh_file_list_thread", 
-                            f"Updating cache with {len(recording_info)} files from device"
+                            "GUI",
+                            "_refresh_file_list_thread",
+                            f"Updating cache with {len(recording_info)} files from device",
                         )
                         device_files = recording_info
                         for f in device_files:
@@ -505,7 +519,9 @@ class DeviceActionsMixin:
                                 try:
                                     date_str = f"{f.get('createDate', '')} {f.get('createTime', '')}".strip()
                                     if date_str and date_str != "---":
-                                        date_created = datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
+                                        date_created = datetime.strptime(
+                                            date_str, "%Y/%m/%d %H:%M:%S"
+                                        )
                                     else:
                                         date_created = None
                                 except (ValueError, TypeError):
@@ -520,7 +536,7 @@ class DeviceActionsMixin:
                                 date_created = f.date_created
                                 local_path = getattr(f, "local_path", None)
                                 checksum = getattr(f, "checksum", None)
-                                
+
                             metadata_to_cache = FileMetadata(
                                 filename=filename,
                                 size=size,
@@ -539,13 +555,13 @@ class DeviceActionsMixin:
                     else:
                         # Device returned incomplete data - try to merge new files with cache
                         logger.warning(
-                            "GUI", 
-                            "_refresh_file_list_thread", 
-                            f"Device returned incomplete data ({len(recording_info)} vs {cached_count} cached), attempting merge"
+                            "GUI",
+                            "_refresh_file_list_thread",
+                            f"Device returned incomplete data ({len(recording_info)} vs {cached_count} cached), attempting merge",
                         )
                         # Create a set of cached filenames for quick lookup
                         cached_filenames = {f.filename for f in cached_files}
-                        
+
                         # Add any new files from device data to cache
                         new_files_added = 0
                         for f in recording_info:
@@ -553,13 +569,15 @@ class DeviceActionsMixin:
                             if filename not in cached_filenames:
                                 # This is a new file not in cache
                                 if isinstance(f, dict):
-                                    # Raw dictionary from adapter  
+                                    # Raw dictionary from adapter
                                     size = f["length"]
                                     duration = f["duration"]
                                     try:
                                         date_str = f"{f.get('createDate', '')} {f.get('createTime', '')}".strip()
                                         if date_str and date_str != "---":
-                                            date_created = datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
+                                            date_created = datetime.strptime(
+                                                date_str, "%Y/%m/%d %H:%M:%S"
+                                            )
                                         else:
                                             date_created = None
                                     except (ValueError, TypeError):
@@ -573,7 +591,7 @@ class DeviceActionsMixin:
                                     date_created = f.date_created
                                     local_path = getattr(f, "local_path", None)
                                     checksum = getattr(f, "checksum", None)
-                                    
+
                                 metadata_to_cache = FileMetadata(
                                     filename=filename,
                                     size=size,
@@ -587,14 +605,14 @@ class DeviceActionsMixin:
                                     metadata_to_cache
                                 )
                                 new_files_added += 1
-                        
+
                         if new_files_added > 0:
                             logger.info(
-                                "GUI", 
-                                "_refresh_file_list_thread", 
-                                f"Added {new_files_added} new files to cache from incomplete device data"
+                                "GUI",
+                                "_refresh_file_list_thread",
+                                f"Added {new_files_added} new files to cache from incomplete device data",
                             )
-                        
+
                         # Use updated cache which now includes any new files
                         files = (
                             self.file_operations_manager.metadata_cache.get_all_metadata()
@@ -604,15 +622,15 @@ class DeviceActionsMixin:
                     # Use cached data as fallback
                     if recording_info:
                         logger.warning(
-                            "GUI", 
-                            "_refresh_file_list_thread", 
-                            f"Device fetch incomplete ({len(recording_info)} vs {cached_count} cached), using cached data"
+                            "GUI",
+                            "_refresh_file_list_thread",
+                            f"Device fetch incomplete ({len(recording_info)} vs {cached_count} cached), using cached data",
                         )
                     else:
                         logger.warning(
-                            "GUI", 
-                            "_refresh_file_list_thread", 
-                            "Device fetch failed, using cached data"
+                            "GUI",
+                            "_refresh_file_list_thread",
+                            "Device fetch failed, using cached data",
                         )
                     files = cached_files  # Use the already loaded cached files
 
@@ -628,14 +646,16 @@ class DeviceActionsMixin:
             # Convert FileMetadata objects to dictionaries in the format the GUI expects
             # Also include version info from raw recording_info data
             files_dict = []
-            
+
             # Create a lookup for version info from raw recording data
             version_lookup = {}
             if recording_info:
                 for raw_file in recording_info:
                     if isinstance(raw_file, dict):
-                        version_lookup[raw_file["name"]] = raw_file.get("version", "N/A")
-            
+                        version_lookup[raw_file["name"]] = raw_file.get(
+                            "version", "N/A"
+                        )
+
             for i, f_info in enumerate(files):
                 # Determine GUI status based on local file existence and active operations
                 gui_status = "On Device"
@@ -803,12 +823,21 @@ class DeviceActionsMixin:
             if self.device_lock.acquire(blocking=False):
                 try:
                     # Skip recording check if file list streaming is active to avoid command conflicts
-                    if (hasattr(self.device_manager.device_interface, 'jensen_device') and 
-                        hasattr(self.device_manager.device_interface.jensen_device, 'is_file_list_streaming') and 
-                        self.device_manager.device_interface.jensen_device.is_file_list_streaming()):
-                        logger.debug("GUI", "_check_recording_status_periodically", "Skipping recording check during file list streaming")
+                    if (
+                        hasattr(self.device_manager.device_interface, "jensen_device")
+                        and hasattr(
+                            self.device_manager.device_interface.jensen_device,
+                            "is_file_list_streaming",
+                        )
+                        and self.device_manager.device_interface.jensen_device.is_file_list_streaming()
+                    ):
+                        logger.debug(
+                            "GUI",
+                            "_check_recording_status_periodically",
+                            "Skipping recording check during file list streaming",
+                        )
                         return
-                        
+
                     # Use the new lightweight method instead of the heavy get_recordings()
                     current_recording_filename = asyncio.run(
                         self.device_manager.device_interface.get_current_recording_filename()

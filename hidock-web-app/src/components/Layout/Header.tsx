@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  Headphones, 
-  Wifi, 
-  WifiOff, 
-  Settings, 
+import {
+  Headphones,
+  Wifi,
+  WifiOff,
+  Settings,
   HardDrive,
   Clock
 } from 'lucide-react';
@@ -56,7 +56,7 @@ export const Header: React.FC = () => {
                   {formatBytes(device.storageInfo.usedSpace)} / {formatBytes(device.storageInfo.totalCapacity)}
                 </span>
               </div>
-              
+
               <div className="flex items-center space-x-2 text-sm text-slate-300">
                 <Clock className="w-4 h-4" />
                 <span>{device.storageInfo.fileCount} files</span>

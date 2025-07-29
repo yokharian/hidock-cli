@@ -17,7 +17,7 @@ proc set_theme {mode} {
             -selectfg       "#ffffff"
             -selectbg       "#007fff"
         }
-        
+
         ttk::style configure . \
             -background $colors(-bg) \
             -foreground $colors(-fg) \
@@ -44,7 +44,7 @@ proc set_theme {mode} {
 
         option add *font [ttk::style lookup . -font]
         option add *Menu.selectcolor $colors(-fg)
-    
+
 	} elseif {$mode == "light"} {
 		ttk::style theme use "azure-light"
 

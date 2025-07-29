@@ -1,9 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Music, 
-  MessageSquare, 
+import {
+  LayoutDashboard,
+  Music,
+  MessageSquare,
   Settings,
   Usb,
   Download,
@@ -22,11 +22,11 @@ const navigationItems = [
 
 export const Sidebar: React.FC = () => {
   const { selectedRecordings } = useAppStore();
-  const { 
-    isDeviceConnected, 
-    connectDevice, 
-    disconnectDevice, 
-    refreshRecordings 
+  const {
+    isDeviceConnected,
+    connectDevice,
+    disconnectDevice,
+    refreshRecordings
   } = useDeviceConnection();
 
   return (
@@ -80,7 +80,7 @@ export const Sidebar: React.FC = () => {
               >
                 <RefreshCw className="w-4 h-4 text-slate-300" />
               </button>
-              
+
               <button
                 className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
                 title="Download Selected"
@@ -88,7 +88,7 @@ export const Sidebar: React.FC = () => {
               >
                 <Download className="w-4 h-4 text-slate-300" />
               </button>
-              
+
               <button
                 className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
                 title="Delete Selected"

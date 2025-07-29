@@ -19,12 +19,13 @@ import customtkinter as ctk
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
-from audio_player_enhanced import AudioProcessor, PlaybackPosition
-from config_and_logger import logger
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from scipy import signal
 from scipy.fft import fftfreq
+
+from audio_player_enhanced import AudioProcessor, PlaybackPosition
+from config_and_logger import logger
 
 
 class WaveformVisualizer:
@@ -110,14 +111,14 @@ class WaveformVisualizer:
                 # The canvas will be drawn when it's actually displayed
                 logger.warning(
                     "WaveformVisualizer",
-                    "_initialize_plot", 
-                    "Skipping initial canvas draw due to recursion error"
+                    "_initialize_plot",
+                    "Skipping initial canvas draw due to recursion error",
                 )
         except Exception as e:
             logger.error(
                 "WaveformVisualizer",
                 "_initialize_plot",
-                f"Error initializing plot: {e}"
+                f"Error initializing plot: {e}",
             )
 
     def _apply_theme_colors(self):
@@ -446,14 +447,12 @@ class SpectrumAnalyzer:
                 # The canvas will be drawn when it's actually displayed
                 logger.warning(
                     "SpectrumAnalyzer",
-                    "_initialize_plot", 
-                    "Skipping initial canvas draw due to recursion error"
+                    "_initialize_plot",
+                    "Skipping initial canvas draw due to recursion error",
                 )
         except Exception as e:
             logger.error(
-                "SpectrumAnalyzer",
-                "_initialize_plot",
-                f"Error initializing plot: {e}"
+                "SpectrumAnalyzer", "_initialize_plot", f"Error initializing plot: {e}"
             )
 
     def start_analysis(self, audio_data: np.ndarray, sample_rate: int):
@@ -461,7 +460,7 @@ class SpectrumAnalyzer:
         try:
             # Stop any existing animation first
             self.stop_analysis()
-            
+
             self.sample_rate = sample_rate
             self.audio_data = audio_data
 
@@ -482,11 +481,11 @@ class SpectrumAnalyzer:
 
             # Start animation with explicit settings to ensure it runs
             logger.info(
-                "SpectrumAnalyzer", 
-                "start_analysis", 
-                f"Starting spectrum analysis with {len(audio_data)} samples at {sample_rate} Hz"
+                "SpectrumAnalyzer",
+                "start_analysis",
+                f"Starting spectrum analysis with {len(audio_data)} samples at {sample_rate} Hz",
             )
-            
+
             self.is_running = True
             self.animation = animation.FuncAnimation(
                 self.figure,
@@ -496,20 +495,26 @@ class SpectrumAnalyzer:
                 cache_frame_data=False,
                 repeat=True,  # Keep repeating the animation
             )
-            
+
             # Force initial draw to start the animation
             try:
                 self.canvas.draw()
                 logger.info(
-                    "SpectrumAnalyzer", "start_analysis", "Initial canvas draw completed"
+                    "SpectrumAnalyzer",
+                    "start_analysis",
+                    "Initial canvas draw completed",
                 )
             except Exception as draw_error:
                 logger.warning(
-                    "SpectrumAnalyzer", "start_analysis", f"Initial draw warning: {draw_error}"
+                    "SpectrumAnalyzer",
+                    "start_analysis",
+                    f"Initial draw warning: {draw_error}",
                 )
 
             logger.info(
-                "SpectrumAnalyzer", "start_analysis", "Spectrum analysis started successfully"
+                "SpectrumAnalyzer",
+                "start_analysis",
+                "Spectrum analysis started successfully",
             )
 
         except Exception as e:
@@ -602,7 +607,7 @@ class SpectrumAnalyzer:
 
             # Update plot data
             self.spectrum_line.set_data(freqs, spectrum)
-            
+
             # Force canvas redraw to make sure spectrum is visible
             try:
                 self.canvas.draw_idle()
@@ -611,13 +616,13 @@ class SpectrumAnalyzer:
                     logger.info(
                         "SpectrumAnalyzer",
                         "_update_spectrum",
-                        f"Updated spectrum at {self.current_position:.1f}s, freq range: {freqs[0]:.1f}-{freqs[-1]:.1f} Hz, max magnitude: {np.max(spectrum):.1f} dB"
+                        f"Updated spectrum at {self.current_position:.1f}s, freq range: {freqs[0]:.1f}-{freqs[-1]:.1f} Hz, max magnitude: {np.max(spectrum):.1f} dB",
                     )
             except Exception as draw_error:
                 logger.error(
                     "SpectrumAnalyzer",
                     "_update_spectrum",
-                    f"Canvas draw error: {draw_error}"
+                    f"Canvas draw error: {draw_error}",
                 )
 
             return [self.spectrum_line]
@@ -634,26 +639,30 @@ class AudioVisualizationWidget(ctk.CTkFrame):
 
     def __init__(self, parent, height=180, **kwargs):
         super().__init__(parent, **kwargs)
-        
+
         # Set a fixed height for the widget and prevent it from expanding
         self.configure(height=height)
         self.pack_propagate(False)  # Prevent child widgets from affecting our size
-        
+
         # Audio player reference (will be set by parent)
         self.audio_player = None
         self.current_speed = 1.0
 
         # Create notebook for different visualization types
-        self.notebook = ctk.CTkTabview(self, height=height-40)  # Leave room for controls
+        self.notebook = ctk.CTkTabview(
+            self, height=height - 40
+        )  # Leave room for controls
         self.notebook.pack(fill="x", expand=False, padx=3, pady=3)
 
         # Waveform tab
         self.waveform_tab = self.notebook.add("Waveform")
-        self.waveform_visualizer = WaveformVisualizer(self.waveform_tab, height=height-80)
+        self.waveform_visualizer = WaveformVisualizer(
+            self.waveform_tab, height=height - 80
+        )
 
         # Spectrum tab
         self.spectrum_tab = self.notebook.add("Spectrum")
-        self.spectrum_analyzer = SpectrumAnalyzer(self.spectrum_tab, height=height-80)
+        self.spectrum_analyzer = SpectrumAnalyzer(self.spectrum_tab, height=height - 80)
 
         # Set up tab change callback
         self.notebook.configure(command=self._on_tab_changed)
@@ -704,7 +713,9 @@ class AudioVisualizationWidget(ctk.CTkFrame):
         # Remove redundant checkboxes - tabs already provide this functionality
         # Visualization state is now controlled by the active tab
         self.show_waveform_var = ctk.BooleanVar(value=True)
-        self.show_spectrum_var = ctk.BooleanVar(value=True)  # Always enable spectrum analyzer
+        self.show_spectrum_var = ctk.BooleanVar(
+            value=True
+        )  # Always enable spectrum analyzer
 
     def _load_theme_icons(self):
         """Load theme toggle icons"""
@@ -798,21 +809,21 @@ class AudioVisualizationWidget(ctk.CTkFrame):
             logger.info(
                 "AudioVisualizationWidget",
                 "start_spectrum_analysis",
-                f"Starting spectrum analysis for {len(audio_data)} samples at {sample_rate} Hz"
+                f"Starting spectrum analysis for {len(audio_data)} samples at {sample_rate} Hz",
             )
-            
+
             self.spectrum_analyzer.start_analysis(audio_data, sample_rate)
-            
+
             logger.info(
                 "AudioVisualizationWidget",
-                "start_spectrum_analysis", 
-                "Spectrum analysis started successfully"
+                "start_spectrum_analysis",
+                "Spectrum analysis started successfully",
             )
         except Exception as e:
             logger.error(
                 "AudioVisualizationWidget",
                 "start_spectrum_analysis",
-                f"Error starting spectrum analysis: {e}"
+                f"Error starting spectrum analysis: {e}",
             )
 
     def stop_spectrum_analysis(self):
@@ -937,10 +948,11 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                         try:
                             from audio_player_enhanced import AudioProcessor
 
-                            waveform_data, sample_rate = (
-                                AudioProcessor.extract_waveform_data(
-                                    current_track.filepath, max_points=1024
-                                )
+                            (
+                                waveform_data,
+                                sample_rate,
+                            ) = AudioProcessor.extract_waveform_data(
+                                current_track.filepath, max_points=1024
                             )
                             if len(waveform_data) > 0:
                                 self.start_spectrum_analysis(waveform_data, sample_rate)
@@ -983,9 +995,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
 
             # Speed label
             ctk.CTkLabel(
-                speed_frame,
-                text="Speed:",
-                font=ctk.CTkFont(size=12, weight="bold")
+                speed_frame, text="Speed:", font=ctk.CTkFont(size=12, weight="bold")
             ).pack(side="left", padx=(8, 5))
 
             # Speed decrease button
@@ -995,7 +1005,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                 width=30,
                 height=24,
                 font=ctk.CTkFont(size=16, weight="bold"),
-                command=self._decrease_speed
+                command=self._decrease_speed,
             )
             self.speed_down_btn.pack(side="left", padx=2)
 
@@ -1004,7 +1014,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                 speed_frame,
                 text="1.0x",
                 width=50,
-                font=ctk.CTkFont(size=12, weight="bold")
+                font=ctk.CTkFont(size=12, weight="bold"),
             )
             self.speed_label.pack(side="left", padx=5)
 
@@ -1015,7 +1025,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                 width=30,
                 height=24,
                 font=ctk.CTkFont(size=16, weight="bold"),
-                command=self._increase_speed
+                command=self._increase_speed,
             )
             self.speed_up_btn.pack(side="left", padx=2)
 
@@ -1026,7 +1036,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                 width=50,
                 height=24,
                 font=ctk.CTkFont(size=11),
-                command=self._reset_speed
+                command=self._reset_speed,
             )
             self.speed_reset_btn.pack(side="left", padx=(5, 8))
 
@@ -1034,11 +1044,9 @@ class AudioVisualizationWidget(ctk.CTkFrame):
             preset_frame = ctk.CTkFrame(self.control_frame)
             preset_frame.pack(side="left", padx=5, pady=3)
 
-            ctk.CTkLabel(
-                preset_frame,
-                text="Presets:",
-                font=ctk.CTkFont(size=10)
-            ).pack(side="left", padx=(5, 3))
+            ctk.CTkLabel(preset_frame, text="Presets:", font=ctk.CTkFont(size=10)).pack(
+                side="left", padx=(5, 3)
+            )
 
             # Create preset buttons for common speeds
             preset_speeds = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
@@ -1049,7 +1057,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                     width=35,
                     height=20,
                     font=ctk.CTkFont(size=9),
-                    command=lambda s=speed: self._set_speed_preset(s)
+                    command=lambda s=speed: self._set_speed_preset(s),
                 )
                 btn.pack(side="left", padx=1)
 
@@ -1057,7 +1065,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
             logger.error(
                 "AudioVisualizationWidget",
                 "_create_speed_controls",
-                f"Error creating speed controls: {e}"
+                f"Error creating speed controls: {e}",
             )
 
     def _decrease_speed(self):
@@ -1086,7 +1094,7 @@ class AudioVisualizationWidget(ctk.CTkFrame):
         logger.info(
             "AudioVisualizationWidget",
             "_set_speed_preset",
-            f"Setting playback speed to {speed}x"
+            f"Setting playback speed to {speed}x",
         )
         if self.audio_player:
             success = self.audio_player.set_playback_speed(speed)
@@ -1096,29 +1104,29 @@ class AudioVisualizationWidget(ctk.CTkFrame):
                 logger.info(
                     "AudioVisualizationWidget",
                     "_set_speed_preset",
-                    f"Successfully set speed to {speed}x"
+                    f"Successfully set speed to {speed}x",
                 )
             else:
                 logger.error(
                     "AudioVisualizationWidget",
                     "_set_speed_preset",
-                    f"Failed to set speed to {speed}x"
+                    f"Failed to set speed to {speed}x",
                 )
         else:
             logger.warning(
                 "AudioVisualizationWidget",
                 "_set_speed_preset",
-                "No audio player reference available"
+                "No audio player reference available",
             )
 
     def _update_speed_display(self):
         """Update the speed display label"""
         try:
-            if hasattr(self, 'speed_label'):
+            if hasattr(self, "speed_label"):
                 self.speed_label.configure(text=f"{self.current_speed:.2f}x")
         except Exception as e:
             logger.error(
                 "AudioVisualizationWidget",
-                "_update_speed_display", 
-                f"Error updating speed display: {e}"
+                "_update_speed_display",
+                f"Error updating speed display: {e}",
             )

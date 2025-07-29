@@ -122,7 +122,7 @@ The HiDock hardware is innovative, but users face challenges with official softw
 setup-windows.bat
 ```
 
-#### **🐧🍎 Linux/Mac (One Command)**  
+#### **🐧🍎 Linux/Mac (One Command)**
 ```bash
 chmod +x setup-unix.sh && ./setup-unix.sh
 ```
@@ -160,8 +160,8 @@ npm run dev
 # Open: http://localhost:5173
 ```
 
-> 📖 **Need help?** See [QUICK_START.md](QUICK_START.md) for detailed instructions  
-> 🛠️ **Developers:** See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines  
+> 📖 **Need help?** See [QUICK_START.md](QUICK_START.md) for detailed instructions
+> 🛠️ **Developers:** See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines
 > 📚 **Documentation:** [docs/](docs/) folder contains comprehensive guides
 
 ### **Optional: Local AI Setup**

@@ -562,28 +562,30 @@ class EnhancedAudioPlayer:
                 # Always load the original file for simplicity
                 # Speed adjustment will be handled by creating pre-processed files
                 file_to_load = current_track.filepath
-                
+
                 if self.playback_speed != 1.0:
                     # Create speed-adjusted audio file
                     logger.info(
                         "EnhancedAudioPlayer",
                         "play",
-                        f"Attempting to create speed-adjusted file at {self.playback_speed}x"
+                        f"Attempting to create speed-adjusted file at {self.playback_speed}x",
                     )
-                    if self._create_speed_adjusted_audio(current_track.filepath, self.playback_speed):
+                    if self._create_speed_adjusted_audio(
+                        current_track.filepath, self.playback_speed
+                    ):
                         file_to_load = self._get_temp_speed_file()
                         logger.info(
                             "EnhancedAudioPlayer",
                             "play",
-                            f"Using speed-adjusted file: {file_to_load}"
+                            f"Using speed-adjusted file: {file_to_load}",
                         )
                     else:
                         logger.warning(
                             "EnhancedAudioPlayer",
                             "play",
-                            "Failed to create speed-adjusted file, using original"
+                            "Failed to create speed-adjusted file, using original",
                         )
-                
+
                 pygame.mixer.music.load(file_to_load)
                 pygame.mixer.music.play(start=self.current_position)
                 pygame.mixer.music.set_volume(self.volume if not self.is_muted else 0.0)
@@ -641,13 +643,15 @@ class EnhancedAudioPlayer:
 
             if PYGAME_AVAILABLE:
                 pygame.mixer.music.stop()
-                
-                # Load appropriate file (speed-adjusted or original)  
+
+                # Load appropriate file (speed-adjusted or original)
                 file_to_load = current_track.filepath
                 if self.playback_speed != 1.0:
-                    if self._create_speed_adjusted_audio(current_track.filepath, self.playback_speed):
+                    if self._create_speed_adjusted_audio(
+                        current_track.filepath, self.playback_speed
+                    ):
                         file_to_load = self._get_temp_speed_file()
-                
+
                 pygame.mixer.music.load(file_to_load)
 
                 if was_playing:
@@ -760,55 +764,59 @@ class EnhancedAudioPlayer:
             speed = max(0.25, min(2.0, speed))
             old_speed = self.playback_speed
             self.playback_speed = speed
-            
+
             logger.info(
                 "EnhancedAudioPlayer",
-                "set_playback_speed", 
-                f"Playback speed changed from {old_speed}x to {speed}x"
+                "set_playback_speed",
+                f"Playback speed changed from {old_speed}x to {speed}x",
             )
-            
+
             # If we're currently playing, we need to restart with the new speed
             if self.state == PlaybackState.PLAYING:
                 current_position = self.current_position
                 logger.info(
                     "EnhancedAudioPlayer",
-                    "set_playback_speed", 
-                    f"Restarting playback at {current_position:.1f}s with new speed {speed}x"
+                    "set_playback_speed",
+                    f"Restarting playback at {current_position:.1f}s with new speed {speed}x",
                 )
-                
+
                 # Stop current playback
                 pygame.mixer.music.stop()
-                
+
                 # Create new speed-adjusted file if needed
                 current_track = self.playlist.get_current_track()
                 if current_track:
                     file_to_load = current_track.filepath
                     if speed != 1.0:
-                        if self._create_speed_adjusted_audio(current_track.filepath, speed):
+                        if self._create_speed_adjusted_audio(
+                            current_track.filepath, speed
+                        ):
                             file_to_load = self._get_temp_speed_file()
                             logger.info(
                                 "EnhancedAudioPlayer",
                                 "set_playback_speed",
-                                f"Created new speed-adjusted file: {file_to_load}"
+                                f"Created new speed-adjusted file: {file_to_load}",
                             )
                         else:
                             logger.warning(
                                 "EnhancedAudioPlayer",
                                 "set_playback_speed",
-                                "Failed to create speed-adjusted file, using original"
+                                "Failed to create speed-adjusted file, using original",
                             )
-                    
+
                     # Load and play with new speed
                     pygame.mixer.music.load(file_to_load)
                     pygame.mixer.music.play(start=current_position)
-                    pygame.mixer.music.set_volume(self.volume if not self.is_muted else 0.0)
-            
+                    pygame.mixer.music.set_volume(
+                        self.volume if not self.is_muted else 0.0
+                    )
+
             return True
         except Exception as e:
             logger.error(
-                "EnhancedAudioPlayer", 
-                "set_playback_speed", 
-                f"Error setting playback speed: {e}"
+                "EnhancedAudioPlayer",
+                "set_playback_speed",
+                f"Error setting playback speed: {e}",
             )
             return False
 
@@ -885,7 +893,7 @@ class EnhancedAudioPlayer:
                 if self.state == PlaybackState.PLAYING and PYGAME_AVAILABLE:
                     # Check if music is still playing
                     music_busy = pygame.mixer.music.get_busy()
-                    
+
                     if music_busy:
                         # Use actual elapsed time for more accurate position tracking
                         current_time = time.time()
@@ -922,14 +930,16 @@ class EnhancedAudioPlayer:
                     else:
                         # Music stopped playing - check if we've reached the end
                         current_track = self.playlist.get_current_track()
-                        if current_track and self.current_position >= (current_track.duration - 0.5):  # 0.5s tolerance
+                        if current_track and self.current_position >= (
+                            current_track.duration - 0.5
+                        ):  # 0.5s tolerance
                             # Track ended naturally
                             logger.info(
                                 "EnhancedAudioPlayer",
                                 "_position_update_worker",
-                                f"Track ended at {self.current_position:.1f}s of {current_track.duration:.1f}s"
+                                f"Track ended at {self.current_position:.1f}s of {current_track.duration:.1f}s",
                             )
-                            
+
                             if self.playlist.repeat_mode == RepeatMode.ONE:
                                 self.current_position = 0.0
                                 self.seek(0.0)
@@ -960,7 +970,7 @@ class EnhancedAudioPlayer:
                     f"Error in position thread: {e}",
                 )
                 break
-    
+
     def _create_speed_adjusted_audio(self, filepath: str, speed: float) -> bool:
         """Create a temporary audio file with adjusted playback speed"""
         try:
@@ -968,43 +978,40 @@ class EnhancedAudioPlayer:
                 logger.warning(
                     "EnhancedAudioPlayer",
                     "_create_speed_adjusted_audio",
-                    "Pydub not available - cannot create speed-adjusted audio"
+                    "Pydub not available - cannot create speed-adjusted audio",
                 )
                 return False
-            
+
             logger.info(
                 "EnhancedAudioPlayer",
                 "_create_speed_adjusted_audio",
-                f"Creating speed-adjusted audio: {speed}x from {filepath}"
+                f"Creating speed-adjusted audio: {speed}x from {filepath}",
             )
-            
+
             # Load audio with pydub
             audio = AudioSegment.from_file(filepath)
-            
+
             # Change speed by manipulating sample rate
             if speed != 1.0:
                 # This approach changes both speed and pitch (like old tape players)
                 # First, we change the frame rate which effectively speeds up/slows down
                 new_sample_rate = int(audio.frame_rate * speed)
-                
+
                 # Create new audio segment with modified frame rate
                 # This actually changes the playback speed
                 speed_adjusted_audio = audio._spawn(
-                    audio.raw_data,
-                    overrides={
-                        "frame_rate": new_sample_rate
-                    }
+                    audio.raw_data, overrides={"frame_rate": new_sample_rate}
                 )
-                
+
                 # Convert back to standard sample rate for pygame compatibility
                 speed_adjusted_audio = speed_adjusted_audio.set_frame_rate(44100)
             else:
                 # No speed change needed
                 speed_adjusted_audio = audio.set_frame_rate(44100)
-            
+
             # Get temporary file path
             temp_file = self._get_temp_speed_file()
-            
+
             # Clean up any existing temp file
             if os.path.exists(temp_file):
                 try:
@@ -1012,46 +1019,49 @@ class EnhancedAudioPlayer:
                     logger.debug(
                         "EnhancedAudioPlayer",
                         "_create_speed_adjusted_audio",
-                        f"Removed existing temp file: {temp_file}"
+                        f"Removed existing temp file: {temp_file}",
                     )
                 except Exception as e:
                     logger.warning(
                         "EnhancedAudioPlayer",
                         "_create_speed_adjusted_audio",
-                        f"Could not remove existing temp file: {e}"
+                        f"Could not remove existing temp file: {e}",
                     )
-            
+
             # Export the speed-adjusted audio to WAV format
             speed_adjusted_audio.export(temp_file, format="wav")
-            
+
             # Verify the file was created and has content
             if os.path.exists(temp_file) and os.path.getsize(temp_file) > 0:
                 logger.info(
                     "EnhancedAudioPlayer",
                     "_create_speed_adjusted_audio",
-                    f"Successfully created speed-adjusted audio at {speed}x: {temp_file} ({os.path.getsize(temp_file)} bytes)"
+                    f"Successfully created speed-adjusted audio at {speed}x: {temp_file} ({os.path.getsize(temp_file)} bytes)",
                 )
                 return True
             else:
                 logger.error(
                     "EnhancedAudioPlayer",
                     "_create_speed_adjusted_audio",
-                    f"Temp file was not created properly: {temp_file}"
+                    f"Temp file was not created properly: {temp_file}",
                 )
                 return False
-            
+
         except Exception as e:
             logger.error(
                 "EnhancedAudioPlayer",
                 "_create_speed_adjusted_audio",
-                f"Error creating speed-adjusted audio: {e}"
+                f"Error creating speed-adjusted audio: {e}",
             )
             return False
-    
+
     def _get_temp_speed_file(self) -> str:
         """Get the path for temporary speed-adjusted audio file"""
         import tempfile
-        return os.path.join(tempfile.gettempdir(), f"hidock_speed_adjusted_{self.playback_speed}x.wav")
+
+        return os.path.join(
+            tempfile.gettempdir(), f"hidock_speed_adjusted_{self.playback_speed}x.wav"
+        )
 
         logger.debug(
             "EnhancedAudioPlayer",

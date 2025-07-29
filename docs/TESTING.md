@@ -90,7 +90,7 @@ class TestAudioPlayer:
         player = AudioPlayer()
         result = player.load("test.wav")
         assert result is True
-        
+
     @pytest.mark.unit
     def test_invalid_file_format(self):
         player = AudioPlayer()
@@ -201,17 +201,17 @@ describe('DeviceList', () => {
     const devices = [
       { id: '1', name: 'HiDock H1', status: 'connected' }
     ];
-    
+
     render(<DeviceList devices={devices} />);
-    
+
     expect(screen.getByText('HiDock H1')).toBeInTheDocument();
     expect(screen.getByText('connected')).toBeInTheDocument();
   });
-  
+
   it('handles device selection', () => {
     const onSelect = vi.fn();
     render(<DeviceList devices={devices} onSelect={onSelect} />);
-    
+
     fireEvent.click(screen.getByText('HiDock H1'));
     expect(onSelect).toHaveBeenCalledWith('1');
   });
@@ -228,15 +228,15 @@ describe('DeviceService', () => {
   it('connects to device', async () => {
     const device = mockDevice();
     const result = await deviceService.connect(device);
-    
+
     expect(result.success).toBe(true);
     expect(result.device).toBeDefined();
   });
-  
+
   it('handles connection errors', async () => {
     const device = mockDevice({ failConnection: true });
     const result = await deviceService.connect(device);
-    
+
     expect(result.success).toBe(false);
     expect(result.error).toContain('Failed to connect');
   });
@@ -320,15 +320,15 @@ def test_full_recording_workflow():
     # 1. Connect to device
     device = HiDockDevice()
     assert device.connect()
-    
+
     # 2. List recordings
     recordings = device.list_recordings()
     assert len(recordings) > 0
-    
+
     # 3. Download recording
     audio_data = device.download_recording(recordings[0])
     assert audio_data is not None
-    
+
     # 4. Transcribe
     transcription = ai_service.transcribe(audio_data)
     assert transcription.text != ""
@@ -355,7 +355,7 @@ jobs:
           cd hidock-desktop-app
           pip install -r requirements.txt
           pytest --cov=. --cov-report=xml
-      
+
   test-web:
     runs-on: ubuntu-latest
     steps:
@@ -407,12 +407,12 @@ def sample_audio_file(tmp_path):
 // Testing async operations
 it('loads device data asynchronously', async () => {
   const promise = deviceService.loadDevices();
-  
+
   // Assert loading state
   expect(deviceService.isLoading).toBe(true);
-  
+
   const devices = await promise;
-  
+
   // Assert loaded state
   expect(devices).toHaveLength(2);
   expect(deviceService.isLoading).toBe(false);
@@ -427,7 +427,7 @@ Always test error paths:
 def test_handles_device_disconnect():
     device = connect_device()
     device.disconnect()
-    
+
     with pytest.raises(DeviceNotConnectedError):
         device.list_recordings()
 ```
@@ -438,9 +438,9 @@ def test_handles_device_disconnect():
 @pytest.mark.performance
 def test_large_file_processing(benchmark):
     large_file = create_large_audio_file(size_mb=100)
-    
+
     result = benchmark(process_audio_file, large_file)
-    
+
     assert result.duration < 5.0  # Should process in under 5 seconds
 ```
 

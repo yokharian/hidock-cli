@@ -1,12 +1,12 @@
 /**
  * Storage Management Component for Web Application
- * 
+ *
  * Features:
  * - Real-time storage usage monitoring with visual indicators
  * - Storage optimization suggestions and cleanup utilities
  * - Storage quota management and warning systems
  * - Storage analytics and usage pattern reporting
- * 
+ *
  * Requirements addressed: 2.1, 2.4, 9.4, 9.5
  */
 

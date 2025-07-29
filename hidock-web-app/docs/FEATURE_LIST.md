@@ -60,7 +60,7 @@ This document lists requested features and enhancements for the HiDock Web Appli
 - **Implementation Notes:** deviceService already has downloadRecording method with progress tracking. Need to integrate with UI components and file system APIs for saving files locally using browser download APIs.
 - **Acceptance Criteria:** Users can select recordings and download them with progress indicators, receive success/error notifications, and files are saved to the browser's download folder.
 
-- **Title:** File Operations - Delete Recordings  
+- **Title:** File Operations - Delete Recordings
 - **Status:** REQUESTED
 - **Description:** Allow users to delete recordings directly from the HiDock device with confirmation dialogs and batch operations.
 - **User Story:** As a user, I want to delete unwanted recordings from my HiDock device to free up storage space and organize my files.
@@ -70,7 +70,7 @@ This document lists requested features and enhancements for the HiDock Web Appli
 - **Acceptance Criteria:** Users can delete individual or multiple recordings with confirmation prompts, see immediate UI updates, and receive success/error feedback.
 
 - **Title:** Audio Playback System
-- **Status:** REQUESTED  
+- **Status:** REQUESTED
 - **Description:** Implement audio playback functionality for recordings stored on the device, including streaming playback and basic controls.
 - **User Story:** As a user, I want to preview my recordings directly in the web app before downloading them, so I can identify the content I need.
 - **Justification:** Audio preview is essential for file management and matches desktop app functionality. Improves user experience by allowing content verification.

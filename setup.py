@@ -59,14 +59,14 @@ def check_node_version():
 def check_git_config():
     """Check if Git is properly configured."""
     print("Checking Git configuration...")
-    
+
     try:
         # Check if git is available
         result = run_command("git --version", check=False)
         if result.returncode != 0:
             print("✗ Git not found")
             return False
-        
+
         # Check user.name
         result = run_command("git config user.name", check=False)
         if result.returncode == 0 and result.stdout.strip():
@@ -78,7 +78,7 @@ def check_git_config():
             if name:
                 run_command(f'git config --global user.name "{name}"')
                 print(f"✓ Set Git user.name to: {name}")
-        
+
         # Check user.email
         result = run_command("git config user.email", check=False)
         if result.returncode == 0 and result.stdout.strip():
@@ -90,9 +90,9 @@ def check_git_config():
             if email:
                 run_command(f'git config --global user.email "{email}"')
                 print(f"✓ Set Git user.email to: {email}")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"✗ Git configuration check failed: {e}")
         return False
@@ -142,7 +142,7 @@ def check_disk_space():
         import shutil
         free_bytes = shutil.disk_usage(".").free
         free_gb = free_bytes / (1024**3)
-        
+
         if free_gb < 1:
             print(f"⚠️  Low disk space: {free_gb:.1f}GB available")
             print("   Node.js dependencies require ~500MB")
@@ -152,7 +152,7 @@ def check_disk_space():
         else:
             print(f"✓ Disk space OK: {free_gb:.1f}GB available")
             return True
-            
+
     except Exception as e:
         print(f"⚠️  Could not check disk space: {e}")
         return True  # Don't block if we can't check
@@ -161,7 +161,7 @@ def check_disk_space():
 def check_development_files():
     """Check for required development files."""
     print("Checking development files...")
-    
+
     # Check Windows-specific requirements
     if platform.system() == "Windows":
         libusb_path = Path("hidock-desktop-app/libusb-1.0.dll")
@@ -170,7 +170,7 @@ def check_development_files():
         else:
             print("⚠️  libusb-1.0.dll not found in hidock-desktop-app/")
             print("   This is required for HiDock device communication")
-        
+
         # Check for Visual C++ Build Tools (needed for some Python packages)
         try:
             result = run_command("where cl", check=False)
@@ -181,10 +181,10 @@ def check_development_files():
                 print("   Download: https://visualstudio.microsoft.com/visual-cpp-build-tools/")
         except Exception:
             print("ℹ️  Could not check for Visual C++ Build Tools")
-        
+
         # Warn about Windows Defender
         print("ℹ️  If installs fail, check Windows Defender exclusions")
-    
+
     # Check Linux USB permissions
     elif platform.system() == "Linux":
         try:
@@ -192,7 +192,7 @@ def check_development_files():
             import getpass
             username = getpass.getuser()
             user_groups = [g.gr_name for g in grp.getgrall() if username in g.gr_mem]
-            
+
             if 'dialout' not in user_groups:
                 print("⚠️  User not in 'dialout' group (needed for USB access)")
                 print("   Run: sudo usermod -a -G dialout $USER")
@@ -201,11 +201,11 @@ def check_development_files():
                 print("✓ USB permissions configured (dialout group)")
         except Exception:
             print("ℹ️  Could not check USB permissions - you may need dialout group")
-    
+
     # Check macOS dependencies
     elif platform.system() == "Darwin":
         print("ℹ️  macOS: USB permissions usually work out of the box")
-        
+
         # Check for Xcode command line tools
         result = run_command("xcode-select -p", check=False)
         if result.returncode != 0:
@@ -213,7 +213,7 @@ def check_development_files():
             print("   Run: xcode-select --install")
         else:
             print("✓ Xcode command line tools installed")
-        
+
         # Check for Homebrew (helpful but not required)
         result = run_command("brew --version", check=False)
         if result.returncode != 0:
@@ -221,14 +221,14 @@ def check_development_files():
             print("   Install: /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"")
         else:
             print("✓ Homebrew available")
-    
+
     # Check for important config files
     desktop_config = Path("hidock-desktop-app/hidock_tool_config.json")
     if desktop_config.exists():
         print("✓ Desktop app configuration file found")
     else:
         print("ℹ️  Desktop app will create configuration on first run")
-    
+
     return True
 
 
@@ -237,51 +237,51 @@ def setup_api_keys():
     print("\n=== AI API Keys Setup (Optional) ===")
     print("The applications support multiple AI providers for transcription and analysis.")
     print("You can set these up now or later in the application settings.\n")
-    
+
     setup_keys = input("Would you like to set up AI API keys now? (y/N): ").strip().lower()
     if setup_keys not in ['y', 'yes']:
         print("⏭️  Skipping API key setup - you can configure these later in app settings")
         return
-    
+
     print("\nAvailable AI providers:")
     print("1. Google Gemini (recommended for beginners)")
     print("2. OpenAI (GPT/Whisper)")
     print("3. Anthropic Claude")
     print("4. Skip - I'll set up later")
-    
+
     choice = input("\nWhich provider would you like to configure? (1-4): ").strip()
-    
+
     if choice == '1':
         print("\n📝 Google Gemini Setup:")
         print("1. Go to https://makersuite.google.com/app/apikey")
         print("2. Create a new API key")
         print("3. Copy the key and paste it below")
-        
+
         api_key = input("\nEnter your Gemini API key (or press Enter to skip): ").strip()
         if api_key:
             print("✓ API key saved (you can change this later in app settings)")
             print("ℹ️  Note: Keys are stored encrypted in the desktop app")
-    
+
     elif choice == '2':
         print("\n📝 OpenAI Setup:")
         print("1. Go to https://platform.openai.com/api-keys")
         print("2. Create a new API key")
         print("3. Copy the key and paste it below")
-        
+
         api_key = input("\nEnter your OpenAI API key (or press Enter to skip): ").strip()
         if api_key:
             print("✓ API key noted (configure in app settings)")
-    
+
     elif choice == '3':
         print("\n📝 Anthropic Claude Setup:")
         print("1. Go to https://console.anthropic.com/")
         print("2. Create an API key")
         print("3. Copy the key and paste it below")
-        
+
         api_key = input("\nEnter your Anthropic API key (or press Enter to skip): ").strip()
         if api_key:
             print("✓ API key noted (configure in app settings)")
-    
+
     print("\nℹ️  All API keys can be configured later in:")
     print("   • Desktop app: Settings → AI Providers")
     print("   • Web app: Settings page")
@@ -290,7 +290,7 @@ def setup_api_keys():
 def test_app_launches():
     """Test that applications can launch properly."""
     print("\n=== Testing Application Launches ===")
-    
+
     # Test desktop app import
     print("Testing desktop app dependencies...")
     desktop_dir = Path("hidock-desktop-app")
@@ -299,7 +299,7 @@ def test_app_launches():
             python_cmd = ".venv\\Scripts\\python"
         else:
             python_cmd = ".venv/bin/python"
-        
+
         # Test basic imports
         test_cmd = f'{python_cmd} -c "import customtkinter; import pygame; print(\'Desktop dependencies OK\')"'
         result = run_command(test_cmd, cwd=desktop_dir, check=False)
@@ -307,7 +307,7 @@ def test_app_launches():
             print("✓ Desktop app dependencies working")
         else:
             print("⚠️  Desktop app dependencies issue - check requirements.txt")
-    
+
     # Test web app
     print("Testing web app...")
     web_dir = Path("hidock-web-app")
@@ -317,7 +317,7 @@ def test_app_launches():
             print("✓ Web app dependencies installed")
         else:
             print("⚠️  Web app node_modules missing")
-    
+
     print("ℹ️  Applications tested - you can now launch them with the commands shown at the end")
 
 
@@ -327,7 +327,7 @@ def check_device_connection():
     print("📱 Checking for connected HiDock devices...")
     print("ℹ️  Note: A HiDock device is NOT required for development!")
     print("   You can develop and test all features without hardware.\n")
-    
+
     # Try to detect USB devices (basic check)
     try:
         if platform.system() == "Windows":
@@ -336,14 +336,14 @@ def check_device_connection():
         else:
             # Basic Linux/Mac USB check
             result = run_command("lsusb 2>/dev/null || system_profiler SPUSBDataType 2>/dev/null | head -20", check=False)
-        
+
         if result.returncode == 0 and "HiDock" in result.stdout:
             print("🎉 HiDock device detected!")
         else:
             print("📱 No HiDock device detected (this is fine for development)")
     except Exception:
         print("📱 Could not check for devices (this is fine for development)")
-    
+
     print("\n💡 Device development tips:")
     print("• Desktop app: Has mock device simulation for testing")
     print("• Web app: Requires real device due to WebUSB requirements")
@@ -385,17 +385,17 @@ def setup_python_env():
         pip_cmd = ".venv/bin/pip"
 
     print("Upgrading pip and installing build tools...")
-    
+
     # Upgrade pip using the recommended method
     if platform.system() == "Windows":
         python_cmd = ".venv\\Scripts\\python"
     else:
         python_cmd = ".venv/bin/python"
-    
+
     result = run_command(f"{python_cmd} -m pip install --upgrade pip setuptools wheel", cwd=desktop_dir, check=False)
     if result.returncode != 0:
         print("⚠️  Failed to upgrade pip (continuing anyway)")
-    
+
     # Install requirements - same for all platforms
     print("Installing dependencies (this may take a few minutes)...")
     result = run_command(f"{pip_cmd} install -r requirements.txt", cwd=desktop_dir, check=False)
@@ -512,7 +512,7 @@ def run_tests():
 def setup_git_workflow():
     """Set up git workflow with feature branch."""
     print("\n=== Setting up development workflow ===")
-    
+
     # Check if we're in a git repository
     try:
         result = run_command("git status", check=False)
@@ -522,13 +522,13 @@ def setup_git_workflow():
     except Exception:
         print("✗ Git not available")
         return
-    
+
     # Check current branch and status
     try:
         result = run_command("git branch --show-current", check=False)
         current_branch = result.stdout.strip() if result.returncode == 0 else "unknown"
         print(f"Current branch: {current_branch}")
-        
+
         # Check for uncommitted changes
         result = run_command("git status --porcelain", check=False)
         if result.returncode == 0 and result.stdout.strip():
@@ -539,7 +539,7 @@ def setup_git_workflow():
             print("2. Stash your changes (git stash)")
             print("3. Continue on current branch")
             print("4. Skip branch creation")
-            
+
             choice = input("\nHow would you like to proceed? (1-4): ").strip()
             if choice == '1':
                 print("Please commit your changes first, then re-run this script")
@@ -554,10 +554,10 @@ def setup_git_workflow():
             elif choice == '4':
                 print("Skipping branch creation")
                 return
-        
+
     except Exception:
         current_branch = "unknown"
-    
+
     # Check if already on a feature branch
     if current_branch and current_branch not in ['main', 'master', 'develop']:
         print(f"\n✓ You're already on feature branch: {current_branch}")
@@ -565,17 +565,17 @@ def setup_git_workflow():
         if continue_branch != 'n':
             print(f"✓ Continuing on branch: {current_branch}")
             return
-    
+
     # Ask user what they want to work on
     print("\nWhat would you like to work on?")
     print("1. Desktop Application features")
-    print("2. Web Application features") 
+    print("2. Web Application features")
     print("3. Audio Insights Extractor")
     print("4. Documentation improvements")
     print("5. Bug fixes")
     print("6. General sandbox/exploration")
     print("7. Skip branch creation (stay on current branch)")
-    
+
     while True:
         try:
             choice = input("\nEnter your choice (1-7): ").strip()
@@ -585,23 +585,23 @@ def setup_git_workflow():
         except KeyboardInterrupt:
             print("\nSkipping branch setup...")
             return
-    
+
     if choice == '7':
         print("Staying on current branch")
         return
-    
+
     # Map choices to branch prefixes
     branch_types = {
         '1': 'feature/desktop',
-        '2': 'feature/web', 
+        '2': 'feature/web',
         '3': 'feature/audio-insights',
         '4': 'docs',
         '5': 'bugfix',
         '6': 'sandbox'
     }
-    
+
     branch_prefix = branch_types[choice]
-    
+
     # Get branch name
     if choice == '6':
         import datetime
@@ -614,20 +614,20 @@ def setup_git_workflow():
         # Clean up branch name
         feature_name = feature_name.lower().replace(' ', '-').replace('_', '-')
         branch_name = f"{branch_prefix}/{feature_name}"
-    
+
     # Create and switch to new branch
     print(f"Creating branch: {branch_name}")
     try:
         run_command(f"git checkout -b {branch_name}")
         print(f"✓ Successfully created and switched to branch: {branch_name}")
-        
+
         # Show some helpful tips
         print("\n📋 Development workflow tips:")
         print("• Make small, focused commits")
         print("• Write descriptive commit messages (feat:, fix:, docs:, etc.)")
         print("• Run tests before committing")
         print("• Push your branch when ready: git push origin " + branch_name)
-        
+
     except Exception as e:
         print(f"✗ Failed to create branch: {e}")
         return
@@ -637,11 +637,11 @@ def check_existing_setup():
     """Check if basic setup was already done and offer upgrade options."""
     desktop_venv = Path("hidock-desktop-app/.venv").exists()
     web_modules = Path("hidock-web-app/node_modules").exists()
-    
+
     # Check if this looks like a basic setup (venv exists but no dev tools indicator)
     # We can use git branch as an indicator - basic setup doesn't create branches
     basic_setup_exists = desktop_venv and not has_developer_setup_indicators()
-    
+
     if basic_setup_exists:
         print("\n🔍 Detected existing basic setup!")
         print("It looks like you (or someone) already ran the simple setup scripts.")
@@ -652,7 +652,7 @@ def check_existing_setup():
         print("2. 🗑️  Clean and restart with full developer setup")
         print("3. ✅ Keep current setup and exit")
         print("4. ℹ️  Show me what's already set up")
-        
+
         while True:
             try:
                 choice = input("\nChoice (1-4): ").strip()
@@ -662,7 +662,7 @@ def check_existing_setup():
             except KeyboardInterrupt:
                 print("\nExiting...")
                 sys.exit(0)
-        
+
         if choice == '1':
             print("\n✅ Great! I'll add developer tools to your existing setup.")
             return "upgrade"
@@ -677,7 +677,7 @@ def check_existing_setup():
         elif choice == '4':
             show_current_setup_status()
             return check_existing_setup()  # Ask again after showing status
-    
+
     return "new"
 
 
@@ -690,19 +690,19 @@ def has_developer_setup_indicators():
             current_branch = result.stdout.strip()
             if current_branch and current_branch not in ['main', 'master']:
                 return True
-        
+
         # Check if pytest is installed in the venv (dev dependency)
         desktop_dir = Path("hidock-desktop-app")
         if desktop_dir.exists():
             if platform.system() == "Windows":
-                pytest_check = run_command(".venv\\Scripts\\python -c \"import pytest\"", 
+                pytest_check = run_command(".venv\\Scripts\\python -c \"import pytest\"",
                                          cwd=desktop_dir, check=False)
             else:
-                pytest_check = run_command(".venv/bin/python -c \"import pytest\"", 
+                pytest_check = run_command(".venv/bin/python -c \"import pytest\"",
                                          cwd=desktop_dir, check=False)
             if pytest_check.returncode == 0:
                 return True
-                
+
         return False
     except Exception:
         return False
@@ -711,27 +711,27 @@ def has_developer_setup_indicators():
 def clean_existing_setup():
     """Remove existing setup to start fresh."""
     print("🧹 Cleaning existing setup...")
-    
+
     # Remove Python virtual environment
     desktop_venv = Path("hidock-desktop-app/.venv")
     if desktop_venv.exists():
         print("  Removing Python virtual environment...")
         import shutil
         shutil.rmtree(desktop_venv)
-    
+
     # Remove node_modules
     web_modules = Path("hidock-web-app/node_modules")
     if web_modules.exists():
         print("  Removing web app node_modules...")
         import shutil
         shutil.rmtree(web_modules)
-    
+
     audio_modules = Path("audio-insights-extractor/node_modules")
     if audio_modules.exists():
         print("  Removing audio insights node_modules...")
         import shutil
         shutil.rmtree(audio_modules)
-    
+
     print("✅ Cleanup complete! Starting fresh setup...")
 
 
@@ -739,28 +739,28 @@ def show_current_setup_status():
     """Show what's currently set up."""
     print("\n📋 Current Setup Status:")
     print("=" * 40)
-    
+
     # Desktop app
     desktop_venv = Path("hidock-desktop-app/.venv")
     if desktop_venv.exists():
         print("✅ Desktop app: Python environment ready")
     else:
         print("❌ Desktop app: Not set up")
-    
+
     # Web app
     web_modules = Path("hidock-web-app/node_modules")
     if web_modules.exists():
         print("✅ Web app: Dependencies installed")
     else:
         print("❌ Web app: Not set up")
-    
+
     # Audio insights
     audio_modules = Path("audio-insights-extractor/node_modules")
     if audio_modules.exists():
         print("✅ Audio insights: Dependencies installed")
     else:
         print("❌ Audio insights: Not set up")
-    
+
     # Git status
     try:
         result = run_command("git branch --show-current", check=False)
@@ -774,13 +774,13 @@ def show_current_setup_status():
             print("❌ Git: Not in a git repository")
     except Exception:
         print("❌ Git: Status unknown")
-    
+
     # Development tools check
     if has_developer_setup_indicators():
         print("✅ Developer tools: Likely installed")
     else:
         print("⚠️  Developer tools: May be missing")
-    
+
     print("")
 
 
@@ -794,7 +794,7 @@ def show_basic_run_instructions():
     else:
         print("   source .venv/bin/activate")
     print("   python main.py")
-    
+
     if Path("hidock-web-app/node_modules").exists():
         print("\n2. 🌐 Web Application:")
         print("   cd hidock-web-app")
@@ -816,17 +816,17 @@ def run_end_user_setup():
         has_node = check_node_version()
         check_permissions()
         check_disk_space()
-        
+
         # Simple environment setup
         print("\n📦 Setting up applications...")
-        
+
         # Desktop app setup
         print("\n🖥️  Setting up Desktop Application...")
         if setup_python_env():
             print("✅ Desktop app ready!")
         else:
             print("❌ Desktop app setup failed - see manual instructions below")
-        
+
         # Web app setup (if Node.js available)
         if has_node:
             print("\n🌐 Setting up Web Application...")
@@ -836,13 +836,13 @@ def run_end_user_setup():
                 print("❌ Web app setup failed - see manual instructions below")
         else:
             print("\n⏭️  Skipping web app (Node.js not available)")
-        
+
         # Skip audio insights for end users (it's a prototype)
-        
+
         print("\n" + "=" * 50)
         print("🎉 Setup Complete! You can now use HiDock!")
         print("=" * 50)
-        
+
         print("\n🚀 How to run the apps:")
         print("\n1. 🖥️  Desktop Application:")
         print("   cd hidock-desktop-app")
@@ -851,26 +851,26 @@ def run_end_user_setup():
         else:
             print("   source .venv/bin/activate")
         print("   python main.py")
-        
+
         if has_node:
             print("\n2. 🌐 Web Application:")
             print("   cd hidock-web-app")
             print("   npm run dev")
             print("   Open: http://localhost:5173")
-        
+
         print("\n💡 First time setup tips:")
         print("• Desktop app: Configure AI providers in Settings for transcription")
         print("• Web app: Add your Gemini API key in Settings")
         print("• Connect your HiDock device via USB")
         print("• Check TROUBLESHOOTING.md if you have issues")
-        
+
         print("\n📚 Documentation:")
         print("• User guide: README.md")
         print("• Troubleshooting: docs/TROUBLESHOOTING.md")
         print("• API setup: Check Settings in each app")
-        
+
         print("\nEnjoy using HiDock! 🎵")
-        
+
     except KeyboardInterrupt:
         print("\n\n⚠️  Setup interrupted!")
         print("You can run this script again anytime.")
@@ -886,28 +886,28 @@ def show_feature_suggestions():
     print("\n🚀 Suggested areas to explore:")
     print("\n📱 Desktop Application:")
     print("  • Auto-download functionality")
-    print("  • Advanced transcription integration") 
+    print("  • Advanced transcription integration")
     print("  • Enhanced file management")
     print("  • Audio enhancement features")
-    
+
     print("\n🌐 Web Application:")
     print("  • Offline capabilities")
     print("  • Advanced AI features")
     print("  • Collaboration features")
     print("  • Performance optimization")
-    
+
     print("\n🎵 Audio Insights Extractor:")
     print("  • Multi-language support")
     print("  • Speaker diarization")
     print("  • Real-time processing")
     print("  • Advanced export options")
-    
+
     print("\n📚 Documentation:")
     print("  • API documentation improvements")
     print("  • Tutorial creation")
     print("  • Architecture diagrams")
     print("  • Code examples")
-    
+
     print("\n🐛 Good First Issues:")
     print("  • UI polish and improvements")
     print("  • Error message enhancements")
@@ -920,10 +920,10 @@ def main():
     print("HiDock Next - Comprehensive Setup")
     print("=" * 50)
     print("")
-    
+
     # Check for existing setup first
     setup_status = check_existing_setup()
-    
+
     if setup_status == "upgrade":
         # Skip the user type selection, go straight to developer setup
         # but skip the basic environment setup since it exists
@@ -948,22 +948,22 @@ def main():
         print("   • Git workflow, testing, AI keys")
         print("   • All development tools")
         print("")
-        
+
         while True:
             user_type = input("What type of setup do you want? (1 for End User, 2 for Developer): ").strip()
             if user_type in ['1', '2']:
                 break
             print("Please enter 1 or 2")
-        
+
         skip_basic_setup = False
-    
+
     if user_type == '1':
         run_end_user_setup()
         return
-    
+
     try:
         if not skip_basic_setup:
-            # Check prerequisites  
+            # Check prerequisites
             print("Checking prerequisites...")
             check_python_version()
             check_node_version()
@@ -1003,7 +1003,7 @@ def main():
         print("\n" + "=" * 50)
         print("🎉 Development environment setup complete!")
         print("\nYou're now ready to start contributing!")
-        
+
         print("\n🚀 Quick start commands:")
         print("\n1. 🖥️  Desktop app:")
         print("   cd hidock-desktop-app")
@@ -1012,29 +1012,29 @@ def main():
         else:
             print("   source .venv/bin/activate")
         print("   python main.py")
-        
+
         print("\n2. 🌐 Web app:")
         print("   cd hidock-web-app")
         print("   npm run dev")
-        
+
         print("\n3. 🎵 Audio insights extractor:")
         print("   cd audio-insights-extractor")
         print("   npm run dev")
-        
+
         print("\n📚 Additional resources:")
         print("• docs/DEVELOPMENT.md - Detailed development guide")
-        print("• docs/API.md - API documentation") 
+        print("• docs/API.md - API documentation")
         print("• docs/TESTING.md - Testing guidelines")
         print("• docs/TROUBLESHOOTING.md - Common issues and solutions")
         print("• CONTRIBUTING.md - Contribution guidelines")
-        
+
         print("\n💡 Remember to:")
         print("• Run tests before committing: pytest (desktop) or npm test (web)")
         print("• Follow conventional commit format: feat:, fix:, docs:, etc.")
         print("• Check the roadmap for feature ideas: docs/ROADMAP.md")
-        
+
         print("\nHappy coding! 🚀")
-    
+
     except KeyboardInterrupt:
         print("\n\n⚠️  Setup interrupted by user!")
         print("You can re-run this script anytime to continue setup.")

@@ -19,6 +19,7 @@ import tkinter  # For tkinter.Menu and messagebox
 import traceback
 
 import customtkinter as ctk  # For CTkInputDialog in settings, and CTk itself
+
 from config_and_logger import logger  # For the top-level exception handler
 
 # Import the main GUI class and the logger

@@ -48,13 +48,13 @@ Both applications communicate with HiDock devices using the Jensen protocol over
 ```python
 class HiDockJensen:
     """Main class for HiDock device communication."""
-    
+
     def connect(self, target_interface_number, vid, pid):
         """Connect to HiDock device."""
-        
+
     def get_recordings(self):
         """Get list of recordings from device."""
-        
+
     def download_recording(self, filename, timeout_s):
         """Download recording from device."""
 ```
@@ -138,7 +138,7 @@ interface AppStore {
   device: HiDockDevice | null
   recordings: AudioRecording[]
   settings: AppSettings
-  
+
   setDevice: (device: HiDockDevice | null) => void
   setRecordings: (recordings: AudioRecording[]) => void
 }

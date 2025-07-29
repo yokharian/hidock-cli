@@ -234,7 +234,7 @@ npm run build
    ```bash
    # Create file: /etc/udev/rules.d/99-hidock.rules
    SUBSYSTEM=="usb", ATTR{idVendor}=="1234", ATTR{idProduct}=="5678", MODE="0666"
-   
+
    # Reload rules
    sudo udevadm control --reload-rules
    sudo udevadm trigger

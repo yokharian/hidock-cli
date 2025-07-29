@@ -10,6 +10,7 @@ import traceback
 from tkinter import filedialog, messagebox
 
 import usb.core
+
 from config_and_logger import Logger, logger
 from settings_window import SettingsDialog
 

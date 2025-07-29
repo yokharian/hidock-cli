@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Settings as SettingsIcon, 
-  Key, 
-  Palette, 
-  Download, 
+import {
+  Settings as SettingsIcon,
+  Key,
+  Palette,
+  Download,
   Bell,
   Save,
   Eye,
@@ -20,7 +20,7 @@ export const Settings: React.FC = () => {
 
   const handleSave = () => {
     updateSettings(tempSettings);
-    
+
     // Reinitialize Gemini service if API key changed
     if (tempSettings.geminiApiKey !== settings.geminiApiKey) {
       try {
@@ -31,7 +31,7 @@ export const Settings: React.FC = () => {
         console.error('Failed to initialize Gemini service:', error);
       }
     }
-    
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -81,9 +81,9 @@ export const Settings: React.FC = () => {
               </div>
               <p className="text-xs text-slate-500 mt-1">
                 Get your API key from{' '}
-                <a 
-                  href="https://makersuite.google.com/app/apikey" 
-                  target="_blank" 
+                <a
+                  href="https://makersuite.google.com/app/apikey"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary-400 hover:text-primary-300"
                 >

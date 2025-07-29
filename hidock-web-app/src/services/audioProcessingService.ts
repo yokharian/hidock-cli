@@ -1,12 +1,12 @@
 /**
  * Audio Processing Service for Web Application
- * 
+ *
  * Provides client-side audio processing capabilities including:
  * - Noise reduction and audio enhancement
  * - Silence detection and removal
  * - Audio normalization and quality improvement
  * - Format conversion and codec support
- * 
+ *
  * Requirements: 9.3, 3.1, 3.2
  */
 

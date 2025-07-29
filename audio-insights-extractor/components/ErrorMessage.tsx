@@ -18,8 +18,8 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, onClear }) 
         </div>
       </div>
       {onClear && (
-        <button 
-          onClick={onClear} 
+        <button
+          onClick={onClear}
           className="absolute top-0 bottom-0 right-0 px-4 py-3 text-red-300 hover:text-red-100"
           aria-label="Clear error"
         >

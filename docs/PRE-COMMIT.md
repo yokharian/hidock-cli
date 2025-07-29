@@ -62,7 +62,7 @@ isort .
 flake8 .
 ```
 
-### JavaScript Issues  
+### JavaScript Issues
 ```bash
 cd hidock-web-app
 # Some issues can be auto-fixed

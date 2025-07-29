@@ -1,12 +1,12 @@
 /**
  * Audio Processing Component for Web Application
- * 
+ *
  * Provides UI for advanced audio processing features including:
  * - Noise reduction controls
  * - Silence detection and removal
  * - Audio normalization settings
  * - Real-time processing preview
- * 
+ *
  * Requirements: 8.2, 8.3, 9.3
  */
 
