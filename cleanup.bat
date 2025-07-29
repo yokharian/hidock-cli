@@ -18,15 +18,15 @@ cd hidock-desktop-app
 if exist .venv (
     echo Removing Python virtual environment...
     rmdir /s /q .venv
-    echo ✓ .venv removed
+    echo Python venv removed
 ) else (
-    echo ℹ️  No .venv found
+    echo No .venv found
 )
 
 if exist __pycache__ (
     echo Removing Python cache...
     rmdir /s /q __pycache__
-    echo ✓ __pycache__ removed
+    echo Python cache removed
 )
 
 for /d %%i in (*__pycache__*) do (
@@ -49,29 +49,29 @@ cd hidock-web-app
 if exist node_modules (
     echo Removing node_modules...
     rmdir /s /q node_modules
-    echo ✓ node_modules removed
+    echo node_modules removed
 ) else (
-    echo ℹ️  No node_modules found
+    echo No node_modules found
 )
 
 if exist package-lock.json (
     echo Removing package-lock.json...
     del /q package-lock.json
-    echo ✓ package-lock.json removed
+    echo package-lock.json removed
 ) else (
-    echo ℹ️  No package-lock.json found
+    echo No package-lock.json found
 )
 
 if exist dist (
     echo Removing dist folder...
     rmdir /s /q dist
-    echo ✓ dist removed
+    echo dist removed
 )
 
 if exist .vite (
     echo Removing .vite cache...
     rmdir /s /q .vite
-    echo ✓ .vite removed
+    echo vite cache removed
 )
 
 cd ..
@@ -82,35 +82,35 @@ cd audio-insights-extractor
 if exist node_modules (
     echo Removing node_modules...
     rmdir /s /q node_modules
-    echo ✓ node_modules removed
+    echo node_modules removed
 ) else (
-    echo ℹ️  No node_modules found
+    echo No node_modules found
 )
 
 if exist package-lock.json (
     echo Removing package-lock.json...
     del /q package-lock.json
-    echo ✓ package-lock.json removed
+    echo package-lock.json removed
 ) else (
-    echo ℹ️  No package-lock.json found
+    echo No package-lock.json found
 )
 
 if exist dist (
     echo Removing dist folder...
     rmdir /s /q dist
-    echo ✓ dist removed
+    echo dist removed
 )
 
 if exist .vite (
     echo Removing .vite cache...
     rmdir /s /q .vite
-    echo ✓ .vite removed
+    echo vite cache removed
 )
 
 cd ..
 
 echo.
-echo ✅ Cleanup Complete!
+echo Cleanup Complete!
 echo.
 echo All build artifacts and dependencies removed.
 echo Ready for fresh setup testing.
