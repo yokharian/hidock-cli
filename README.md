@@ -5,7 +5,7 @@
 HiDock Next provides comprehensive local control over your HiDock recordings with advanced AI transcription capabilities. Manage, analyze, and transcribe your audio files using **11 different AI providers** including cloud services and local models - all while maintaining complete data ownership.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 
 ## **🌟 Why HiDock Next?**
@@ -26,6 +26,7 @@ The HiDock hardware is innovative, but users face challenges with official softw
 - **🏠 Offline Capable:** Full functionality without internet using local AI
 - **⚡ Advanced Features:** Speed control, waveform visualization, background processing
 - **🎯 Professional UI:** Modern CustomTkinter interface with comprehensive settings
+- **🔧 Code Quality:** Pre-commit hooks, comprehensive testing, 120-char line length standard
 
 ## **🚀 Key Features Overview**
 
@@ -301,7 +302,21 @@ We welcome contributions! Areas for development:
 - **Documentation:** Guides and tutorials
 - **Testing:** Automated test coverage
 
-See `CONTRIBUTING.md` for detailed guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+### **Development Setup**
+
+```bash
+# Quick developer setup
+python setup.py  # Choose option 2 (Developer)
+
+# Pre-commit hooks (installed automatically)
+pre-commit install
+
+# Run tests
+cd hidock-desktop-app && python -m pytest tests/ -v
+cd hidock-web-app && npm test
+```
 
 ## **💡 Use Cases**
 

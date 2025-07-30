@@ -19,12 +19,16 @@ This project uses pre-commit hooks to ensure code quality before commits.
 Before each commit, the following checks run automatically:
 
 ### Python Code (Desktop App)
-- **Flake8**: Code style and error checking
-- **Black**: Automatic formatting (88 char line length)
+- **Flake8**: Code style and error checking (120 char line length)
+- **Black**: Automatic formatting (120 char line length)
 - **isort**: Import sorting
+- **pytest**: Run Python tests on pre-push (optional if tests exist)
 
 ### JavaScript/TypeScript (Web Apps)
 - **ESLint**: Code style and error checking for both web apps
+- **TypeScript**: Type checking on pre-push
+- **Tests**: Run web app tests on pre-push (optional if tests exist)
+- **Build**: Validate TypeScript compilation on pre-push
 
 ### General Files
 - Remove trailing whitespace
@@ -80,3 +84,12 @@ npm run lint
 **Import order conflicts**: Let isort handle imports - it's configured to work with Black
 
 **ESLint errors**: Many can be auto-fixed with `--fix` flag
+
+**Test failures in test files**: Test-specific lint issues are ignored - only production code enforces strict linting
+
+## Configuration Files
+
+- **`.pre-commit-config.yaml`**: Main pre-commit configuration
+- **`hidock-desktop-app/pyproject.toml`**: Python tool configuration (Black, isort, flake8)
+- **`hidock-desktop-app/.flake8`**: Flake8 configuration with test file ignores
+- **`hidock-web-app/.eslintrc.cjs`**: ESLint configuration with test overrides

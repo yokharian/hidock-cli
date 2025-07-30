@@ -14,9 +14,10 @@
 
 | Document | Purpose | Audience |
 |----------|---------|----------|
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | How to contribute to the project | Developers |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Complete contribution guide | New contributors |
 | **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** | Development guide and architecture | Developers |
-| **[CLAUDE.md](CLAUDE.md)** | Instructions for Claude Code AI | Claude AI |
+| **[AGENT.md](AGENT.md)** | Instructions for Claude Code AI | Claude AI |
+| **[docs/PRE-COMMIT.md](docs/PRE-COMMIT.md)** | Pre-commit hooks and code quality | Developers |
 
 ## 📖 Reference Documentation
 
@@ -59,11 +60,12 @@
 4. **[hidock-web-app/README.md](hidock-web-app/README.md)** - Web app features
 
 ### **👨‍💻 Developers - Want to Contribute**
-1. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Start here
-2. **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** - Architecture and guidelines
+1. **[CONTRIBUTING.md](CONTRIBUTING.md)** - Start here for contribution guide
+2. **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** - Technical development guide
 3. **[docs/API.md](docs/API.md)** - API reference
 4. **[docs/TESTING.md](docs/TESTING.md)** - Testing guide
-5. **[CLAUDE.md](CLAUDE.md)** - For AI development assistance
+5. **[docs/PRE-COMMIT.md](docs/PRE-COMMIT.md)** - Code quality tools
+6. **[AGENT.md](AGENT.md)** - For AI development assistance
 
 ### **🚀 DevOps - Want to Deploy**
 1. **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Deployment guide
@@ -78,5 +80,14 @@
 - 💡 **Feature request?** → [GitHub Issues](https://github.com/sgeraldes/hidock-next/issues) with "enhancement" label
 - 🔧 **Setup problems?** → [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
+## 🎯 Recent Updates
+
+**July 2025 - Code Quality Initiative:**
+- ✅ Pre-commit hooks implemented with comprehensive linting
+- ✅ Python line length standardized to 120 characters
+- ✅ TypeScript strict type checking enforced
+- ✅ Test configuration for ignoring test-specific lint issues
+- ✅ Automated testing on commit and push
+
 ---
-*This index is automatically updated with new documentation. Last updated: January 2025*
+*This index is automatically updated with new documentation. Last updated: July 2025*

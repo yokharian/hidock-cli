@@ -16,6 +16,7 @@ python setup.py
 This automated setup handles:
 - ✅ Environment setup (Python virtual envs, Node.js dependencies)
 - ✅ Development tools (testing, linting, formatting)
+- ✅ Pre-commit hooks (automated code quality)
 - ✅ Git workflow (branch creation, commit guidelines)
 - ✅ AI integration setup (optional API keys)
 - ✅ Project guidance (features to work on, documentation)
@@ -24,18 +25,19 @@ This automated setup handles:
 
 ## Architecture Overview
 
-The HiDock Community Platform consists of two main applications:
+The HiDock Next platform consists of three main applications:
 
-1. **Desktop Application** (Python/CustomTkinter)
-2. **Web Application** (React/TypeScript)
+1. **Desktop Application** (Python/CustomTkinter) - Full-featured with 11 AI providers
+2. **Web Application** (React/TypeScript) - Browser-based interface
+3. **Audio Insights Extractor** (React/TypeScript) - Standalone analysis tool
 
-Both applications communicate with HiDock devices using the Jensen protocol over USB.
+All applications communicate with HiDock devices using USB protocols (pyusb/WebUSB).
 
 ## Desktop Application Development
 
 ### Technology Stack
 
-- **Python 3.8+**
+- **Python 3.12+** (minimum 3.8)
 - **CustomTkinter** - Modern GUI framework
 - **PyUSB** - USB device communication
 - **Pygame** - Audio playback
@@ -97,9 +99,37 @@ class HiDockJensen:
 4. **Code formatting:**
 
    ```bash
-   black .
-   flake8 .
+   black . --line-length=120
+   flake8 . --max-line-length=120
+   isort .
    ```
+
+5. **Pre-commit hooks** (automatically installed with developer setup):
+
+   ```bash
+   # Run manually on all files
+   pre-commit run --all-files
+
+   # Check specific hook
+   pre-commit run flake8-desktop-app
+   ```
+
+## Code Quality Standards
+
+### Line Length
+- **120 characters** for all code (Python, TypeScript, JavaScript)
+- Configured in all tools: Black, Flake8, ESLint, Prettier
+
+### Python Standards
+- **Black** formatting with 120-char line length
+- **Flake8** linting with E203 (slice whitespace) exceptions
+- **isort** import sorting with Black profile
+- **mypy** type checking (when configured)
+
+### TypeScript/JavaScript Standards
+- **ESLint** with React hooks rules
+- **TypeScript** strict mode
+- **Test files** have relaxed linting rules for test-specific code
 
 ### Testing Strategy
 

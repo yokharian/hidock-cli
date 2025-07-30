@@ -4,7 +4,7 @@
 
 The HiDock Desktop Application is a full-featured Python desktop GUI for managing HiDock recording devices with advanced AI transcription capabilities. Built with CustomTkinter, it provides comprehensive local control over your HiDock devices while supporting both cloud and local AI providers for audio transcription and analysis.
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-green.svg)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -89,7 +89,7 @@ sudo dnf install libusb1-devel
 
 **Python Requirements:**
 
-- Python 3.8 or higher
+- Python 3.12+ recommended (minimum 3.8)
 - pip package manager
 
 ### Installation
