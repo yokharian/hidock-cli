@@ -345,9 +345,9 @@ class EnhancedPlaybackControlsFrame(ctk.CTkFrame):
                 self.progress_slider.set(position.percentage)
 
             # Update time display
-            current_time = f"{int(position.current_time//60):02d}:{int(position.current_time%60):02d}"
+            current_time = f"{int(position.current_time // 60):02d}:{int(position.current_time % 60):02d}"
             total_time = (
-                f"{int(position.total_time//60):02d}:{int(position.total_time%60):02d}"
+                f"{int(position.total_time // 60):02d}:{int(position.total_time % 60):02d}"
             )
             self.time_label.configure(text=f"{current_time} / {total_time}")
 
@@ -562,7 +562,7 @@ class PlaylistWidget(ctk.CTkFrame):
         title_label.pack(fill="x")
 
         # Details
-        duration_str = f"{int(track.duration//60):02d}:{int(track.duration%60):02d}"
+        duration_str = f"{int(track.duration // 60):02d}:{int(track.duration % 60):02d}"
         size_str = "Unknown size"
         if track.size > 0:
             size_str = f"{track.size / (1024*1024):.1f} MB"

@@ -212,7 +212,7 @@ class EventHandlersMixin:
                     start_range_idx = min(anchor_index, current_motion_index)
                     end_range_idx = max(anchor_index, current_motion_index)
                     items_in_current_drag_sweep = all_children[
-                        start_range_idx : end_range_idx + 1
+                        start_range_idx:end_range_idx + 1
                     ]
                     if self._drag_action_is_deselect:
                         logger.debug(

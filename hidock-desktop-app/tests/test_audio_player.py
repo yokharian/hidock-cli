@@ -197,7 +197,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
         self.mock_messagebox.showerror.assert_called_once_with(
             "Playback Error",
-            f"Failed to download file: Stream failed: ERROR",
+            "Failed to download file: Stream failed: ERROR",
             parent=self.app,
         )
         self.app._set_long_operation_active_state.assert_called_with(
@@ -217,7 +217,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.app._download_for_playback_thread(file_info, local_path)
 
         self.mock_messagebox.showerror.assert_called_once_with(
-            "Playback Error", f"Failed to download file: Disk Full", parent=self.app
+            "Playback Error", "Failed to download file: Disk Full", parent=self.app
         )
         self.app._set_long_operation_active_state.assert_called_with(
             False, "Playback Preparation"
@@ -267,7 +267,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
         self.assertFalse(self.app.is_audio_playing)
         self.mock_messagebox.showerror.assert_called_once_with(
-            "Playback Error", f"Could not play file: Test Pygame Error", parent=self.app
+            "Playback Error", "Could not play file: Test Pygame Error", parent=self.app
         )
         self.app._destroy_playback_controls.assert_called_once()
         self.app._update_menu_states.assert_called_once()

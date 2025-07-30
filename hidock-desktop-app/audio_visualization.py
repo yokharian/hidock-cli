@@ -171,7 +171,7 @@ class WaveformVisualizer:
             self._update_waveform_display()
 
             logger.info(
-                "WaveformVisualizer", "load_audio", f"Waveform loaded successfully"
+                "WaveformVisualizer", "load_audio", "Waveform loaded successfully"
             )
             return True
 
@@ -280,7 +280,7 @@ class WaveformVisualizer:
             )
 
             # Add time text
-            time_text = f"{int(self.current_position//60):02d}:{int(self.current_position%60):02d}"
+            time_text = f"{int(self.current_position//60):02d}:{int(self.current_position % 60):02d}"
             self.ax.text(
                 self.current_position,
                 0.9,

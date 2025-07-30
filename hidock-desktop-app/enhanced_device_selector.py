@@ -217,7 +217,7 @@ class EnhancedDeviceSelector(ctk.CTkFrame):
                             usb.util.get_string(device, device.iProduct)
                             or f"USB Device {hex(device.idProduct)}"
                         )
-                    except:
+                    except (AttributeError, UnicodeDecodeError, ValueError):
                         name = f"USB Device {hex(device.idProduct)}"
 
                     # Check if it's a HiDock device
@@ -241,7 +241,7 @@ class EnhancedDeviceSelector(ctk.CTkFrame):
                             version = (
                                 f"{device.bcdDevice >> 8}.{device.bcdDevice & 0xFF}"
                             )
-                        except:
+                        except (AttributeError, ValueError):
                             pass
 
                     device_info = DeviceInfo(

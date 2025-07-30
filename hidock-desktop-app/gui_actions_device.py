@@ -214,7 +214,7 @@ class DeviceActionsMixin:
                 logger.info(
                     "GUI",
                     "_connect_device_thread",
-                    f"Connection attempt failed.",
+                    "Connection attempt failed.",
                 )
                 if self.winfo_exists():
                     # Remove previous banner if it exists
@@ -762,7 +762,7 @@ class DeviceActionsMixin:
                     0,
                     lambda: self.update_status_bar(
                         progress_text=(
-                            f"Error: Failed to list files"
+                            "Error: Failed to list files"
                             if not files
                             else "Ready. No files found."
                         )

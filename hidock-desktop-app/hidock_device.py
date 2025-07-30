@@ -921,7 +921,7 @@ class HiDockJensen:
                         return {
                             "id": response_cmd_id,
                             "sequence": response_seq_id,
-                            "body": msg_bytes_full[12 : 12 + body_len],
+                            "body": msg_bytes_full[12:12 + body_len],
                         }
                     else:
                         logger.warning(
@@ -1452,7 +1452,7 @@ class HiDockJensen:
             and file_list_aggregate_data[offset + 1] == 0xFF
         ):
             total_files_from_header = struct.unpack(
-                ">I", file_list_aggregate_data[offset + 2 : offset + 6]
+                ">I", file_list_aggregate_data[offset + 2:offset + 6]
             )[0]
             offset += 6
 
@@ -1466,7 +1466,7 @@ class HiDockJensen:
                 offset += 1
 
                 name_len = struct.unpack(
-                    ">I", b"\x00" + file_list_aggregate_data[offset : offset + 3]
+                    ">I", b"\x00" + file_list_aggregate_data[offset:offset + 3]
                 )[0]
                 offset += 3
 
@@ -1475,7 +1475,7 @@ class HiDockJensen:
 
                 filename = "".join(
                     chr(b)
-                    for b in file_list_aggregate_data[offset : offset + name_len]
+                    for b in file_list_aggregate_data[offset:offset + name_len]
                     if b > 0
                 )
                 offset += name_len
@@ -1485,11 +1485,11 @@ class HiDockJensen:
                     break
 
                 file_length_bytes = struct.unpack(
-                    ">I", file_list_aggregate_data[offset : offset + 4]
+                    ">I", file_list_aggregate_data[offset:offset + 4]
                 )[0]
                 offset += 4
                 offset += 6  # Skip 6 bytes
-                signature_hex = file_list_aggregate_data[offset : offset + 16].hex()
+                signature_hex = file_list_aggregate_data[offset:offset + 16].hex()
                 offset += 16
 
                 # Parse date/time from filename

@@ -482,7 +482,7 @@ class StorageOptimizer:
                 if file_path.is_file():
                     try:
                         cache_size += file_path.stat().st_size
-                    except:
+                    except (OSError, PermissionError):
                         pass
 
         # Check system temp directories
@@ -493,7 +493,7 @@ class StorageOptimizer:
                     if file_path.is_file():
                         try:
                             cache_size += file_path.stat().st_size
-                        except:
+                        except (OSError, PermissionError):
                             pass
 
         return cache_size
