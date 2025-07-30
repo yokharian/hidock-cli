@@ -2,6 +2,12 @@ import { ERROR_MESSAGES } from '@/constants';
 import { geminiService } from '@/services/geminiService';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Type for accessing internal gemini service properties in tests
+interface TestableGeminiService {
+    genAI: unknown;
+    activeRequests: Map<string, AbortController>;
+}
+
 // Mock the Google Generative AI
 vi.mock('@google/generative-ai', () => ({
     GoogleGenerativeAI: vi.fn().mockImplementation(() => ({
@@ -33,8 +39,8 @@ describe('GeminiService', () => {
         });
 
         it('should throw error with null/undefined API key', () => {
-            expect(() => geminiService.initialize(null as any)).toThrow(ERROR_MESSAGES.API_KEY_MISSING);
-            expect(() => geminiService.initialize(undefined as any)).toThrow(ERROR_MESSAGES.API_KEY_MISSING);
+            expect(() => geminiService.initialize(null as unknown as string)).toThrow(ERROR_MESSAGES.API_KEY_MISSING);
+            expect(() => geminiService.initialize(undefined as unknown as string)).toThrow(ERROR_MESSAGES.API_KEY_MISSING);
         });
     });
 
@@ -81,7 +87,7 @@ describe('GeminiService', () => {
             };
 
             // Mock the private genAI property
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             const progressCallback = vi.fn();
 
@@ -133,7 +139,7 @@ describe('GeminiService', () => {
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             const result = await geminiService.transcribeAudio('base64data', 'audio/wav');
 
@@ -173,7 +179,7 @@ describe('GeminiService', () => {
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             const result = await geminiService.extractInsights('Test transcription');
 
@@ -203,7 +209,7 @@ Sentiment: positive`
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             const result = await geminiService.extractInsights('Test transcription');
 
@@ -226,7 +232,7 @@ Sentiment: positive`
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             const progressCallback = vi.fn();
 
@@ -277,7 +283,7 @@ Sentiment: positive`
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             const progressCallback = vi.fn();
 
@@ -320,19 +326,19 @@ Sentiment: positive`
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             // Start a request but don't wait for it
             const promise = geminiService.transcribeAudio('base64data', 'audio/wav');
 
             // Check that request is tracked
-            expect((geminiService as any).activeRequests.size).toBe(1);
+            expect((geminiService as unknown as TestableGeminiService).activeRequests.size).toBe(1);
 
             // Wait for completion
             await promise.catch(() => { }); // Ignore errors for this test
 
             // Check that request is cleaned up
-            expect((geminiService as any).activeRequests.size).toBe(0);
+            expect((geminiService as unknown as TestableGeminiService).activeRequests.size).toBe(0);
         });
 
         it('should cancel all requests', () => {
@@ -340,8 +346,8 @@ Sentiment: positive`
             const controller1 = new AbortController();
             const controller2 = new AbortController();
 
-            (geminiService as any).activeRequests.set('req1', controller1);
-            (geminiService as any).activeRequests.set('req2', controller2);
+            (geminiService as unknown as TestableGeminiService).activeRequests.set('req1', controller1);
+            (geminiService as unknown as TestableGeminiService).activeRequests.set('req2', controller2);
 
             const abortSpy1 = vi.spyOn(controller1, 'abort');
             const abortSpy2 = vi.spyOn(controller2, 'abort');
@@ -350,7 +356,7 @@ Sentiment: positive`
 
             expect(abortSpy1).toHaveBeenCalled();
             expect(abortSpy2).toHaveBeenCalled();
-            expect((geminiService as any).activeRequests.size).toBe(0);
+            expect((geminiService as unknown as TestableGeminiService).activeRequests.size).toBe(0);
         });
     });
 
@@ -368,7 +374,7 @@ Sentiment: positive`
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             await expect(
                 geminiService.transcribeAudio('base64data', 'audio/wav')
@@ -384,7 +390,7 @@ Sentiment: positive`
                 getGenerativeModel: vi.fn().mockReturnValue(mockModel)
             };
 
-            (geminiService as any).genAI = mockGenAI;
+            (geminiService as unknown as TestableGeminiService).genAI = mockGenAI;
 
             await expect(
                 geminiService.transcribeAudio('base64data', 'audio/wav')

@@ -120,7 +120,8 @@ class FileActionsMixin:
     def _perform_gui_update_for_operation(self, operation):
         """Performs the actual GUI update on the main thread."""
         if operation.status == FileOperationStatus.IN_PROGRESS:
-            status_text = f"{operation.operation_type.value.capitalize()} {operation.filename}: {operation.progress:.0f}%"
+            status_text = (f"{operation.operation_type.value.capitalize()} "
+                          f"{operation.filename}: {operation.progress:.0f}%")
             self.update_status_bar(progress_text=status_text)
             self._update_file_status_in_treeview(
                 operation.filename,

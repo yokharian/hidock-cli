@@ -25,7 +25,15 @@
       "Bash(fi)",
       "Bash(then .venv/Scripts/python -m flake8 --exclude=.venv --max-line-length=120 tests/test_device_communication.py)",
       "Bash(npm run build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(then echo \"=== PYTHON FLAKE8 TEST ===\")",
+      "Bash(.venv/Scripts/python -m flake8:*)",
+      "Bash(else echo \"No .venv found for Python testing\")",
+      "Bash(flake8:*)",
+      "Bash(if [ -d \".venv\" ])",
+      "Bash(then .venv/Scripts/python -m flake8 --exclude=.venv --max-line-length=120 . --statistics --count)",
+      "Bash(then .venv/Scripts/python -m flake8 --exclude=.venv . --count)",
+      "Bash(then .venv/Scripts/python -m flake8 . --count --statistics)"
     ],
     "deny": []
   }

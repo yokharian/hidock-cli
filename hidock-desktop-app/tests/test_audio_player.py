@@ -1,5 +1,5 @@
-import os
-import threading
+# import os  # Future: for test file operations
+# import threading  # Future: for thread testing
 import tkinter
 import unittest
 from unittest.mock import MagicMock, call, patch
@@ -47,14 +47,10 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.mock_pygame.mixer.reset_mock()
         # self.mock_pygame.reset_mock() # This line is problematic, as it resets the get_init mock
 
-        self.app = MockApp()
-
-        # Call _create_playback_controls to set up the mocked CTk widgets in the app instance
-        self.app._create_playback_controls()
-
-    class MockApp(AudioPlayerMixin):
-        def __init__(self):
-            self.file_tree = MagicMock()
+        # Create MockApp after class definition
+        class MockApp(AudioPlayerMixin):
+            def __init__(self):
+                self.file_tree = MagicMock()
             self.displayed_files_details = []
             self.is_audio_playing = False
             self.dock = MagicMock()
@@ -81,45 +77,51 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         def _update_file_status_in_treeview(self, file_iid, status_text, status_tags):
             pass
 
-        # These methods will use the patched imports from audio_player.py
-        def _start_audio_playback(self, filepath, file_detail):
-            import pygame
+            # These methods will use the patched imports from audio_player.py
+            def _start_audio_playback(self, filepath, file_detail):
+                import pygame
 
-            self.is_audio_playing = True
-            pygame.mixer.music.load(filepath)
-            pygame.mixer.music.set_volume(self.volume_var.get())
-            pygame.mixer.music.play()
+                self.is_audio_playing = True
+                pygame.mixer.music.load(filepath)
+                pygame.mixer.music.set_volume(self.volume_var.get())
+                pygame.mixer.music.play()
 
-        def _stop_audio_playback(self):
-            import pygame
+            def _stop_audio_playback(self):
+                import pygame
 
-            self.is_audio_playing = False
-            pygame.mixer.music.stop()
+                self.is_audio_playing = False
+                pygame.mixer.music.stop()
 
-        def _create_playback_controls(self):
-            import customtkinter as ctk
+            def _create_playback_controls(self):
+                import customtkinter as ctk
 
-            self.playback_controls_frame = ctk.CTkFrame.return_value
-            self.playback_controls_frame.winfo_exists.return_value = True
-            self.current_time_label = ctk.CTkLabel.return_value
-            self.playback_slider = ctk.CTkSlider.return_value
-            self.total_duration_label = ctk.CTkLabel.return_value
-            self.volume_slider_widget = ctk.CTkSlider.return_value
-            self.loop_checkbox = ctk.CTkCheckBox.return_value
+                self.playback_controls_frame = ctk.CTkFrame.return_value
+                self.playback_controls_frame.winfo_exists.return_value = True
+                self.current_time_label = ctk.CTkLabel.return_value
+                self.playback_slider = ctk.CTkSlider.return_value
+                self.total_duration_label = ctk.CTkLabel.return_value
+                self.volume_slider_widget = ctk.CTkSlider.return_value
+                self.loop_checkbox = ctk.CTkCheckBox.return_value
 
-        def _destroy_playback_controls(self):
-            if (
-                self.playback_controls_frame
-                and self.playback_controls_frame.winfo_exists()
-            ):
-                self.playback_controls_frame.destroy()
-                self.playback_controls_frame = None
+            def _destroy_playback_controls(self):
+                if (
+                    self.playback_controls_frame
+                    and self.playback_controls_frame.winfo_exists()
+                ):
+                    self.playback_controls_frame.destroy()
+                    self.playback_controls_frame = None
 
-        def _update_playback_progress(self):
-            pass
+            def _update_playback_progress(self):
+                pass
 
-        def _update_menu_states(self):
-            pass
+            def _update_menu_states(self):
+                pass
+
+        # Instantiate MockApp after class definition
+        self.app = MockApp()
+
+        # Call _create_playback_controls to set up the mocked CTk widgets in the app instance
+        self.app._create_playback_controls()
 
         def refresh_file_list_gui(self):
             pass

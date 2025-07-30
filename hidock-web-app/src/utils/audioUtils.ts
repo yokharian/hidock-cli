@@ -108,7 +108,7 @@ export async function extractAudioMetadata(file: File): Promise<AudioMetadata> {
 export async function getDetailedAudioInfo(file: File): Promise<AudioMetadata> {
     try {
         const arrayBuffer = await file.arrayBuffer();
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
         const metadata: AudioMetadata = {
@@ -136,7 +136,7 @@ export async function convertAudioFormat(
     options: ConversionOptions
 ): Promise<{ blob: Blob; metadata: AudioMetadata }> {
     try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
@@ -287,7 +287,7 @@ export async function applyAudioEffects(
     }
 ): Promise<Blob> {
     try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
@@ -412,7 +412,7 @@ export async function detectSilence(
     minDuration: number = 0.5
 ): Promise<Array<{ start: number; end: number }>> {
     try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
@@ -470,7 +470,7 @@ export async function trimSilence(
     threshold: number = 0.01
 ): Promise<{ blob: Blob; trimmedStart: number; trimmedEnd: number }> {
     try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
@@ -534,7 +534,7 @@ export async function generateWaveformData(
     samples: number = 1000
 ): Promise<Float32Array> {
     try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 

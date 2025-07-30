@@ -329,7 +329,7 @@ export const StorageManager: React.FC = () => {
                 ].map(tab => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tab.id as 'overview' | 'analytics' | 'optimization' | 'settings')}
                         className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${activeTab === tab.id
                                 ? 'bg-slate-700 text-slate-100'
                                 : 'text-slate-400 hover:text-slate-200'

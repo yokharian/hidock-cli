@@ -127,7 +127,7 @@ export const Settings: React.FC = () => {
               </label>
               <select
                 value={tempSettings.theme}
-                onChange={(e) => setTempSettings({ ...tempSettings, theme: e.target.value as any })}
+                onChange={(e) => setTempSettings({ ...tempSettings, theme: e.target.value as 'light' | 'dark' | 'system' })}
                 className="input-field w-full"
               >
                 <option value="dark">Dark</option>
@@ -178,7 +178,7 @@ export const Settings: React.FC = () => {
               </label>
               <select
                 value={tempSettings.audioQuality}
-                onChange={(e) => setTempSettings({ ...tempSettings, audioQuality: e.target.value as any })}
+                onChange={(e) => setTempSettings({ ...tempSettings, audioQuality: e.target.value as 'low' | 'medium' | 'high' })}
                 className="input-field w-full"
               >
                 <option value="low">Low (Faster)</option>

@@ -5,6 +5,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HIDOCK_COMMANDS, HIDOCK_DEVICE_CONFIG, HIDOCK_PRODUCT_IDS } from '../constants';
 import { deviceService } from '../services/deviceService';
 
+// Type for accessing internal device service properties in tests
+interface TestableDeviceService {
+    device: USBDevice | null;
+    isConnected: boolean;
+    sequenceId: number;
+    receiveBuffer: Uint8Array;
+    buildPacket: (commandId: number, bodyBytes: Uint8Array) => Uint8Array;
+    sendCommand: (commandId: number, bodyBytes?: Uint8Array) => Promise<number>;
+    parsePacket: () => unknown;
+    updateProgress: (operationId: string, progress: unknown) => void;
+}
+
 // Mock WebUSB API
 const mockUSBDevice = {
     vendorId: HIDOCK_DEVICE_CONFIG.VENDOR_ID,
@@ -42,10 +54,10 @@ beforeEach(() => {
     });
 
     // Reset device service state
-    (deviceService as any).device = null;
-    (deviceService as any).isConnected = false;
-    (deviceService as any).sequenceId = 0;
-    (deviceService as any).receiveBuffer = new Uint8Array(0);
+    (deviceService as unknown as TestableDeviceService).device = null;
+    (deviceService as unknown as TestableDeviceService).isConnected = false;
+    (deviceService as unknown as TestableDeviceService).sequenceId = 0;
+    (deviceService as unknown as TestableDeviceService).receiveBuffer = new Uint8Array(0);
 
     // Mock transferIn and transferOut to prevent timeouts
     mockUSBDevice.transferIn.mockResolvedValue({ status: 'ok', data: new DataView(new ArrayBuffer(0)) });
@@ -59,7 +71,7 @@ describe('DeviceService WebUSB Implementation', () => {
     describe('Device Discovery and Connection', () => {
         it('should check WebUSB support', async () => {
             // Remove WebUSB support
-            delete (global.navigator as any).usb;
+            delete (global.navigator as Navigator & { usb?: unknown }).usb;
 
             await expect(deviceService.requestDevice()).rejects.toThrow(
                 'HiDock device not found. Please connect your device and try again.'
@@ -126,7 +138,7 @@ describe('DeviceService WebUSB Implementation', () => {
             const bodyBytes = new Uint8Array([1, 2, 3, 4]);
 
             // Access private method for testing
-            const packet = (deviceService as any).buildPacket(commandId, bodyBytes);
+            const packet = (deviceService as unknown as TestableDeviceService).buildPacket(commandId, bodyBytes);
 
             expect(packet.length).toBe(12 + bodyBytes.length);
             expect(packet[0]).toBe(0x12); // Sync byte 1
@@ -149,7 +161,7 @@ describe('DeviceService WebUSB Implementation', () => {
                 bytesWritten: 12
             });
 
-            const seqId = await (deviceService as any).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO);
+            const seqId = await (deviceService as unknown as TestableDeviceService).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO);
 
             expect(mockUSBDevice.transferOut).toHaveBeenCalledWith(
                 HIDOCK_DEVICE_CONFIG.ENDPOINT_OUT,
@@ -165,7 +177,7 @@ describe('DeviceService WebUSB Implementation', () => {
             });
 
             await expect(
-                (deviceService as any).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO)
+                (deviceService as unknown as TestableDeviceService).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO)
             ).rejects.toThrow('Failed to send command to device');
         });
 
@@ -187,8 +199,8 @@ describe('DeviceService WebUSB Implementation', () => {
             packet.set(body, 12);
 
             // Set receive buffer and parse
-            (deviceService as any).receiveBuffer = packet;
-            const parsed = (deviceService as any).parsePacket();
+            (deviceService as unknown as TestableDeviceService).receiveBuffer = packet;
+            const parsed = (deviceService as unknown as TestableDeviceService).parsePacket();
 
             expect(parsed).toEqual({
                 id: commandId,
@@ -199,9 +211,9 @@ describe('DeviceService WebUSB Implementation', () => {
 
         it('should handle malformed packets gracefully', () => {
             // Set invalid data in receive buffer
-            (deviceService as any).receiveBuffer = new Uint8Array([0xFF, 0xFF, 0xFF]);
+            (deviceService as unknown as TestableDeviceService).receiveBuffer = new Uint8Array([0xFF, 0xFF, 0xFF]);
 
-            const parsed = (deviceService as any).parsePacket();
+            const parsed = (deviceService as unknown as TestableDeviceService).parsePacket();
             expect(parsed).toBeNull();
         });
     });
@@ -403,7 +415,7 @@ describe('DeviceService WebUSB Implementation', () => {
             mockUSBDevice.transferOut.mockRejectedValue(new DOMException('Network error', 'NetworkError'));
 
             try {
-                await (deviceService as any).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO);
+                await (deviceService as unknown as TestableDeviceService).sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO);
             } catch (_error) {
                 // Expected to fail
             }
@@ -428,7 +440,7 @@ describe('DeviceService WebUSB Implementation', () => {
             const progressCallback = vi.fn();
 
             deviceService.onProgress('test-operation', progressCallback);
-            (deviceService as any).updateProgress('test-operation', {
+            (deviceService as unknown as TestableDeviceService).updateProgress('test-operation', {
                 operation: 'Test',
                 progress: 50,
                 total: 100,

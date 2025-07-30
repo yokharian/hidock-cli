@@ -132,7 +132,7 @@ export const FileManager: React.FC = () => {
 
         // Sort recordings
         filtered.sort((a, b) => {
-            let aValue: any, bValue: any;
+            let aValue: string | number, bValue: string | number;
 
             switch (sortField) {
                 case 'name':

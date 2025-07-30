@@ -71,7 +71,7 @@ export class AudioProcessingService {
     private workletLoaded = false;
 
     constructor() {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        this.audioContext = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
         this.initializeWorklets();
     }
 

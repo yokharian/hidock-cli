@@ -10,8 +10,8 @@ This module provides comprehensive storage management capabilities including:
 Requirements addressed: 2.1, 2.4, 9.4, 9.5
 """
 
-import json
-import os
+# import json  # Future: for storage statistics export
+# import os  # Future: for advanced path operations
 import shutil
 import sqlite3
 import threading
@@ -773,7 +773,8 @@ class StorageQuotaManager:
         # Check file size limit
         if file_size > self.quota_config.max_file_size:
             violations.append(
-                f"File size {file_size / (1024*1024):.1f} MB exceeds limit of {self.quota_config.max_file_size / (1024*1024):.1f} MB"
+                f"File size {file_size / (1024*1024):.1f} MB exceeds limit of "
+                f"{self.quota_config.max_file_size / (1024*1024):.1f} MB"
             )
 
         # Check total size limit (simplified - would need actual usage data)

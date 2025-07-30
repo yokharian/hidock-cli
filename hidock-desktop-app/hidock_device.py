@@ -378,7 +378,8 @@ class HiDockJensen:
                 logger.warning(
                     "Jensen",
                     "connect",
-                    f"Connection attempt {self._connection_retry_count} failed: {error_msg}. Retrying in {self._retry_delay}s...",
+                    f"Connection attempt {self._connection_retry_count} failed: {error_msg}. "
+                    f"Retrying in {self._retry_delay}s...",
                 )
                 time.sleep(self._retry_delay)
 
@@ -994,7 +995,8 @@ class HiDockJensen:
             logger.debug(
                 "Jensen",
                 "_receive_response",
-                f"Expected streaming timeout for SeqID {expected_seq_id} (CMD {streaming_cmd_id}) - device pausing between chunks",
+                f"Expected streaming timeout for SeqID {expected_seq_id} (CMD {streaming_cmd_id}) - "
+                f"device pausing between chunks",
             )
         else:
             logger.warning(
@@ -1164,7 +1166,7 @@ class HiDockJensen:
             float: Duration in seconds
         """
         # Audio format constants based on device specifications
-        ACTUAL_BITRATE_BPS = 64000  # 64kbps - actual encoding bitrate
+        _ACTUAL_BITRATE_BPS = 64000  # 64kbps - Future: use for precise duration calculation
         SAMPLE_RATE_48K = 48000
         SAMPLE_RATE_24K = 24000
         SAMPLE_RATE_16K = 16000
@@ -1273,7 +1275,7 @@ class HiDockJensen:
 
                 # Handler function mimicking the web version's Jensen.registerHandler pattern
                 def file_list_handler(response_data):
-                    nonlocal file_list_chunks, expected_file_count
+                    nonlocal expected_file_count
 
                     if not response_data or len(response_data) == 0:
                         # Empty response signals end of transmission
@@ -1393,7 +1395,8 @@ class HiDockJensen:
                         logger.debug(
                             "Jensen",
                             "list_files",
-                            f"Unexpected response CMD:{response.get('id', 'unknown')} SEQ:{response.get('sequence', 'unknown')} during file list",
+                            f"Unexpected response CMD:{response.get('id', 'unknown')} "
+                            f"SEQ:{response.get('sequence', 'unknown')} during file list",
                         )
                         continue
 

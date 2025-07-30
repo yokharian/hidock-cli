@@ -9,7 +9,7 @@ operation timeouts, device-specific behaviors, and logging options.
 """
 
 import base64
-import json
+# import json  # Future: for advanced configuration import/export
 import os
 import threading  # For device settings apply thread
 import tkinter

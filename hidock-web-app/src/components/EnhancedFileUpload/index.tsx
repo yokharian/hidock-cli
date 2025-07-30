@@ -99,7 +99,12 @@ export const EnhancedFileUpload: React.FC<EnhancedFileUploadProps> = ({
     }, []);
 
     // Extract audio metadata
-    const extractMetadata = useCallback(async (file: File): Promise<any> => {
+    const extractMetadata = useCallback(async (file: File): Promise<{
+        duration?: number;
+        sampleRate?: number;
+        channels?: number;
+        bitrate?: number;
+    }> => {
         if (!audioContextRef.current) return {};
 
         try {

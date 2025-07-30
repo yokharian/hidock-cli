@@ -92,10 +92,10 @@ def _call_gemini_api(
 
     if genai is None:
         logger.error(
-            "GeminiAPI", "_call_gemini_api", "google.generativeai not available. Install with: pip install google-generativeai"
+            "GeminiAPI", "_call_gemini_api",
+            "google.generativeai not available. Install with: pip install google-generativeai"
         )
         return None
-        
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -303,7 +303,7 @@ async def process_audio_file_for_insights(
     try:
         # Check if it's an HTA file and convert it first
         ext = os.path.splitext(audio_file_path)[1].lower()
-        _original_file_path = audio_file_path  # Future: for cleanup/restore operations
+        # _original_file_path = audio_file_path  # Future: for cleanup/restore operations
         temp_wav_file = None
 
         if ext == ".hta":

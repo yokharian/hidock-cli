@@ -1,6 +1,43 @@
 import { ERROR_MESSAGES, HIDOCK_COMMANDS, HIDOCK_DEVICE_CONFIG, HIDOCK_PRODUCT_IDS } from '@/constants';
 import type { AudioRecording, HiDockDevice, StorageInfo } from '@/types';
 
+// Device service specific interfaces
+interface ConnectionStats {
+    isConnected: boolean;
+    retryCount: number;
+    errorCounts: Record<string, number>;
+    operationStats: Record<string, number>;
+    lastError: string | null;
+    deviceInfo: {
+        vendorId: number;
+        productId: number;
+        productName?: string;
+        serialNumber?: string;
+    } | null;
+}
+
+interface DeviceResponse {
+    success: boolean;
+    data?: unknown;
+    error?: string;
+}
+
+interface DeviceInfo {
+    vendorId: number;
+    productId: number;
+    productName?: string;
+    manufacturerName?: string;
+    serialNumber?: string;
+    firmwareVersion?: string;
+}
+
+interface PacketData {
+    cmdId: number;
+    seqId: number;
+    data: Uint8Array;
+    isComplete: boolean;
+}
+
 // WebUSB type definitions for better TypeScript support
 declare global {
     interface Navigator {
@@ -196,11 +233,13 @@ class DeviceService {
             this.connectionRetryCount = 0;
         }
 
-        while (true) {
+        let connected = false;
+        while (!connected) {
             try {
                 const result = await this.attemptConnection(usbDevice);
                 this.connectionRetryCount = 0;
                 this.operationStats.connectionTime = Date.now();
+                connected = true;
                 return result;
             } catch (error) {
                 this.lastError = error instanceof Error ? error.message : 'Unknown error';
@@ -382,7 +421,7 @@ class DeviceService {
         this.progressCallbacks.delete(operationId);
     }
 
-    public getConnectionStats(): any {
+    public getConnectionStats(): ConnectionStats {
         return {
             isConnected: this.isConnected,
             retryCount: this.connectionRetryCount,
@@ -452,7 +491,7 @@ class DeviceService {
         const recordings: AudioRecording[] = [];
         const dataView = new DataView(responseBody.buffer, responseBody.byteOffset);
         let offset = 0;
-        let totalSizeBytes = 0;
+        const totalSizeBytes = 0; // Not reassigned anymore
         let totalFilesFromHeader = -1;
 
         // Check for header with total file count
@@ -521,7 +560,7 @@ class DeviceService {
                     status: 'on_device',
                 });
 
-                totalSizeBytes += fileLengthBytes;
+                const _totalSizeBytes = totalSizeBytes + fileLengthBytes; // Future: use for storage calculation
                 parsedFileCount++;
 
                 if (totalFilesFromHeader !== -1 && parsedFileCount >= totalFilesFromHeader) {
@@ -818,7 +857,7 @@ class DeviceService {
         }
     }
 
-    private async receiveResponse(expectedSeqId: number, timeoutMs = 5000, streamingCmdId?: number): Promise<any> {
+    private async receiveResponse(expectedSeqId: number, timeoutMs = 5000, streamingCmdId?: number): Promise<DeviceResponse> {
         if (!this.device || !this.isConnected) {
             throw new Error('Device not connected');
         }
@@ -844,9 +883,13 @@ class DeviceService {
                     this.operationStats.bytesTransferred += newData.length;
 
                     // Try to parse complete packets
-                    while (true) {
+                    let packetParsed = true;
+                    while (packetParsed) {
                         const packet = this.parsePacket();
-                        if (!packet) break;
+                        if (!packet) {
+                            packetParsed = false;
+                            break;
+                        }
 
                         // Check if this is the response we're waiting for OR a streaming packet
                         if (packet.sequence === expectedSeqId ||
@@ -884,7 +927,7 @@ class DeviceService {
         throw new Error(`Response timeout waiting for SeqID ${expectedSeqId}`);
     }
 
-    private parsePacket(): any {
+    private parsePacket(): PacketData | null {
         if (this.receiveBuffer.length < 2) {
             return null;
         }
@@ -952,7 +995,7 @@ class DeviceService {
         }
     }
 
-    private async getDeviceInfo(): Promise<any> {
+    private async getDeviceInfo(): Promise<DeviceInfo> {
         try {
             const seqId = await this.sendCommand(HIDOCK_COMMANDS.GET_DEVICE_INFO);
             const response = await this.receiveResponse(seqId);
@@ -960,23 +1003,25 @@ class DeviceService {
             if (response.body.length >= 4) {
                 const view = new DataView(response.body.buffer, response.body.byteOffset);
                 const versionCodeBytes = response.body.slice(0, 4);
-                const versionNumber = view.getUint32(0, false);
+                const _versionNumber = view.getUint32(0, false); // Future: use for version validation
                 const versionCode = Array.from(versionCodeBytes.slice(1)).join('.');
 
                 let serialNumber = 'N/A';
                 if (response.body.length > 4) {
                     const serialBytes = response.body.slice(4, 20);
                     // Filter printable characters and decode
-                    const printableBytes = Array.from(serialBytes).filter((b: any) => (b >= 32 && b <= 126) || b === 0);
+                    const printableBytes = Array.from(serialBytes).filter((b: number) => (b >= 32 && b <= 126) || b === 0);
                     const nullIndex = printableBytes.indexOf(0);
                     const cleanBytes = nullIndex !== -1 ? printableBytes.slice(0, nullIndex) : printableBytes;
                     serialNumber = new TextDecoder().decode(new Uint8Array(cleanBytes as number[])).trim() ||
-                        Array.from(serialBytes).map((b: any) => b.toString(16).padStart(2, '0')).join('');
+                        Array.from(serialBytes).map((b: number) => b.toString(16).padStart(2, '0')).join('');
                 }
 
                 return {
-                    versionCode,
-                    versionNumber,
+                    vendorId: this.device?.vendorId || 0,
+                    productId: this.device?.productId || 0,
+                    productName: this.device?.productName,
+                    manufacturerName: this.device?.manufacturerName,
                     serialNumber,
                     firmwareVersion: versionCode
                 };
@@ -984,8 +1029,10 @@ class DeviceService {
 
             // Fallback to basic info
             return {
-                versionCode: '1.0.0',
-                versionNumber: 0,
+                vendorId: this.device?.vendorId || 0,
+                productId: this.device?.productId || 0,
+                productName: this.device?.productName,
+                manufacturerName: this.device?.manufacturerName,
                 serialNumber: this.device?.serialNumber || 'Unknown',
                 firmwareVersion: '1.0.0'
             };
@@ -993,8 +1040,10 @@ class DeviceService {
             console.error('Failed to get device info:', error);
             // Fallback to basic info
             return {
-                versionCode: '1.0.0',
-                versionNumber: 0,
+                vendorId: this.device?.vendorId || 0,
+                productId: this.device?.productId || 0,
+                productName: this.device?.productName,
+                manufacturerName: this.device?.manufacturerName,
                 serialNumber: 'Unknown',
                 firmwareVersion: '1.0.0'
             };

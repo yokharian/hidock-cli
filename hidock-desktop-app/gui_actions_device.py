@@ -488,7 +488,7 @@ class DeviceActionsMixin:
                 )
 
                 # Get storage info after file list to avoid command conflicts
-                card_info = asyncio.run(
+                _card_info = asyncio.run(
                     self.device_manager.device_interface.get_storage_info()
                 )
 
@@ -557,7 +557,8 @@ class DeviceActionsMixin:
                         logger.warning(
                             "GUI",
                             "_refresh_file_list_thread",
-                            f"Device returned incomplete data ({len(recording_info)} vs {cached_count} cached), attempting merge",
+                            f"Device returned incomplete data ({len(recording_info)} vs "
+                            f"{cached_count} cached), attempting merge",
                         )
                         # Create a set of cached filenames for quick lookup
                         cached_filenames = {f.filename for f in cached_files}
@@ -624,7 +625,8 @@ class DeviceActionsMixin:
                         logger.warning(
                             "GUI",
                             "_refresh_file_list_thread",
-                            f"Device fetch incomplete ({len(recording_info)} vs {cached_count} cached), using cached data",
+                            f"Device fetch incomplete ({len(recording_info)} vs "
+                            f"{cached_count} cached), using cached data",
                         )
                     else:
                         logger.warning(

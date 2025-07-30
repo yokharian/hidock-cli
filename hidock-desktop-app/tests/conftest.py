@@ -1,10 +1,11 @@
 """
 Pytest configuration and fixtures for HiDock Next testing.
 """
-import os
+# import os  # Future: for test path operations
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, Mock
+# from unittest.mock import MagicMock  # Future: for advanced test mocking
+from unittest.mock import Mock
 
 import pytest
 

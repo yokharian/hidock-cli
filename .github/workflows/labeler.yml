@@ -1,0 +1,17 @@
+name: Auto Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Add labels to issues
+        uses: anolilab/labeler@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml

@@ -23,7 +23,7 @@ import threading
 # import time  # Commented out - not used in current implementation
 import tkinter
 import traceback
-from datetime import datetime  # Only datetime is used, not datetime.datetime specifically
+# from datetime import datetime  # Currently unused - may be needed for future timestamp features
 from tkinter import messagebox, ttk  # Removed filedialog - not used
 
 import customtkinter as ctk
@@ -2070,7 +2070,7 @@ class HiDockToolGUI(
         import os
         import threading
 
-        from transcription_module import process_audio_file_for_insights
+        # from transcription_module import process_audio_file_for_insights  # Future: for audio insights feature
 
         file_detail = next(
             (f for f in self.displayed_files_details if f["name"] == file_iid), None
@@ -2442,7 +2442,7 @@ class HiDockToolGUI(
         try:
             import shutil
             # subprocess already imported at module level - no need to import again
-            from tkinter import messagebox
+            # from tkinter import messagebox  # Already imported at module level
 
             # Check for ffmpeg
             ffmpeg_available = False
@@ -2575,7 +2575,8 @@ You can dismiss this warning and continue using the application with limited aud
             logger.debug(
                 "MainWindow",
                 "_on_audio_position_changed",
-                f"Position update: {position.current_time:.1f}s / {position.total_time:.1f}s ({position.percentage:.1f}%)",
+                f"Position update: {position.current_time:.1f}s / "
+                f"{position.total_time:.1f}s ({position.percentage:.1f}%)",
             )
 
             if (
@@ -2600,7 +2601,8 @@ You can dismiss this warning and continue using the application with limited aud
                             logger.debug(
                                 "MainWindow",
                                 "_on_audio_position_changed",
-                                f"Skipping position update - visualizing {selected_filename} but playing {self.current_playing_filename_for_replay}",
+                                f"Skipping position update - visualizing {selected_filename} "
+                                f"but playing {self.current_playing_filename_for_replay}",
                             )
 
         except Exception as e:
@@ -3035,7 +3037,7 @@ You can dismiss this warning and continue using the application with limited aud
             # ...
 
             # Run the audio enhancer
-            enhancer = AudioEnhancer()
+            _enhancer = AudioEnhancer()  # Future: implement audio enhancement features
             # ... (call enhancer methods)
 
             dialog.destroy()
@@ -3049,7 +3051,7 @@ You can dismiss this warning and continue using the application with limited aud
         dialog.geometry("400x300")
 
         storage_monitor = StorageMonitor([self.download_directory])
-        storage_info = storage_monitor.get_storage_info()
+        _storage_info = storage_monitor.get_storage_info()  # Future: display in health dialog
 
         # Display storage info in the dialog
         # ... (This will be implemented in a future step)
@@ -3060,7 +3062,7 @@ You can dismiss this warning and continue using the application with limited aud
         dialog.geometry("600x400")
 
         storage_optimizer = StorageOptimizer([self.download_directory])
-        optimization_suggestions = storage_optimizer.analyze_storage()
+        _optimization_suggestions = storage_optimizer.analyze_storage()  # Future: display suggestions
 
         # Display optimization suggestions in the dialog
         # ... (This will be implemented in a future step)

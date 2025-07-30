@@ -227,7 +227,9 @@ class AuxiliaryMixin:
                     device_info = asyncio.run(
                         self.device_manager.device_interface.get_device_info()
                     )
-                    connected_device_desc = f"Currently Connected: {device_info.name} (VID={hex(device_info.vendor_id)}, PID={hex(device_info.product_id)})"
+                    connected_device_desc = (f"Currently Connected: {device_info.name} "
+                                            f"(VID={hex(device_info.vendor_id)}, "
+                                            f"PID={hex(device_info.product_id)})")
 
                     # Update combobox with connected device
                     if (

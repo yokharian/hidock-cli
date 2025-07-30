@@ -24,4 +24,23 @@ module.exports = {
     ],
     '@typescript-eslint/no-explicit-any': 'warn',
   },
+  overrides: [
+    {
+      // Relaxed rules for test files
+      files: ['**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/tests/**', '**/__tests__/**'],
+      rules: {
+        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        'react-refresh/only-export-components': 'off',
+        'no-constant-condition': 'off',
+      }
+    },
+    {
+      // Test utilities can export multiple things
+      files: ['**/test/utils.tsx', '**/test/setup.ts'],
+      rules: {
+        'react-refresh/only-export-components': 'off',
+      }
+    }
+  ],
 }

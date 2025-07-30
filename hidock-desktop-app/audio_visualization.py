@@ -616,7 +616,9 @@ class SpectrumAnalyzer:
                     logger.info(
                         "SpectrumAnalyzer",
                         "_update_spectrum",
-                        f"Updated spectrum at {self.current_position:.1f}s, freq range: {freqs[0]:.1f}-{freqs[-1]:.1f} Hz, max magnitude: {np.max(spectrum):.1f} dB",
+                        f"Updated spectrum at {self.current_position:.1f}s, "
+                        f"freq range: {freqs[0]:.1f}-{freqs[-1]:.1f} Hz, "
+                        f"max magnitude: {np.max(spectrum):.1f} dB",
                     )
             except Exception as draw_error:
                 logger.error(

@@ -7,7 +7,8 @@ desktop and web implementations.
 
 import asyncio
 import sys
-from unittest.mock import MagicMock, Mock
+# from unittest.mock import MagicMock  # Future: for advanced mocking
+from unittest.mock import Mock
 
 from desktop_device_adapter import DesktopDeviceAdapter
 
@@ -187,7 +188,7 @@ async def test_desktop_adapter():
     print(f"Connected: {device_info.connected}")
     print(f"Serial: {device_info.serial_number}")
     print(f"Model: {device_info.model}")
-    assert device_info.connected == True
+    assert device_info.connected is True
     assert device_info.model == DeviceModel.H1E
     assert device_info.serial_number == "TEST123456"
 
@@ -262,7 +263,7 @@ async def test_device_manager():
 
     # Test connection
     device_info = await manager.connect_to_device()
-    assert device_info.connected == True
+    assert device_info.connected is True
 
     # Test capabilities
     capabilities = manager.get_device_capabilities()
@@ -270,8 +271,8 @@ async def test_device_manager():
     assert DeviceCapability.HEALTH_MONITORING in capabilities
 
     # Test capability checking
-    assert manager.has_capability(DeviceCapability.FILE_LIST) == True
-    assert manager.has_capability(DeviceCapability.AUDIO_PLAYBACK) == False
+    assert manager.has_capability(DeviceCapability.FILE_LIST) is True
+    assert manager.has_capability(DeviceCapability.AUDIO_PLAYBACK) is False
 
     # Test model info
     model_info = await manager.get_device_model_info()

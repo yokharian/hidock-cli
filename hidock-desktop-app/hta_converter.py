@@ -16,7 +16,7 @@ Requirements: 4.3
 """
 
 import os
-import struct
+# import struct  # Future: for binary data parsing if needed
 import tempfile
 import wave
 from typing import Optional, Tuple
