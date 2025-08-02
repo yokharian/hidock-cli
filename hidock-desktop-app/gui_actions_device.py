@@ -27,11 +27,22 @@ class DeviceActionsMixin:
         error_to_report, local_backend_instance = None, None
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            dll_paths_to_try = (
-                [os.path.join(script_dir, name) for name in ["libusb-1.0.dll"]]
-                + [os.path.join(script_dir, "MS64", "dll", name) for name in ["libusb-1.0.dll"]]
-                + [os.path.join(script_dir, "MS32", "dll", name) for name in ["libusb-1.0.dll"]]
-            )
+            system = platform.system()
+            if system == "Darwin":  # macOS
+                dll_paths_to_try = [
+                    "/opt/homebrew/lib/libusb-1.0.dylib",  # Apple Silicon
+                    "/usr/local/lib/libusb-1.0.dylib",  # Intel Macs
+                ]
+            elif system == "Linux":
+                dll_paths_to_try = ["/usr/lib/x86_64-linux-gnu/libusb-1.0.so"]
+            elif system == "Windows":
+                dll_paths_to_try = (
+                    [os.path.join(script_dir, name) for name in ["libusb-1.0.dll"]]
+                    + [os.path.join(script_dir, "MS64", "dll", name) for name in ["libusb-1.0.dll"]]
+                    + [os.path.join(script_dir, "MS32", "dll", name) for name in ["libusb-1.0.dll"]]
+                )
+            else:  # Try system paths.
+                dll_paths_to_try = []
             dll_path = next((p for p in dll_paths_to_try if os.path.exists(p)), None)
             if not dll_path:
                 logger.warning(

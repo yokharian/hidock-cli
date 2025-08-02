@@ -211,6 +211,13 @@ def check_development_files():
         else:
             print("✓ Homebrew available")
 
+        result = run_command("brew list libusb", check=False)
+        if result.returncode != 0:
+            print("ℹ️  libusb not found using brew (you may have to install it manually)")
+            print("   brew install libusb")
+        else:
+            print("✓ libusb available")
+
     # Check for important config files
     desktop_config = Path("hidock-desktop-app/hidock_config.json")
     if desktop_config.exists():
