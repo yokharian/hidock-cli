@@ -439,9 +439,8 @@ def setup_git_workflow():
             print("1. Commit your changes first")
             print("2. Stash your changes (git stash)")
             print("3. Continue on current branch")
-            print("4. Skip branch creation")
 
-            choice = input("\nHow would you like to proceed? (1-4): ").strip()
+            choice = input("\nHow would you like to proceed? (1-3): ").strip()
             if choice == "1":
                 print("Please commit your changes first, then re-run this script")
                 return
@@ -451,9 +450,6 @@ def setup_git_workflow():
                 print("✓ Changes stashed - you can retrieve them later with 'git stash pop'")
             elif choice == "3":
                 print(f"Continuing on current branch: {current_branch}")
-                return
-            elif choice == "4":
-                print("Skipping branch creation")
                 return
 
     except Exception:
@@ -470,37 +466,37 @@ def setup_git_workflow():
     # Ask user what they want to work on
     print("\nWhat would you like to work on?")
     print("1. Desktop Application features")
-    print("4. Documentation improvements")
-    print("5. Bug fixes")
-    print("6. General sandbox/exploration")
-    print("7. Skip branch creation (stay on current branch)")
+    print("2. Documentation improvements")
+    print("3. Bug fixes")
+    print("4. General sandbox/exploration")
+    print("5. Skip branch creation (stay on current branch)")
 
     while True:
         try:
-            choice = input("\nEnter your choice (1-7): ").strip()
-            if choice in ["1", "4", "5", "6", "7"]:
+            choice = input("\nEnter your choice (1-5): ").strip()
+            if choice in ["1", "2", "3", "4", "5"]:
                 break
-            print("Please enter a number between 1-7")
+            print("Please enter a number between 1-5")
         except KeyboardInterrupt:
             print("\nSkipping branch setup...")
             return
 
-    if choice == "7":
+    if choice == "5":
         print("Staying on current branch")
         return
 
     # Map choices to branch prefixes
     branch_types = {
         "1": "feature/desktop",
-        "4": "docs",
-        "5": "bugfix",
-        "6": "sandbox",
+        "2": "docs",
+        "3": "bugfix",
+        "4": "sandbox",
     }
 
     branch_prefix = branch_types[choice]
 
     # Get branch name
-    if choice == "6":
+    if choice == "4":
         import datetime
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d")
