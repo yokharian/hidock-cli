@@ -20,8 +20,6 @@ import threading
 import traceback
 from textwrap import dedent
 
-from gui_event_handlers import EventHandlersMixin
-
 from audio_player_enhanced import EnhancedAudioPlayer
 from audio_processing_advanced import AudioEnhancer
 from config_and_logger import Logger, load_config, logger, save_config
@@ -32,6 +30,7 @@ from file_operations_manager import FileOperationsManager
 from gui_actions_device import DeviceActionsMixin
 from gui_actions_file import FileActionsMixin
 from gui_auxiliary import AuxiliaryMixin
+from gui_event_handlers import EventHandlersMixin
 from storage_management import StorageMonitor, StorageOptimizer
 from transcription_module import process_audio_file_for_insights
 
@@ -595,13 +594,13 @@ class HiDockToolGUI(
                     text="Disconnect",
                     command=self.disconnect_device,
                     state="normal",
-                                    )
+                )
             else:
                 self.toolbar_connect_button.configure(
                     text="Connect",
                     command=self.connect_device,
                     state=("normal" if self.backend_initialized_successfully else "disabled"),
-                                    )
+                )
         if hasattr(self, "toolbar_refresh_button") and self.toolbar_refresh_button.winfo_exists():
             self.toolbar_refresh_button.configure(
                 state=(
@@ -616,7 +615,7 @@ class HiDockToolGUI(
                     text="Cancel DL",
                     command=self.request_cancel_operation,
                     state="normal",
-                                    )
+                )
             else:
                 self.toolbar_download_button.configure(
                     text="Download",
@@ -629,34 +628,33 @@ class HiDockToolGUI(
                         and not self.is_audio_playing
                         else "disabled"
                     ),
-
-                                    )
+                )
         if hasattr(self, "toolbar_play_button") and self.toolbar_play_button.winfo_exists():
             if self.is_audio_playing:
                 self.toolbar_play_button.configure(
                     text="Stop",
                     command=self._stop_audio_playback,
                     state="normal",
-                                    )
+                )
             elif self.is_long_operation_active and self.active_operation_name == "Playback Preparation":
                 self.toolbar_play_button.configure(
                     text="Cancel Prep",
                     command=self.request_cancel_operation,
                     state="normal",
-                                    )
+                )
             else:
                 self.toolbar_play_button.configure(
                     text="Play",
                     command=self.play_selected_audio_gui,
                     state=("normal" if can_play_selected and not self.is_long_operation_active else "disabled"),
-                                    )
+                )
         if hasattr(self, "toolbar_insights_button") and self.toolbar_insights_button.winfo_exists():
             if self.is_long_operation_active and self.active_operation_name == "Transcription":
                 self.toolbar_insights_button.configure(
                     text="Cancel Insights",
                     command=self.request_cancel_operation,
                     state="normal",
-                                    )
+                )
             else:
                 self.toolbar_insights_button.configure(
                     text="Get Insights",
@@ -670,14 +668,14 @@ class HiDockToolGUI(
                         and not self.is_audio_playing
                         else "disabled"
                     ),
-                                    )
+                )
         if hasattr(self, "toolbar_delete_button") and self.toolbar_delete_button.winfo_exists():
             if self.is_long_operation_active and self.active_operation_name == "Deletion":
                 self.toolbar_delete_button.configure(
                     text="Cancel Del.",
                     command=self.request_cancel_operation,
                     state="normal",
-                                    )
+                )
             else:
                 self.toolbar_delete_button.configure(
                     text="Delete",
@@ -690,7 +688,7 @@ class HiDockToolGUI(
                         and not self.is_audio_playing
                         else "disabled"
                     ),
-                                    )
+                )
         if hasattr(self, "toolbar_settings_button") and self.toolbar_settings_button.winfo_exists():
             self.toolbar_settings_button.configure(state="normal")
 
@@ -707,24 +705,29 @@ class HiDockToolGUI(
 
         file_detail = next((f for f in self.displayed_files_details if f["name"] == file_iid), None)
         if not file_detail:
-            logger.error("MainWindow","Transcription Error", "File details not found.", )
+            logger.error(
+                "MainWindow",
+                "Transcription Error",
+                "File details not found.",
+            )
             return
 
         local_filepath = self._get_local_filepath(file_detail["name"])
         if not os.path.isfile(local_filepath):
-            logger.error("MainWindow",
+            logger.error(
+                "MainWindow",
                 "File Not Found",
-                f"Local file not found: {local_filepath}\nPlease download the file first."
+                f"Local file not found: {local_filepath}\nPlease download the file first.",
             )
             return
 
         # Get API key from encrypted settings
         gemini_api_key = self.get_decrypted_api_key()
         if not gemini_api_key:
-            logger.error("MainWindow",
+            logger.error(
+                "MainWindow",
                 "API Key Missing",
                 "AI API Key not configured. Please set your API key in Settings > AI Transcription.",
-
             )
             return
 
@@ -856,8 +859,9 @@ class HiDockToolGUI(
                     original_filename,
                 )
 
-    def _set_long_operation_active_state(self, state=False, text="Transcription"):
-        ... # Placeholder for the method that sets the long operation state
+    def _set_long_operation_active_state(
+        self, state=False, text="Transcription"
+    ): ...  # Placeholder for the method that sets the long operation state
 
     def _on_transcription_complete_for_panel(self, results, original_filename):
         """Handle completion of transcription and update the panel."""
@@ -1002,9 +1006,9 @@ class HiDockToolGUI(
     def _show_ffmpeg_warning(self):
         """Show a user-friendly warning about missing ffmpeg dependency."""
         import platform
+
         system = platform.system().lower()
 
-        install_msg=""
         if system == "windows":
             install_msg = """To install FFmpeg on Windows:
             1. Download from: https://ffmpeg.org/download.html#build-windows
@@ -1013,15 +1017,15 @@ class HiDockToolGUI(
             4. Restart the application
 
             Alternative: Install via Chocolatey: choco install ffmpeg"""
-                        elif system == "darwin":  # macOS
-                            install_msg = """To install FFmpeg on macOS:
+        elif system == "darwin":  # macOS
+            install_msg = """To install FFmpeg on macOS:
             1. Install Homebrew: https://brew.sh
             2. Run: brew install ffmpeg
             3. Restart the application
 
             Alternative: Download from https://ffmpeg.org/download.html#build-mac"""
-                        else:  # Linux
-                            install_msg = """To install FFmpeg on Linux:
+        else:  # Linux
+            install_msg = """To install FFmpeg on Linux:
             Ubuntu/Debian: sudo apt update && sudo apt install ffmpeg
             CentOS/RHEL: sudo yum install ffmpeg
             Fedora: sudo dnf install ffmpeg
@@ -1075,9 +1079,7 @@ class HiDockToolGUI(
                 self.after(
                     0,
                     lambda: logger.error(
-                        "MainWindow",
-                        "Playback Error",
-                        f"Could not download file for playback: {error_msg}"
+                        "MainWindow", "Playback Error", f"Could not download file for playback: {error_msg}"
                     ),
                 )
 
@@ -1088,9 +1090,7 @@ class HiDockToolGUI(
         Handles the window closing event.
         """
         logger.info("MainWindow", "on_closing", "Window closing event triggered.")
-        if (
-            self.device_manager.device_interface.is_connected()
-        ):
+        if self.device_manager.device_interface.is_connected():
             logger.info("MainWindow", "on_closing", "Quit cancelled by user.")
             return
         self.config["window_geometry"] = self.geometry()
@@ -1147,15 +1147,19 @@ class HiDockToolGUI(
     def _process_selected_audio(self, file_iid):
         file_detail = next((f for f in self.displayed_files_details if f["name"] == file_iid), None)
         if not file_detail:
-            logger.error("MainWindow","Audio Processing Error", "File details not found.", )
+            logger.error(
+                "MainWindow",
+                "Audio Processing Error",
+                "File details not found.",
+            )
             return
 
         local_filepath = self._get_local_filepath(file_detail["name"])
         if not os.path.exists(local_filepath):
-            logger.warning("MainWindow",
+            logger.warning(
+                "MainWindow",
                 "Audio Processing",
                 "File not downloaded. Please download it first.",
-
             )
             return
         # Add processing options to the dialog

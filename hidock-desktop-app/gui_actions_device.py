@@ -13,7 +13,6 @@ import traceback
 from datetime import datetime
 
 import usb.core
-
 from config_and_logger import logger
 from file_operations_manager import FileMetadata
 

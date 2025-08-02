@@ -1,7 +1,6 @@
 import time
 
 import pytest
-
 from file_operations_manager import FileOperationsManager
 
 

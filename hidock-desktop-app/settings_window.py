@@ -24,7 +24,7 @@ except ImportError:
 from config_and_logger import Logger, logger, save_config  # For type hint and logger instance
 
 
-class SettingsDialog():
+class SettingsDialog:
     """
     A top-level class for configuring application settings.
 
@@ -74,7 +74,6 @@ class SettingsDialog():
         # If device is connected, load its specific settings
         if self.dock.is_connected():
             threading.Thread(target=self._load_device_settings_for_dialog_thread, daemon=True).start()
-
 
     def _clone_parent_vars(self):
         """Clones relevant CTk Variables from the parent GUI for local modification and reset."""
@@ -131,33 +130,32 @@ class SettingsDialog():
                 self.local_vars[var_name] = var_class(value=parent_value)
                 self.local_vars[var_name].trace_add("write", self._update_button_states_on_change)
 
-
     def _populate_ai_transcription_tab(self, tab):
         """Populates the 'AI Transcription' tab with AI service settings."""
 
         # API Provider Selection
-        text="AI Service Provider:"
+        text = "AI Service Provider:"
         self.local_vars["ai_api_provider_var"]
-        command=self._on_ai_provider_changed
-        values=[
-                "gemini",
-                "openai",
-                "anthropic",
-                "openrouter",
-                "amazon",
-                "qwen",
-                "deepseek",
-                "ollama",
-                "lmstudio",
+        command = self._on_ai_provider_changed
+        values = [
+            "gemini",
+            "openai",
+            "anthropic",
+            "openrouter",
+            "amazon",
+            "qwen",
+            "deepseek",
+            "ollama",
+            "lmstudio",
         ]
 
         # API Key Entry
-        text="API Key:"
-        command=self._validate_api_key
+        text = "API Key:"
+        command = self._validate_api_key
 
         # Model Selection
-        variable=self.local_vars["ai_model_var"],
-        values=[
+        variable = (self.local_vars["ai_model_var"],)
+        values = [
             "gemini-2.5-flash",
             "gemini-2.5-pro",
             "gemini-2.5-lite",
@@ -169,17 +167,17 @@ class SettingsDialog():
         ]
 
         # Temperature Setting
-        text="Temperature (0.0 - 1.0):"
+        text = "Temperature (0.0 - 1.0):"
         self.local_vars["ai_temperature_var"]
-        text=f"{temp_value:.2f}"
+        text = f"{temp_value:.2f}"
 
         # Max Tokens Setting
-        text="Max Tokens:"
+        text = "Max Tokens:"
         self.local_vars["ai_max_tokens_var"],
 
         # Language Setting
         self.local_vars["ai_language_var"],
-        values=["auto", "en", "es", "fr", "de", "pt", "zh", "ja", "ko"],
+        values = (["auto", "en", "es", "fr", "de", "pt", "zh", "ja", "ko"],)
 
     def _update_provider_config(self):
         """Show/hide provider-specific configuration based on selected provider"""
@@ -214,20 +212,20 @@ class SettingsDialog():
 
         ##
         ##
-        text="Provider Configuration:"
+        text = "Provider Configuration:"
         ##
         ##
 
         # OpenRouter Configuration
-        text="Base URL:"
+        text = "Base URL:"
         self.local_vars["ai_openrouter_base_url_var"]
-        placeholder_text="https://openrouter.ai/api/v1"
+        placeholder_text = "https://openrouter.ai/api/v1"
 
         # Amazon Bedrock Configuration
-        text="AWS Region:"
+        text = "AWS Region:"
         self.amazon_frame
         self.local_vars["ai_amazon_region_var"]
-        values=[
+        values = [
             "us-east-1",
             "us-west-2",
             "eu-west-1",
@@ -237,29 +235,29 @@ class SettingsDialog():
 
         # Qwen Configuration
         self.qwen_frame
-        text="API Base URL:"
+        text = "API Base URL:"
         self.local_vars["ai_qwen_base_url_var"]
-        placeholder_text="https://dashscope.aliyuncs.com/compatible-mode/v1"
+        placeholder_text = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
         # DeepSeek Configuration
         self.deepseek_frame
-        text="API Base URL:"
-        textvariable=self.local_vars["ai_deepseek_base_url_var"]
-        placeholder_text="https://api.deepseek.com"
+        text = "API Base URL:"
+        textvariable = self.local_vars["ai_deepseek_base_url_var"]
+        placeholder_text = "https://api.deepseek.com"
 
         # Ollama Configuration
         self.ollama_frame
-        text="🏠 Local Ollama Server:"
-        textvariable=self.local_vars["ai_ollama_base_url_var"]
-        placeholder_text="http://localhost:11434"
-        text_info="💡 Tip: Install Ollama locally and pull models with 'ollama pull llama3.2'",
+        text = "🏠 Local Ollama Server:"
+        textvariable = self.local_vars["ai_ollama_base_url_var"]
+        placeholder_text = "http://localhost:11434"
+        text_info = ("💡 Tip: Install Ollama locally and pull models with 'ollama pull llama3.2'",)
 
         # LM Studio Configuration
         self.lmstudio_frame
-        text="🏠 Local LM Studio Server:"
+        text = "🏠 Local LM Studio Server:"
         self.lmstudio_frame
-        textvariable=self.local_vars["ai_lmstudio_base_url_var"]
-        text_info="💡 Tip: Download LM Studio and start local server with your preferred model"
+        textvariable = self.local_vars["ai_lmstudio_base_url_var"]
+        text_info = "💡 Tip: Download LM Studio and start local server with your preferred model"
 
     def _select_download_dir_action(self):
         """Opens a file dialog to select the download directory and updates the UI."""
@@ -652,9 +650,17 @@ class SettingsDialog():
         """Called when API key validation completes."""
         if hasattr(self, "api_key_status_label") and hasattr(self, "validate_key_button"):
             if success:
-                text="Status: Valid API key"
+                logger.info(
+                    "SettingsDialog",
+                    "_validation_complete",
+                    "API key validation successful.",
+                )
             else:
-                Raise Exception(text="Status: Invalid API key")
+                logger.error(
+                    "SettingsDialog",
+                    "_validation_complete",
+                    "API key validation failed.",
+                )
 
     def _on_device_scan_complete(self, devices):
         """Handle completion of device scan."""
@@ -749,11 +755,7 @@ class SettingsDialog():
                 "_load_device_settings",
                 f"USB/Connection Error: {e_usb}",
             )
-            logger.error(
-                "SettingsDialog",
-                "_load_device_settings",
-                f"Failed to load device settings: {e_usb}"
-            )
+            logger.error("SettingsDialog", "_load_device_settings", f"Failed to load device settings: {e_usb}")
         except (
             AttributeError,
             KeyError,

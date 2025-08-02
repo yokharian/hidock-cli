@@ -8,7 +8,6 @@ for handling the settings dialog, GUI logging, and other helper functions.
 import traceback
 
 import usb.core
-
 from config_and_logger import Logger, logger
 from settings_window import SettingsDialog
 

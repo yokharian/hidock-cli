@@ -80,11 +80,14 @@ class FileActionsMixin:
             #
             # This is where we update the file status in the treeview
             if operation.operation_type.value == "download":
+                pass
                 # For downloads, show "Downloaded" status instead of "Completed"
             elif operation.operation_type.value == "delete":
+                pass
                 # For deletions, remove the file from the treeview and refresh the file list
                 # Refresh the file list to ensure consistency with device state
             else:
+                pass
                 # Refresh the file list to ensure consistency with device state
         elif operation.status == FileOperationStatus.FAILED:
             status_text = f"Failed to {operation.operation_type.value} {operation.filename}: {operation.error_message}"
