@@ -212,7 +212,7 @@ def check_development_files():
             print("✓ Homebrew available")
 
     # Check for important config files
-    desktop_config = Path("hidock-desktop-app/hidock_tool_config.json")
+    desktop_config = Path("hidock-desktop-app/hidock_config.json")
     if desktop_config.exists():
         print("✓ Desktop app configuration file found")
     else:

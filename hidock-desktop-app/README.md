@@ -280,7 +280,7 @@ The `requirements.txt` includes both runtime and development dependencies:
 
 ### Application Settings
 
-Settings are stored in `hidock_tool_config.json`:
+Settings are stored in `hidock_config.json`:
 
 - **AI Provider Configurations**: Encrypted API keys and endpoints
 - **Audio Preferences**: Default volume, speed, visualization settings

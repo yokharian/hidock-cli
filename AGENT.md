@@ -89,7 +89,7 @@ mypy .
 ## Key Configuration Files
 
 - **Python**: `hidock-desktop-app/pyproject.toml` - Project metadata, dependencies, and tool configuration
-- **Desktop Config**: `hidock-desktop-app/hidock_tool_config.json` - Runtime application settings
+- **Desktop Config**: `hidock-desktop-app/hidock_config.json` - Runtime application settings
 - **Test Configuration**: `hidock-desktop-app/pytest.ini` - Python test settings and markers
 
 ## Development Workflow
@@ -190,7 +190,7 @@ The desktop application supports **7 implemented AI providers** with **3 additio
 - Always run from the `hidock-desktop-app/` directory to ensure proper icon and configuration file paths
 - **AI Provider Setup**: Each provider requires specific configuration in settings
 - **Local Models**: Ollama and LM Studio require separate server installation
-- **API Keys**: Stored encrypted in `hidock_tool_config.json` - never commit plain text keys
+- **API Keys**: Stored encrypted in `hidock_config.json` - never commit plain text keys
 - **HTA Files**: Automatically converted to WAV for AI processing
 - **Background Processing**: Use progress bars and cancellation for long AI operations
 
