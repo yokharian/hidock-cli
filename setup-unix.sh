@@ -31,7 +31,7 @@ fi
 
 # Check Python version
 PYTHON_VERSION=$($PYTHON_CMD --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2)
-if [ "$(printf '%s\n' "3.12" "$PYTHON_VERSION" | sort -V | head -n1)" != "3.12" ]; then
+if [ "$(printf '%s\n' "3.12" "$PYTHON_VERSION" | sort -V | tail -n1)" != "3.12" ]; then
     echo "❌ ERROR: Python 3.12 required for optimal compatibility, found $PYTHON_VERSION"
     echo "Some packages may not work with other versions"
     exit 1
