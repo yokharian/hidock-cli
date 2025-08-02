@@ -1,15 +1,15 @@
 #!/bin/bash
-# HiDock Next - Simple Linux/Mac Setup
+# HiDock Cli - Simple Linux/Mac Setup
 # Run: chmod +x setup-unix.sh && ./setup-unix.sh
 
 set -e  # Exit on any error
 
 echo ""
 echo "================================"
-echo "   HiDock Next - Quick Setup"
+echo "   HiDock Cli - Quick Setup"
 echo "================================"
 echo ""
-echo "This will set up HiDock apps for immediate use."
+echo "This will set up HiDock Cli for immediate use."
 echo ""
 
 # Check Python
@@ -62,42 +62,6 @@ pip install -r requirements.txt || {
 echo "✅ Desktop app setup complete!"
 cd ..
 
-# Check Node.js for Web Apps
-echo ""
-echo "[3/4] Checking Node.js for Web Apps..."
-if command -v node &> /dev/null; then
-    NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
-    if [ "$NODE_VERSION" -ge 18 ]; then
-        echo "✓ Node.js found! Setting up web apps..."
-
-        echo "Setting up HiDock Web App..."
-        cd hidock-web-app
-        npm install || {
-            echo "⚠️  WARNING: Web app setup failed"
-        }
-        echo "✅ Web app setup complete!"
-        cd ..
-
-        echo "Setting up Audio Insights Extractor..."
-        cd audio-insights-extractor
-        npm install || {
-            echo "⚠️  WARNING: Audio Insights Extractor setup failed"
-        }
-        echo "✅ Audio Insights Extractor setup complete!"
-        cd ..
-
-        WEB_APP_READY=true
-    else
-        echo "⚠️  Node.js version $NODE_VERSION found, but 18+ required"
-        echo "Update Node.js if you want the web apps"
-        WEB_APP_READY=false
-    fi
-else
-    echo "ℹ️  Node.js not found - skipping web apps setup"
-    echo "Install Node.js 18+ from https://nodejs.org if you want the web apps"
-    WEB_APP_READY=false
-fi
-
 # Complete
 echo ""
 echo "[4/4] Setup Complete!"
@@ -110,14 +74,6 @@ echo "  1. cd hidock-desktop-app"
 echo "  2. source .venv/bin/activate"
 echo "  3. python main.py"
 echo ""
-
-if [ "$WEB_APP_READY" = true ]; then
-    echo "Web App:"
-    echo "  1. cd hidock-web-app"
-    echo "  2. npm run dev"
-    echo "  3. Open: http://localhost:5173"
-    echo ""
-fi
 
 echo "💡 FIRST TIME TIPS:"
 echo "• Configure AI providers in app Settings for transcription"

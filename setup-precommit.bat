@@ -43,7 +43,6 @@ echo The following checks will run:
 echo:
 echo BEFORE COMMIT:
 echo - Flake8 (Python linting) for desktop app
-echo - ESLint (JS/TS linting) for web apps
 echo - Black (Python formatting)
 echo - isort (Python import sorting)
 echo - General file checks (trailing whitespace, JSON validation, etc.)
@@ -51,8 +50,6 @@ echo - Security checks (detect secrets, private keys)
 echo:
 echo BEFORE PUSH:
 echo - Python tests (pytest)
-echo - TypeScript compilation check
-echo - JavaScript tests (if configured)
 echo:
 echo To run hooks manually: pre-commit run --all-files
 echo To skip hooks once: git commit --no-verify

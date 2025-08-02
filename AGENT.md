@@ -7,8 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 HiDock Next is a multi-platform application suite for managing HiDock recording devices locally with comprehensive AI-powered transcription and analysis capabilities. The project includes three main applications:
 
 - **Desktop Application** (Python): Full-featured GUI application with 11 AI provider support
-- **Web Application** (React/TypeScript): Modern browser-based interface with AI transcription
-- **Audio Insights Extractor** (React/TypeScript): Standalone audio analysis tool
 
 ## Architecture
 
@@ -17,11 +15,8 @@ HiDock Next is a multi-platform application suite for managing HiDock recording 
 The desktop application is the flagship component with advanced AI integration and professional-grade features.
 
 #### Core Architecture
+
 - **Main Entry**: `main.py` - Application entry point with enhanced error handling
-- **GUI Architecture**:
-  - `gui_main_window.py` - Main application window with AI transcription panels and advanced controls
-  - `settings_window.py` - Comprehensive settings with multi-provider AI configuration
-  - `gui_*.py` files - Modular GUI components (treeview, actions, event handlers, auxiliary functions)
 - **Device Communication**:
   - `hidock_device.py` - USB device interface using pyusb/libusb
   - `enhanced_device_selector.py` - Professional device selection UI with status indicators
@@ -29,6 +24,7 @@ The desktop application is the flagship component with advanced AI integration a
 - **File Operations**: `file_operations_manager.py` - Local file management with HTA conversion support
 
 #### AI Integration Layer
+
 - **Unified AI Service**: `ai_service.py` - Central service managing 11 AI providers
   - **Cloud Providers**: Google Gemini, OpenAI, Anthropic, OpenRouter, Amazon Bedrock, Qwen, DeepSeek
   - **Local Providers**: Ollama, LM Studio
@@ -37,26 +33,10 @@ The desktop application is the flagship component with advanced AI integration a
 - **HTA Converter**: `hta_converter.py` - Proprietary audio format conversion utility
 
 #### Advanced Features
-- **Audio Processing**:
-  - `audio_player_enhanced.py` - Variable speed playback (0.25x-2.0x)
-  - `audio_visualization.py` - Real-time waveform and spectrum analysis with pinned mode
+
 - **Background Processing**: Non-blocking AI operations with progress tracking and cancellation
 - **Security**: Encrypted API key storage using Fernet encryption
 - **File Format Support**: Native .hda, .hta conversion, standard audio formats
-
-### Web Application (`hidock-web-app/`)
-
-- **Framework**: React 18 with TypeScript and Vite
-- **State Management**: Zustand store (`src/store/useAppStore.ts`)
-- **Device Interface**: WebUSB API through `src/adapters/webDeviceAdapter.ts`
-- **AI Integration**: Google Gemini API for transcription (`src/services/geminiService.ts`)
-- **Routing**: React Router with pages for Dashboard, Recordings, Transcription, Settings
-
-### Audio Insights Extractor (`audio-insights-extractor/`)
-
-- **Purpose**: Standalone tool for audio analysis and insights
-- **Framework**: React 19 with TypeScript and Vite
-- **AI Integration**: Google GenAI for audio processing
 
 ## Quick Setup
 
@@ -106,50 +86,10 @@ isort .
 mypy .
 ```
 
-### Web Application
-
-```bash
-cd hidock-web-app
-
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm run test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode
-npm run test:watch
-
-# Linting
-npm run lint
-```
-
-### Audio Insights Extractor
-
-```bash
-cd audio-insights-extractor
-
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview built application
-npm run preview
-```
-
 ## Key Configuration Files
 
 - **Python**: `hidock-desktop-app/pyproject.toml` - Project metadata, dependencies, and tool configuration
 - **Desktop Config**: `hidock-desktop-app/hidock_tool_config.json` - Runtime application settings
-- **Web Dependencies**: `hidock-web-app/package.json` - Web app dependencies and scripts
 - **Test Configuration**: `hidock-desktop-app/pytest.ini` - Python test settings and markers
 
 ## Development Workflow
@@ -157,13 +97,11 @@ npm run preview
 ### Testing Strategy
 
 - **Python**: pytest with markers for unit (`@pytest.mark.unit`), integration (`@pytest.mark.integration`), and device tests (`@pytest.mark.device`)
-- **Web**: Vitest with Testing Library for React components
 - **Coverage**: Minimum 80% coverage required for Python code
 
 ### Code Style
 
 - **Python**: Black formatter (line length 88), Flake8 linting, isort for imports, mypy for type checking
-- **TypeScript**: ESLint with React hooks rules, Prettier-compatible formatting
 
 ### Git Workflow
 
@@ -177,7 +115,6 @@ npm run preview
 ### USB Protocol
 
 - **Desktop**: Direct USB communication via pyusb/libusb
-- **Web**: WebUSB API (requires HTTPS and user permission)
 - **Device Types**: HiDock H1, H1E, P1 variants
 - **Operations**: List recordings, download, play, delete, format storage, sync time
 
@@ -196,6 +133,7 @@ npm run preview
 The desktop application supports **7 implemented AI providers** with **3 additional providers planned** through a unified interface:
 
 #### Fully Implemented Providers (7)
+
 - **Google Gemini**: Complete implementation with multiple models (gemini-1.5-flash, gemini-pro)
 - **OpenAI**: Full GPT and Whisper integration for transcription and analysis
 - **Anthropic**: Claude models for text analysis
@@ -205,11 +143,13 @@ The desktop application supports **7 implemented AI providers** with **3 additio
 - **Mock Provider**: For development and testing without API keys
 
 #### Planned/Future Providers (3)
+
 - **Amazon Bedrock**: Enterprise AI models (referenced in imports, not implemented)
 - **Qwen**: Alibaba's multilingual models (mentioned in comments, not implemented)
 - **DeepSeek**: Coding-specialized models (mentioned in comments, not implemented)
 
 #### Features
+
 - **Unified Interface**: Single API for all providers through `ai_service.py`
 - **Secure Storage**: Encrypted API key management with Fernet encryption
 - **Provider Abstraction**: Abstract base class ensures consistent interfaces
@@ -217,24 +157,18 @@ The desktop application supports **7 implemented AI providers** with **3 additio
 - **Background Processing**: Non-blocking transcription with progress tracking
 - **Error Handling**: Comprehensive error reporting and fallback mechanisms
 
-### Web Application
-
-- Google Gemini API integration for real-time transcription
-- BYOK (Bring Your Own Key) model
-- Client-side processing to maintain privacy
-
 ## Dependencies
 
 ### Python (Desktop)
 
 #### Core Dependencies
-- `customtkinter` - Modern GUI framework with professional styling
+
 - `pyusb` - USB device communication with libusb backend
-- `pygame` - Audio playback and processing
 - `matplotlib` - Real-time audio visualization and waveform display
 - `cryptography` - Secure API key encryption with Fernet
 
 #### AI Provider Dependencies
+
 - `google-generativeai` - Google Gemini integration
 - `openai` - OpenAI GPT and Whisper integration
 - `anthropic` - Anthropic Claude integration
@@ -242,22 +176,17 @@ The desktop application supports **7 implemented AI providers** with **3 additio
 - `requests` - HTTP client for OpenRouter, Ollama, LM Studio, other providers
 
 #### Development Tools
+
 - `pytest` - Testing framework with coverage reporting
 - `black` - Code formatting (line length 88)
 - `flake8` - Linting and style checking
 - `isort` - Import sorting and organization
 - `mypy` - Static type checking
 
-### TypeScript (Web)
-
-- `react` / `react-dom` - UI framework
-- `zustand` - State management
-- `@google/generative-ai` - AI services
-- Development: `vite`, `vitest`, `eslint`, `typescript`
-
 ## Important Notes
 
 ### Desktop Application
+
 - Always run from the `hidock-desktop-app/` directory to ensure proper icon and configuration file paths
 - **AI Provider Setup**: Each provider requires specific configuration in settings
 - **Local Models**: Ollama and LM Studio require separate server installation
@@ -266,17 +195,15 @@ The desktop application supports **7 implemented AI providers** with **3 additio
 - **Background Processing**: Use progress bars and cancellation for long AI operations
 
 ### Development Guidelines
+
 - **Testing**: Device tests require actual HiDock hardware (`@pytest.mark.device`)
 - **AI Testing**: Mock providers available for development without API keys
 - **Error Handling**: Always implement fallback mechanisms for AI operations
 - **Configuration**: JSON format with validation before commits
 - **Security**: Never log or expose API keys in debug output
 
-### Web Application
-- Requires HTTPS for WebUSB functionality
-- Supports offline functionality for core device management
-
 ### Multi-Provider AI Architecture
+
 - **Provider Registration**: Use `ai_service.configure_provider()` before operations
 - **Unified Interface**: All providers implement `AIProvider` abstract base class
 - **Error Handling**: Providers return consistent error response format
