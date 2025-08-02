@@ -30,14 +30,8 @@ class DeviceActionsMixin:
             script_dir = os.path.dirname(os.path.abspath(__file__))
             dll_paths_to_try = (
                 [os.path.join(script_dir, name) for name in ["libusb-1.0.dll"]]
-                + [
-                    os.path.join(script_dir, "MS64", "dll", name)
-                    for name in ["libusb-1.0.dll"]
-                ]
-                + [
-                    os.path.join(script_dir, "MS32", "dll", name)
-                    for name in ["libusb-1.0.dll"]
-                ]
+                + [os.path.join(script_dir, "MS64", "dll", name) for name in ["libusb-1.0.dll"]]
+                + [os.path.join(script_dir, "MS32", "dll", name) for name in ["libusb-1.0.dll"]]
             )
             dll_path = next((p for p in dll_paths_to_try if os.path.exists(p)), None)
             if not dll_path:
@@ -55,9 +49,7 @@ class DeviceActionsMixin:
                     "_initialize_backend_early",
                     f"Attempting backend with DLL: {dll_path}",
                 )
-                local_backend_instance = usb.backend.libusb1.get_backend(
-                    find_library=lambda x: dll_path
-                )
+                local_backend_instance = usb.backend.libusb1.get_backend(find_library=lambda x: dll_path)
                 if not local_backend_instance:
                     error_to_report = f"Failed with DLL: {dll_path}. Check 32/64 bit."
             if error_to_report:
@@ -87,14 +79,9 @@ class DeviceActionsMixin:
     def attempt_autoconnect_on_startup(self):  # Enhanced with auto-detection
         """Attempts to autoconnect to the HiDock device on startup if autoconnect is enabled."""
         if not self.backend_initialized_successfully:
-            logger.warning(
-                "GUI", "attempt_autoconnect", "Skipping autoconnect, USB backend error."
-            )
+            logger.warning("GUI", "attempt_autoconnect", "Skipping autoconnect, USB backend error.")
             return
-        if (
-            self.autoconnect_var.get()
-            and not self.device_manager.device_interface.jensen_device.is_connected()
-        ):
+        if self.autoconnect_var.get() and not self.device_manager.device_interface.jensen_device.is_connected():
             logger.info(
                 "GUI",
                 "attempt_autoconnect",
@@ -103,9 +90,7 @@ class DeviceActionsMixin:
 
             # Try to discover available devices first
             try:
-                discovered_devices = asyncio.run(
-                    self.device_manager.device_interface.discover_devices()
-                )
+                discovered_devices = asyncio.run(self.device_manager.device_interface.discover_devices())
                 if discovered_devices:
                     # Use the first discovered device
                     first_device = discovered_devices[0]
@@ -138,14 +123,10 @@ class DeviceActionsMixin:
     def connect_device(self):  # Identical to original, parent=self for dialogs
         """Connects to the HiDock device using the selected VID, PID, and interface."""
         if not self.backend_initialized_successfully:
-            logger.error(
-                "GUI", "connect_device", "Cannot connect: USB backend not initialized."
-            )
+            logger.error("GUI", "connect_device", "Cannot connect: USB backend not initialized.")
             self.update_status_bar(connection_status="Status: USB Backend FAILED!")
             if self.backend_init_error_message:
-                messagebox.showerror(
-                    "USB Backend Error", self.backend_init_error_message, parent=self
-                )
+                messagebox.showerror("USB Backend Error", self.backend_init_error_message, parent=self)
             self._update_menu_states()
             return
         if not self.winfo_exists():
@@ -166,15 +147,11 @@ class DeviceActionsMixin:
                 )
                 device_id = f"{vid:04x}:{pid:04x}"
                 # The connect method returns DeviceInfo, eliminating the need for a separate get_device_info call
-                device_info = asyncio.run(
-                    self.device_manager.device_interface.connect(device_id=device_id)
-                )
+                device_info = asyncio.run(self.device_manager.device_interface.connect(device_id=device_id))
 
             if self.device_manager.device_interface.is_connected() and device_info:
                 # Build the status text from the info we just got.
-                conn_status_text = (
-                    f"Status: Connected ({device_info.model.value or 'HiDock'})"
-                )
+                conn_status_text = f"Status: Connected ({device_info.model.value or 'HiDock'})"
                 if device_info.serial_number != "N/A":
                     conn_status_text += f" SN: {device_info.serial_number}"
 
@@ -199,9 +176,7 @@ class DeviceActionsMixin:
                 self.after(500, self.start_recording_status_check)
                 if self.auto_refresh_files_var.get():
                     self.after(600, self.start_auto_file_refresh_periodic_check)
-            elif (
-                self.device_manager.device_interface.is_connected() and not device_info
-            ):
+            elif self.device_manager.device_interface.is_connected() and not device_info:
                 self.after(
                     0,
                     lambda: self.update_status_bar(
@@ -246,11 +221,7 @@ class DeviceActionsMixin:
                     self._connection_error_banner.show()
                 self.after(
                     0,
-                    lambda: (
-                        self.handle_auto_disconnect_ui()
-                        if self.winfo_exists()
-                        else None
-                    ),
+                    lambda: (self.handle_auto_disconnect_ui() if self.winfo_exists() else None),
                 )
         except (usb.core.USBError, ConnectionError, OSError, RuntimeError) as e:
             # Log the technical error for debugging
@@ -292,11 +263,7 @@ class DeviceActionsMixin:
                 if not self.device_manager.device_interface.is_connected():
                     self.after(
                         0,
-                        lambda: (
-                            self.handle_auto_disconnect_ui()
-                            if self.winfo_exists()
-                            else None
-                        ),
+                        lambda: (self.handle_auto_disconnect_ui() if self.winfo_exists() else None),
                     )
         finally:
             if self.winfo_exists():
@@ -385,12 +352,7 @@ class DeviceActionsMixin:
         found_count = 0
         for f_info in files:
             # Generate the safe filename as _get_local_filepath does
-            safe_filename = (
-                f_info.filename.replace(":", "-")
-                .replace(" ", "_")
-                .replace("\\", "_")
-                .replace("/", "_")
-            )
+            safe_filename = f_info.filename.replace(":", "-").replace(" ", "_").replace("\\", "_").replace("/", "_")
             if safe_filename in downloaded_files:
                 local_filepath = os.path.join(download_dir, safe_filename)
                 # Skip the isfile check for performance - trust the directory listing
@@ -422,9 +384,7 @@ class DeviceActionsMixin:
     def _show_cached_files_if_available(self):
         """Show cached files immediately if available to improve perceived performance."""
         try:
-            cached_files = (
-                self.file_operations_manager.metadata_cache.get_all_metadata()
-            )
+            cached_files = self.file_operations_manager.metadata_cache.get_all_metadata()
             if cached_files:
                 logger.info(
                     "GUI",
@@ -438,22 +398,12 @@ class DeviceActionsMixin:
                         "name": f_info.filename,
                         "length": f_info.size,
                         "duration": f_info.duration,
-                        "createDate": (
-                            f_info.date_created.strftime("%Y/%m/%d")
-                            if f_info.date_created
-                            else "---"
-                        ),
-                        "createTime": (
-                            f_info.date_created.strftime("%H:%M:%S")
-                            if f_info.date_created
-                            else "---"
-                        ),
+                        "createDate": (f_info.date_created.strftime("%Y/%m/%d") if f_info.date_created else "---"),
+                        "createTime": (f_info.date_created.strftime("%H:%M:%S") if f_info.date_created else "---"),
                         "time": f_info.date_created,
                         "version": "⟳",  # Refreshing indicator
                         "original_index": i + 1,
-                        "gui_status": "Cached"
-                        if not f_info.local_path
-                        else "Downloaded",
+                        "gui_status": "Cached" if not f_info.local_path else "Downloaded",
                         "local_path": f_info.local_path,
                         "checksum": f_info.checksum,
                     }
@@ -483,19 +433,13 @@ class DeviceActionsMixin:
 
             with self.device_lock:
                 # Always fetch fresh data from device to ensure we have the latest files
-                recording_info = asyncio.run(
-                    self.device_manager.device_interface.get_recordings()
-                )
+                recording_info = asyncio.run(self.device_manager.device_interface.get_recordings())
 
                 # Get storage info after file list to avoid command conflicts
-                _card_info = asyncio.run(
-                    self.device_manager.device_interface.get_storage_info()
-                )
+                _card_info = asyncio.run(self.device_manager.device_interface.get_storage_info())
 
                 # Check cache to see how many files we had before
-                cached_files = (
-                    self.file_operations_manager.metadata_cache.get_all_metadata()
-                )
+                cached_files = self.file_operations_manager.metadata_cache.get_all_metadata()
                 cached_count = len(cached_files)
 
                 # If we got fresh data from device, decide how to handle it
@@ -519,9 +463,7 @@ class DeviceActionsMixin:
                                 try:
                                     date_str = f"{f.get('createDate', '')} {f.get('createTime', '')}".strip()
                                     if date_str and date_str != "---":
-                                        date_created = datetime.strptime(
-                                            date_str, "%Y/%m/%d %H:%M:%S"
-                                        )
+                                        date_created = datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
                                     else:
                                         date_created = None
                                 except (ValueError, TypeError):
@@ -546,12 +488,8 @@ class DeviceActionsMixin:
                                 local_path=local_path,
                                 checksum=checksum,
                             )
-                            self.file_operations_manager.metadata_cache.set_metadata(
-                                metadata_to_cache
-                            )
-                        files = (
-                            self.file_operations_manager.metadata_cache.get_all_metadata()
-                        )
+                            self.file_operations_manager.metadata_cache.set_metadata(metadata_to_cache)
+                        files = self.file_operations_manager.metadata_cache.get_all_metadata()
                     else:
                         # Device returned incomplete data - try to merge new files with cache
                         logger.warning(
@@ -576,9 +514,7 @@ class DeviceActionsMixin:
                                     try:
                                         date_str = f"{f.get('createDate', '')} {f.get('createTime', '')}".strip()
                                         if date_str and date_str != "---":
-                                            date_created = datetime.strptime(
-                                                date_str, "%Y/%m/%d %H:%M:%S"
-                                            )
+                                            date_created = datetime.strptime(date_str, "%Y/%m/%d %H:%M:%S")
                                         else:
                                             date_created = None
                                     except (ValueError, TypeError):
@@ -602,9 +538,7 @@ class DeviceActionsMixin:
                                     local_path=local_path,
                                     checksum=checksum,
                                 )
-                                self.file_operations_manager.metadata_cache.set_metadata(
-                                    metadata_to_cache
-                                )
+                                self.file_operations_manager.metadata_cache.set_metadata(metadata_to_cache)
                                 new_files_added += 1
 
                         if new_files_added > 0:
@@ -615,9 +549,7 @@ class DeviceActionsMixin:
                             )
 
                         # Use updated cache which now includes any new files
-                        files = (
-                            self.file_operations_manager.metadata_cache.get_all_metadata()
-                        )
+                        files = self.file_operations_manager.metadata_cache.get_all_metadata()
                 else:
                     # Device fetch failed, returned no data, or returned incomplete data
                     # Use cached data as fallback
@@ -654,9 +586,7 @@ class DeviceActionsMixin:
             if recording_info:
                 for raw_file in recording_info:
                     if isinstance(raw_file, dict):
-                        version_lookup[raw_file["name"]] = raw_file.get(
-                            "version", "N/A"
-                        )
+                        version_lookup[raw_file["name"]] = raw_file.get("version", "N/A")
 
             for i, f_info in enumerate(files):
                 # Determine GUI status based on local file existence and active operations
@@ -684,16 +614,8 @@ class DeviceActionsMixin:
                         "name": f_info.filename,
                         "length": f_info.size,
                         "duration": f_info.duration,
-                        "createDate": (
-                            f_info.date_created.strftime("%Y/%m/%d")
-                            if f_info.date_created
-                            else "---"
-                        ),
-                        "createTime": (
-                            f_info.date_created.strftime("%H:%M:%S")
-                            if f_info.date_created
-                            else "---"
-                        ),
+                        "createDate": (f_info.date_created.strftime("%Y/%m/%d") if f_info.date_created else "---"),
+                        "createTime": (f_info.date_created.strftime("%H:%M:%S") if f_info.date_created else "---"),
                         "time": f_info.date_created,  # For sorting
                         "version": version,  # Add version field from raw data
                         "original_index": i + 1,
@@ -745,13 +667,8 @@ class DeviceActionsMixin:
             all_files_to_display = list(files_dict)
 
             if all_files_to_display:
-                if (
-                    self.saved_treeview_sort_column
-                    and self.saved_treeview_sort_column in self.original_tree_headings
-                ):
-                    all_files_to_display = self._apply_saved_sort_state_to_tree_and_ui(
-                        all_files_to_display
-                    )
+                if self.saved_treeview_sort_column and self.saved_treeview_sort_column in self.original_tree_headings:
+                    all_files_to_display = self._apply_saved_sort_state_to_tree_and_ui(all_files_to_display)
                 elif self.treeview_sort_column:
                     all_files_to_display = self._sort_files_data(
                         all_files_to_display,
@@ -763,34 +680,22 @@ class DeviceActionsMixin:
                 self.after(
                     0,
                     lambda: self.update_status_bar(
-                        progress_text=(
-                            "Error: Failed to list files"
-                            if not files
-                            else "Ready. No files found."
-                        )
+                        progress_text=("Error: Failed to list files" if not files else "Ready. No files found.")
                     ),
                 )
         except ConnectionError as ce:
             logger.error("GUI", "_refresh_thread", f"ConnErr: {ce}")
             self.after(0, self.handle_auto_disconnect_ui)
         except (usb.core.USBError, tkinter.TclError) as e:
-            logger.error(
-                "GUI", "_refresh_thread", f"Error: {e}\n{traceback.format_exc()}"
-            )
-            self.after(
-                0, lambda: self.update_status_bar(progress_text="Error loading files.")
-            )
+            logger.error("GUI", "_refresh_thread", f"Error: {e}\n{traceback.format_exc()}")
+            self.after(0, lambda: self.update_status_bar(progress_text="Error loading files."))
         finally:
             self.after(0, lambda: setattr(self, "_is_ui_refresh_in_progress", False))
             self.after(0, self._update_menu_states)
             self.after(
                 0,
                 lambda: self.update_status_bar(
-                    progress_text=(
-                        "Ready."
-                        if self.device_manager.device_interface.is_connected()
-                        else "Disconnected."
-                    )
+                    progress_text=("Ready." if self.device_manager.device_interface.is_connected() else "Disconnected.")
                 ),
             )
             self.after(0, self.update_all_status_info)
@@ -862,30 +767,21 @@ class DeviceActionsMixin:
                 finally:
                     self.device_lock.release()
             else:
-                logger.debug(
-                    "GUI", "_check_rec_status", "Skipping check, device is busy."
-                )
+                logger.debug("GUI", "_check_rec_status", "Skipping check, device is busy.")
         except (ConnectionError, usb.core.USBError, tkinter.TclError) as e:
-            logger.error(
-                "GUI", "_check_rec_status", f"Unhandled: {e}\n{traceback.format_exc()}"
-            )
+            logger.error("GUI", "_check_rec_status", f"Unhandled: {e}\n{traceback.format_exc()}")
         finally:
             if self.winfo_exists():  # Check if window still exists
                 interval_ms = self.recording_check_interval_var.get() * 1000
                 if interval_ms <= 0:
                     self.stop_recording_status_check()
                 else:
-                    self._recording_check_timer_id = self.after(
-                        interval_ms, self._check_recording_status_periodically
-                    )
+                    self._recording_check_timer_id = self.after(interval_ms, self._check_recording_status_periodically)
 
     def start_auto_file_refresh_periodic_check(self):  # Identical to original
         """Starts periodic checking for file list refresh based on the auto-refresh settings."""
         self.stop_auto_file_refresh_periodic_check()
-        if (
-            self.auto_refresh_files_var.get()
-            and self.device_manager.device_interface.is_connected()
-        ):
+        if self.auto_refresh_files_var.get() and self.device_manager.device_interface.is_connected():
             interval_s = self.auto_refresh_interval_s_var.get()
             if interval_s <= 0:
                 logger.info("GUI", "start_auto_refresh", "Interval <=0, disabled.")
@@ -898,9 +794,7 @@ class DeviceActionsMixin:
                 "start_auto_refresh",
                 f"Auto-refresh scheduled to run every {interval_s} seconds.",
             )
-            self._auto_file_refresh_timer_id = self.after(
-                interval_ms, self._check_auto_file_refresh_periodically
-            )
+            self._auto_file_refresh_timer_id = self.after(interval_ms, self._check_auto_file_refresh_periodically)
 
     def stop_auto_file_refresh_periodic_check(self):  # Identical to original
         """Stops periodic checking for file list refresh."""
@@ -913,10 +807,7 @@ class DeviceActionsMixin:
     ):  # Identical to original logic, uses self.after
         """Periodically checks if the file list needs to be refreshed."""
         try:
-            if (
-                not self.device_manager.device_interface.is_connected()
-                or not self.auto_refresh_files_var.get()
-            ):
+            if not self.device_manager.device_interface.is_connected() or not self.auto_refresh_files_var.get():
                 self.stop_auto_file_refresh_periodic_check()
                 return
             if self.is_long_operation_active:
@@ -953,14 +844,10 @@ class DeviceActionsMixin:
             parent=self,
         ):
             return
-        dialog = self.CTkInputDialog(
-            text="Type 'FORMAT' to confirm formatting.", title="Type Confirmation"
-        )
+        dialog = self.CTkInputDialog(text="Type 'FORMAT' to confirm formatting.", title="Type Confirmation")
         confirm_text = dialog.get_input()  # This will show the dialog and return input
         if confirm_text is None or confirm_text.upper() != "FORMAT":
-            messagebox.showwarning(
-                "Format Cancelled", "Confirmation text mismatch.", parent=self
-            )
+            messagebox.showwarning("Format Cancelled", "Confirmation text mismatch.", parent=self)
             return
         self._set_long_operation_active_state(True, "Formatting Storage")
         threading.Thread(target=self._format_sd_card_thread, daemon=True).start()
@@ -971,17 +858,13 @@ class DeviceActionsMixin:
         """Formats the SD card in a separate thread."""
         self.after(
             0,
-            lambda: self.update_status_bar(
-                progress_text="Formatting Storage... Please wait."
-            ),
+            lambda: self.update_status_bar(progress_text="Formatting Storage... Please wait."),
         )
         status = asyncio.run(self.device_manager.device_interface.format_storage())
         if status and status.get("result") == "success":
             self.after(
                 0,
-                lambda: messagebox.showinfo(
-                    "Format Success", "Storage formatted successfully.", parent=self
-                ),
+                lambda: messagebox.showinfo("Format Success", "Storage formatted successfully.", parent=self),
             )
         else:
             self.after(
@@ -997,9 +880,7 @@ class DeviceActionsMixin:
             lambda: self.update_status_bar(progress_text="Format operation finished."),
         )
         self.after(0, self.refresh_file_list_gui)
-        self.after(
-            0, self._set_long_operation_active_state, False, "Formatting Storage"
-        )
+        self.after(0, self._set_long_operation_active_state, False, "Formatting Storage")
 
     def sync_device_time_gui(self):  # Identical to original, parent=self for dialogs
         """Synchronizes the device time with the computer's current time."""
@@ -1019,16 +900,12 @@ class DeviceActionsMixin:
         self,
     ):  # Identical to original logic, uses self.after, parent=self for dialogs
         """Synchronizes the device time in a separate thread."""
-        self.after(
-            0, lambda: self.update_status_bar(progress_text="Syncing device time...")
-        )
+        self.after(0, lambda: self.update_status_bar(progress_text="Syncing device time..."))
         result = asyncio.run(self.device_manager.device_interface.sync_time())
         if result and result.get("result") == "success":
             self.after(
                 0,
-                lambda: messagebox.showinfo(
-                    "Time Sync", "Device time synchronized.", parent=self
-                ),
+                lambda: messagebox.showinfo("Time Sync", "Device time synchronized.", parent=self),
             )
         else:
             err = result.get("error", "Unknown") if result else "Comm error"
@@ -1036,11 +913,7 @@ class DeviceActionsMixin:
                 err += f" (Dev code: {result['device_code']})"
             self.after(
                 0,
-                lambda e=err: messagebox.showerror(
-                    "Time Sync Error", f"Failed to sync time: {e}", parent=self
-                ),
+                lambda e=err: messagebox.showerror("Time Sync Error", f"Failed to sync time: {e}", parent=self),
             )
         self.after(0, self._set_long_operation_active_state, False, "Time Sync")
-        self.after(
-            0, lambda: self.update_status_bar(progress_text="Time sync finished.")
-        )
+        self.after(0, lambda: self.update_status_bar(progress_text="Time sync finished."))

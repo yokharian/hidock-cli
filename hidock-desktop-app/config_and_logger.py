@@ -89,14 +89,10 @@ def load_config():
         with open(_CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        print(
-            f"[INFO] ConfigManager::load_config - {_CONFIG_FILE_PATH} not found, using defaults."
-        )
+        print(f"[INFO] ConfigManager::load_config - {_CONFIG_FILE_PATH} not found, using defaults.")
         return get_default_config()
     except json.JSONDecodeError:
-        print(
-            f"[ERROR] ConfigManager::load_config - Error decoding {_CONFIG_FILE_PATH} Using defaults"
-        )
+        print(f"[ERROR] ConfigManager::load_config - Error decoding {_CONFIG_FILE_PATH} Using defaults")
         return get_default_config()
 
 
@@ -274,10 +270,6 @@ def save_config(config_data_to_save):
             f"Configuration saved to {_CONFIG_FILE_PATH}",
         )
     except IOError:
-        logger.error(
-            "ConfigManager", "save_config", f"Error writing to {_CONFIG_FILE_PATH}."
-        )
+        logger.error("ConfigManager", "save_config", f"Error writing to {_CONFIG_FILE_PATH}.")
     except Exception as e:  # pylint: disable=broad-except
-        logger.error(
-            "ConfigManager", "save_config", f"Unexpected error saving config: {e}"
-        )
+        logger.error("ConfigManager", "save_config", f"Unexpected error saving config: {e}")

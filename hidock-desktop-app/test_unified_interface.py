@@ -7,19 +7,14 @@ desktop and web implementations.
 
 import asyncio
 import sys
+
 # from unittest.mock import MagicMock  # Future: for advanced mocking
 from unittest.mock import Mock
 
 from desktop_device_adapter import DesktopDeviceAdapter
 
 # Import the unified interface components
-from device_interface import (
-    DeviceCapability,
-    DeviceManager,
-    DeviceModel,
-    detect_device_model,
-    get_model_capabilities,
-)
+from device_interface import DeviceCapability, DeviceManager, DeviceModel, detect_device_model, get_model_capabilities
 
 
 class MockUSBBackend:
@@ -36,9 +31,7 @@ class MockHiDockJensen:
         self.is_connected_flag = False
         self.device_info = {"sn": "TEST123456", "versionCode": "1.2.3"}
 
-    def connect(
-        self, target_interface_number=0, vid=0x10D6, pid=0xAF0D, auto_retry=True
-    ):
+    def connect(self, target_interface_number=0, vid=0x10D6, pid=0xAF0D, auto_retry=True):
         self.is_connected_flag = True
         self.connected_pid = pid  # Store the PID for model detection
         return True, None
@@ -253,9 +246,7 @@ async def test_device_manager():
         pass
 
     mock_adapter.connect = mock_connect
-    mock_adapter.get_capabilities = Mock(
-        return_value=[DeviceCapability.FILE_LIST, DeviceCapability.HEALTH_MONITORING]
-    )
+    mock_adapter.get_capabilities = Mock(return_value=[DeviceCapability.FILE_LIST, DeviceCapability.HEALTH_MONITORING])
     mock_adapter.disconnect = mock_disconnect
 
     # Create device manager
@@ -296,9 +287,7 @@ async def main():
         await test_desktop_adapter()
         await test_device_manager()
 
-        print(
-            "\n🎉 All tests passed! The unified device interface is working correctly."
-        )
+        print("\n🎉 All tests passed! The unified device interface is working correctly.")
 
     except AssertionError as e:
         print(f"\n❌ Test failed: {e}")

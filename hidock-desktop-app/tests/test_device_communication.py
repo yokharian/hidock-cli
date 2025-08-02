@@ -1,20 +1,19 @@
 """
 Tests for device communication functionality.
 """
+
 import struct
+
 # import threading  # Future: threaded device communication tests
 import time
 from unittest.mock import Mock, patch
-# from unittest.mock import MagicMock, call  # Future: additional mock functionality
 
 import pytest
 import usb.core
 import usb.util
 
-from constants import (
-    # CMD_DELETE_FILE,  # Future: delete command tests
+from constants import (  # CMD_DELETE_FILE,  # Future: delete command tests; CMD_GET_FILE_LIST,  # Future: file list command tests
     CMD_GET_DEVICE_INFO,
-    # CMD_GET_FILE_LIST,  # Future: file list command tests
     CMD_TRANSFER_FILE,
     DEFAULT_PRODUCT_ID,
     DEFAULT_VENDOR_ID,
@@ -22,6 +21,8 @@ from constants import (
     EP_OUT_ADDR,
 )
 from hidock_device import HiDockJensen
+
+# from unittest.mock import MagicMock, call  # Future: additional mock functionality
 
 
 class TestHiDockJensenEnhanced:
@@ -138,9 +139,7 @@ class TestHiDockJensenEnhanced:
 
         # Should not retry after too many connection lost errors
         jensen_device._connection_retry_count = 0
-        jensen_device._error_counts[
-            "connection_lost"
-        ] = jensen_device._max_error_threshold
+        jensen_device._error_counts["connection_lost"] = jensen_device._max_error_threshold
         assert jensen_device._should_retry_connection() is False
 
     @patch("hidock_device.time.time")
@@ -189,9 +188,7 @@ class TestHiDockJensenEnhanced:
     @patch("hidock_device.usb.core.find")
     @patch("hidock_device.usb.util.claim_interface")
     @patch("hidock_device.usb.util.find_descriptor")
-    def test_connect_success_with_retry(
-        self, mock_find_desc, mock_claim, mock_find, jensen_device
-    ):
+    def test_connect_success_with_retry(self, mock_find_desc, mock_claim, mock_find, jensen_device):
         """Test successful connection with retry mechanism."""
         # Setup mocks
         mock_device = Mock()
@@ -237,9 +234,7 @@ class TestHiDockJensenEnhanced:
 
         assert success is False
         assert "not found" in error
-        assert (
-            jensen_device._connection_retry_count == jensen_device._max_retry_attempts
-        )
+        assert jensen_device._connection_retry_count == jensen_device._max_retry_attempts
         assert mock_sleep.call_count == jensen_device._max_retry_attempts - 1
 
     def test_send_command_not_connected(self, jensen_device):
@@ -250,9 +245,7 @@ class TestHiDockJensenEnhanced:
     @patch("hidock_device.usb.core.find")
     @patch("hidock_device.usb.util.claim_interface")
     @patch("hidock_device.usb.util.find_descriptor")
-    def test_send_command_success(
-        self, mock_find_desc, mock_claim, mock_find, jensen_device
-    ):
+    def test_send_command_success(self, mock_find_desc, mock_claim, mock_find, jensen_device):
         """Test successful command sending with performance tracking."""
         # Setup connected device
         self._setup_connected_device(mock_find, mock_find_desc, jensen_device)
@@ -269,9 +262,7 @@ class TestHiDockJensenEnhanced:
     @patch("hidock_device.usb.core.find")
     @patch("hidock_device.usb.util.claim_interface")
     @patch("hidock_device.usb.util.find_descriptor")
-    def test_send_command_usb_timeout(
-        self, mock_find_desc, mock_claim, mock_find, jensen_device
-    ):
+    def test_send_command_usb_timeout(self, mock_find_desc, mock_claim, mock_find, jensen_device):
         """Test USB timeout error handling in send command."""
         # Setup connected device
         _mock_device = self._setup_connected_device(  # Future: may need for additional assertions
@@ -289,14 +280,10 @@ class TestHiDockJensenEnhanced:
     @patch("hidock_device.usb.core.find")
     @patch("hidock_device.usb.util.claim_interface")
     @patch("hidock_device.usb.util.find_descriptor")
-    def test_send_command_pipe_error(
-        self, mock_find_desc, mock_claim, mock_find, jensen_device
-    ):
+    def test_send_command_pipe_error(self, mock_find_desc, mock_claim, mock_find, jensen_device):
         """Test USB pipe error handling in send command."""
         # Setup connected device
-        mock_device = self._setup_connected_device(
-            mock_find, mock_find_desc, jensen_device
-        )
+        mock_device = self._setup_connected_device(mock_find, mock_find_desc, jensen_device)
 
         # Make write raise pipe error
         pipe_error = usb.core.USBError("Pipe error")
@@ -317,19 +304,13 @@ class TestHiDockJensenEnhanced:
     @patch("hidock_device.usb.core.find")
     @patch("hidock_device.usb.util.claim_interface")
     @patch("hidock_device.usb.util.find_descriptor")
-    def test_receive_response_success(
-        self, mock_find_desc, mock_claim, mock_find, jensen_device
-    ):
+    def test_receive_response_success(self, mock_find_desc, mock_claim, mock_find, jensen_device):
         """Test successful response receiving with performance tracking."""
         # Setup connected device
-        mock_device = self._setup_connected_device(
-            mock_find, mock_find_desc, jensen_device
-        )
+        mock_device = self._setup_connected_device(mock_find, mock_find_desc, jensen_device)
 
         # Create a valid response packet
-        response_data = self._create_response_packet(
-            CMD_GET_DEVICE_INFO, 1, b"response_body"
-        )
+        response_data = self._create_response_packet(CMD_GET_DEVICE_INFO, 1, b"response_body")
         mock_device.read.return_value = response_data
 
         response = jensen_device._receive_response(1)
@@ -343,14 +324,10 @@ class TestHiDockJensenEnhanced:
     @patch("hidock_device.usb.core.find")
     @patch("hidock_device.usb.util.claim_interface")
     @patch("hidock_device.usb.util.find_descriptor")
-    def test_receive_response_timeout(
-        self, mock_find_desc, mock_claim, mock_find, jensen_device
-    ):
+    def test_receive_response_timeout(self, mock_find_desc, mock_claim, mock_find, jensen_device):
         """Test response timeout handling."""
         # Setup connected device
-        mock_device = self._setup_connected_device(
-            mock_find, mock_find_desc, jensen_device
-        )
+        mock_device = self._setup_connected_device(mock_find, mock_find_desc, jensen_device)
 
         # Make read always timeout
         mock_device.read.side_effect = usb.core.USBTimeoutError("Timeout")
@@ -371,13 +348,9 @@ class TestHiDockJensenEnhanced:
                     "body": b"test",
                 }
 
-                result = jensen_device._send_and_receive(
-                    CMD_GET_DEVICE_INFO, b"test_body"
-                )
+                result = jensen_device._send_and_receive(CMD_GET_DEVICE_INFO, b"test_body")
 
-                mock_send.assert_called_once_with(
-                    CMD_GET_DEVICE_INFO, b"test_body", 5000
-                )
+                mock_send.assert_called_once_with(CMD_GET_DEVICE_INFO, b"test_body", 5000)
                 mock_receive.assert_called_once_with(123, 5000, streaming_cmd_id=None)
                 assert result["id"] == CMD_GET_DEVICE_INFO
 

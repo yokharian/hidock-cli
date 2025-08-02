@@ -9,18 +9,18 @@ IDeviceInterface, providing consistent API across platforms.
 # import threading  # Commented out - not used in current implementation
 import time
 from datetime import datetime
+
 # from pathlib import Path  # Commented out - not used, may be needed for future file operations
 from typing import Callable, Dict, List, Optional  # Removed Any - not used
 
 from config_and_logger import logger
 from constants import DEFAULT_PRODUCT_ID, DEFAULT_VENDOR_ID
-from device_interface import (
+from device_interface import (  # DeviceModel,  # Commented out - not used directly, but detect_device_model returns it
     AudioRecording,
     ConnectionStats,
     DeviceCapability,
     DeviceHealth,
     DeviceInfo,
-    # DeviceModel,  # Commented out - not used directly, but detect_device_model returns it
     IDeviceInterface,
     OperationProgress,
     OperationStatus,
@@ -76,9 +76,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                             id=f"{DEFAULT_VENDOR_ID:04x}:{pid:04x}",
                             name=f"HiDock {model.value}",
                             model=model,
-                            serial_number=getattr(
-                                found_device, "serial_number", "Unknown"
-                            ),
+                            serial_number=getattr(found_device, "serial_number", "Unknown"),
                             firmware_version="1.0.0",  # Would need to be queried
                             vendor_id=DEFAULT_VENDOR_ID,
                             product_id=pid,
@@ -105,9 +103,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
             )
             return []
 
-    async def connect(
-        self, device_id: Optional[str] = None, auto_retry: bool = True
-    ) -> DeviceInfo:
+    async def connect(self, device_id: Optional[str] = None, auto_retry: bool = True) -> DeviceInfo:
         """
         Connect to a HiDock device.
 
@@ -128,9 +124,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                     vid_str, pid_str = device_id.split(":")
                     vid, pid = int(vid_str, 16), int(pid_str, 16)
                 except ValueError:
-                    logger.warning(
-                        f"Invalid device_id format: {device_id}, using defaults"
-                    )
+                    logger.warning(f"Invalid device_id format: {device_id}, using defaults")
 
             # Connect using the Jensen device
             success, error_msg = self.jensen_device.connect(
@@ -173,13 +167,9 @@ class DesktopDeviceAdapter(IDeviceInterface):
             self.jensen_device.disconnect()
             self._current_device_info = None
             self._connection_start_time = None
-            logger.info(
-                "DesktopDeviceAdapter", "disconnect", "Device disconnected successfully"
-            )
+            logger.info("DesktopDeviceAdapter", "disconnect", "Device disconnected successfully")
         except Exception as e:
-            logger.error(
-                "DesktopDeviceAdapter", "disconnect", f"Disconnect failed: {e}"
-            )
+            logger.error("DesktopDeviceAdapter", "disconnect", f"Disconnect failed: {e}")
             raise RuntimeError(f"Failed to disconnect: {e}")
 
     def is_connected(self) -> bool:
@@ -216,10 +206,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
 
         try:
             # Check if file list streaming is in progress to avoid command collisions
-            if (
-                hasattr(self.jensen_device, "is_file_list_streaming")
-                and self.jensen_device.is_file_list_streaming()
-            ):
+            if hasattr(self.jensen_device, "is_file_list_streaming") and self.jensen_device.is_file_list_streaming():
                 # Return cached/fallback values during streaming to avoid collisions
                 total_capacity = 8 * 1024 * 1024 * 1024  # 8GB fallback
                 used_space = 0
@@ -231,9 +218,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                 card_info = self.jensen_device.get_card_info()
                 if card_info:
                     status_raw = card_info.get("status_raw", 0)
-                    total_capacity = (
-                        card_info.get("capacity", 0) * 1024 * 1024
-                    )  # Convert MB to bytes
+                    total_capacity = card_info.get("capacity", 0) * 1024 * 1024  # Convert MB to bytes
                     used_space = card_info.get("used", 0) * 1024 * 1024
                     free_space = total_capacity - used_space
                 else:
@@ -293,10 +278,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
 
         try:
             # Check if file list streaming is in progress to avoid command collisions
-            if (
-                hasattr(self.jensen_device, "is_file_list_streaming")
-                and self.jensen_device.is_file_list_streaming()
-            ):
+            if hasattr(self.jensen_device, "is_file_list_streaming") and self.jensen_device.is_file_list_streaming():
                 # Return None during streaming to avoid collisions
                 return None
 
@@ -353,9 +335,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
 
             # Set up progress tracking
             if progress_callback:
-                self.add_progress_listener(
-                    f"download_{recording_id}", progress_callback
-                )
+                self.add_progress_listener(f"download_{recording_id}", progress_callback)
 
             # Open output file for streaming write
             bytes_written = 0
@@ -372,9 +352,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                         progress = OperationProgress(
                             operation_id=f"download_{recording_id}",
                             operation_name=f"Downloading {recording_filename}",
-                            progress=(
-                                bytes_received / total_bytes if total_bytes > 0 else 0.0
-                            ),
+                            progress=(bytes_received / total_bytes if total_bytes > 0 else 0.0),
                             status=OperationStatus.IN_PROGRESS,
                             bytes_processed=bytes_received,
                             total_bytes=total_bytes,
@@ -407,9 +385,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                 progress_callback(final_progress)
 
         except Exception as e:
-            logger.error(
-                "DesktopDeviceAdapter", "download_recording", f"Download failed: {e}"
-            )
+            logger.error("DesktopDeviceAdapter", "download_recording", f"Download failed: {e}")
             if progress_callback:
                 error_progress = OperationProgress(
                     operation_id=f"download_{recording_id}",
@@ -453,9 +429,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
             result = self.jensen_device.delete_file(recording.filename)
 
             if result.get("result") != "success":
-                raise RuntimeError(
-                    f"Delete failed: {result.get('result', 'unknown error')}"
-                )
+                raise RuntimeError(f"Delete failed: {result.get('result', 'unknown error')}")
 
             if progress_callback:
                 progress_callback(
@@ -468,9 +442,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                 )
 
         except Exception as e:
-            logger.error(
-                "DesktopDeviceAdapter", "delete_recording", f"Delete failed: {e}"
-            )
+            logger.error("DesktopDeviceAdapter", "delete_recording", f"Delete failed: {e}")
             if progress_callback:
                 progress_callback(
                     OperationProgress(
@@ -483,9 +455,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                 )
             raise
 
-    async def format_storage(
-        self, progress_callback: Optional[Callable[[OperationProgress], None]] = None
-    ) -> None:
+    async def format_storage(self, progress_callback: Optional[Callable[[OperationProgress], None]] = None) -> None:
         """Format the device storage."""
         if not self.is_connected():
             raise ConnectionError("No device connected")
@@ -504,9 +474,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
             result = self.jensen_device.format_card()
 
             if result.get("result") != "success":
-                raise RuntimeError(
-                    f"Format failed: {result.get('result', 'unknown error')}"
-                )
+                raise RuntimeError(f"Format failed: {result.get('result', 'unknown error')}")
 
             if progress_callback:
                 progress_callback(
@@ -519,9 +487,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
                 )
 
         except Exception as e:
-            logger.error(
-                "DesktopDeviceAdapter", "format_storage", f"Format failed: {e}"
-            )
+            logger.error("DesktopDeviceAdapter", "format_storage", f"Format failed: {e}")
             if progress_callback:
                 progress_callback(
                     OperationProgress(
@@ -544,9 +510,7 @@ class DesktopDeviceAdapter(IDeviceInterface):
             result = self.jensen_device.set_device_time(sync_time)
 
             if result.get("result") != "success":
-                raise RuntimeError(
-                    f"Time sync failed: {result.get('error', 'unknown error')}"
-                )
+                raise RuntimeError(f"Time sync failed: {result.get('error', 'unknown error')}")
 
         except Exception as e:
             logger.error("DesktopDeviceAdapter", "sync_time", f"Time sync failed: {e}")
@@ -567,26 +531,13 @@ class DesktopDeviceAdapter(IDeviceInterface):
             connection_attempts=jensen_stats.get("retry_count", 0) + 1,
             successful_connections=1 if jensen_stats.get("is_connected", False) else 0,
             failed_connections=jensen_stats.get("retry_count", 0),
-            total_operations=jensen_stats.get("operation_stats", {}).get(
-                "commands_sent", 0
-            ),
-            successful_operations=jensen_stats.get("operation_stats", {}).get(
-                "responses_received", 0
-            ),
-            failed_operations=jensen_stats.get("operation_stats", {}).get(
-                "commands_sent", 0
-            )
+            total_operations=jensen_stats.get("operation_stats", {}).get("commands_sent", 0),
+            successful_operations=jensen_stats.get("operation_stats", {}).get("responses_received", 0),
+            failed_operations=jensen_stats.get("operation_stats", {}).get("commands_sent", 0)
             - jensen_stats.get("operation_stats", {}).get("responses_received", 0),
-            bytes_transferred=jensen_stats.get("operation_stats", {}).get(
-                "bytes_transferred", 0
-            ),
-            average_operation_time=jensen_stats.get("operation_stats", {}).get(
-                "last_operation_time", 0
-            ),
-            uptime=time.time()
-            - jensen_stats.get("operation_stats", {}).get(
-                "connection_time", time.time()
-            ),
+            bytes_transferred=jensen_stats.get("operation_stats", {}).get("bytes_transferred", 0),
+            average_operation_time=jensen_stats.get("operation_stats", {}).get("last_operation_time", 0),
+            uptime=time.time() - jensen_stats.get("operation_stats", {}).get("connection_time", time.time()),
             error_counts=jensen_stats.get("error_counts", {}),
         )
 
@@ -619,18 +570,14 @@ class DesktopDeviceAdapter(IDeviceInterface):
             overall_status=overall_status,
             connection_quality=connection_quality,
             error_rate=error_rate,
-            last_successful_operation=(
-                datetime.now() if stats.successful_operations > 0 else None
-            ),
+            last_successful_operation=(datetime.now() if stats.successful_operations > 0 else None),
             temperature=None,  # Not available
             battery_level=None,  # Not available
             storage_health="good",  # Would need to be determined
             firmware_status="up_to_date",  # Would need to be determined
         )
 
-    def add_progress_listener(
-        self, operation_id: str, callback: Callable[[OperationProgress], None]
-    ) -> None:
+    def add_progress_listener(self, operation_id: str, callback: Callable[[OperationProgress], None]) -> None:
         """Add a progress listener for device operations."""
         self.progress_callbacks[operation_id] = callback
 

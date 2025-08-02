@@ -174,8 +174,8 @@ def check_development_files():
     # Check Linux USB permissions
     elif platform.system() == "Linux":
         try:
-            import grp
             import getpass
+            import grp
 
             username = getpass.getuser()
             user_groups = [g.gr_name for g in grp.getgrall() if username in g.gr_mem]

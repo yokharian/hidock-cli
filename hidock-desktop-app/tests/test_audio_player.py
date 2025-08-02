@@ -27,12 +27,8 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
         # Configure pygame mocks
         self.mock_pygame.mixer.music = MagicMock()
-        self.mock_pygame.mixer.get_init = MagicMock(
-            return_value=True
-        )  # Corrected mocking
-        self.mock_pygame.error = type(
-            "PygameError", (Exception,), {}
-        )  # Mock pygame.error as a class
+        self.mock_pygame.mixer.get_init = MagicMock(return_value=True)  # Corrected mocking
+        self.mock_pygame.error = type("PygameError", (Exception,), {})  # Mock pygame.error as a class
 
         # Configure CTkinter mocks
         self.mock_ctk.CTkFrame.return_value = MagicMock(spec=tkinter.Frame)
@@ -51,6 +47,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         class MockApp(AudioPlayerMixin):
             def __init__(self):
                 self.file_tree = MagicMock()
+
             self.displayed_files_details = []
             self.is_audio_playing = False
             self.dock = MagicMock()
@@ -104,10 +101,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
                 self.loop_checkbox = ctk.CTkCheckBox.return_value
 
             def _destroy_playback_controls(self):
-                if (
-                    self.playback_controls_frame
-                    and self.playback_controls_frame.winfo_exists()
-                ):
+                if self.playback_controls_frame and self.playback_controls_frame.winfo_exists():
                     self.playback_controls_frame.destroy()
                     self.playback_controls_frame = None
 
@@ -164,9 +158,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.assertFalse(self.app.is_audio_playing)
 
     @patch("os.path.exists", return_value=True)
-    def test_download_for_playback_thread_success(
-        self, mock_exists, mock_open, mock_rename, mock_remove
-    ):
+    def test_download_for_playback_thread_success(self, mock_exists, mock_open, mock_rename, mock_remove):
         file_info = {"name": "test_file.mp3", "length": 100}
         local_path = "local/path/test_file.mp3"
         self.app.dock.stream_file.return_value = "OK"
@@ -181,9 +173,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         mock_remove.assert_called_once_with(local_path)
         mock_rename.assert_called_once_with(local_path + ".tmp", local_path)
         self.app._start_audio_playback.assert_called_once_with(local_path, file_info)
-        self.app._set_long_operation_active_state.assert_called_with(
-            False, "Playback Preparation"
-        )
+        self.app._set_long_operation_active_state.assert_called_with(False, "Playback Preparation")
         self.app.refresh_file_list_gui.assert_called_once()
 
     @patch("os.path.exists", return_value=False)
@@ -202,9 +192,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
             "Failed to download file: Stream failed: ERROR",
             parent=self.app,
         )
-        self.app._set_long_operation_active_state.assert_called_with(
-            False, "Playback Preparation"
-        )
+        self.app._set_long_operation_active_state.assert_called_with(False, "Playback Preparation")
         self.app.refresh_file_list_gui.assert_called_once()
         self.mock_logger.error.assert_called_once()
 
@@ -221,9 +209,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.mock_messagebox.showerror.assert_called_once_with(
             "Playback Error", "Failed to download file: Disk Full", parent=self.app
         )
-        self.app._set_long_operation_active_state.assert_called_with(
-            False, "Playback Preparation"
-        )
+        self.app._set_long_operation_active_state.assert_called_with(False, "Playback Preparation")
         self.app.refresh_file_list_gui.assert_called_once()
         self.mock_logger.error.assert_called_once()
 
@@ -251,16 +237,12 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.app._create_playback_controls.assert_called_once()
         self.app._update_playback_progress.assert_called_once()
         self.app._update_menu_states.assert_called_once()
-        self.app._update_file_status_in_treeview.assert_called_once_with(
-            file_detail["name"], "Playing", ("playing",)
-        )
+        self.app._update_file_status_in_treeview.assert_called_once_with(file_detail["name"], "Playing", ("playing",))
 
     def test_start_audio_playback_pygame_error(self):
         filepath = "local/path/test_file.mp3"
         file_detail = {"name": "test_file.mp3", "duration": 60}
-        self.mock_pygame.mixer.music.load.side_effect = self.mock_pygame.error(
-            "Test Pygame Error"
-        )
+        self.mock_pygame.mixer.music.load.side_effect = self.mock_pygame.error("Test Pygame Error")
         self.app._destroy_playback_controls = MagicMock()
         self.app._update_menu_states = MagicMock()
         self.app.refresh_file_list_gui = MagicMock()
@@ -280,9 +262,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.app.is_audio_playing = True
         self.app._stop_audio_playback()
         self.mock_pygame.mixer.music.stop.assert_not_called()
-        self.assertTrue(
-            self.app.is_audio_playing
-        )  # Should not change if pygame not initialized
+        self.assertTrue(self.app.is_audio_playing)  # Should not change if pygame not initialized
 
     def test_stop_audio_playback_success(self):
         self.app.is_audio_playing = True
@@ -318,12 +298,8 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
         self.app._create_playback_controls()
 
-        self.mock_ctk.CTkFrame.assert_called_once_with(
-            self.app.status_bar_frame, fg_color="transparent"
-        )
-        self.app.playback_controls_frame.pack.assert_called_once_with(
-            side="right", padx=10, pady=2, fill="x"
-        )
+        self.mock_ctk.CTkFrame.assert_called_once_with(self.app.status_bar_frame, fg_color="transparent")
+        self.app.playback_controls_frame.pack.assert_called_once_with(side="right", padx=10, pady=2, fill="x")
 
         self.mock_ctk.CTkLabel.assert_has_calls(
             [
@@ -331,12 +307,8 @@ class TestAudioPlayerInitialization(unittest.TestCase):
                 call(self.app.playback_controls_frame, text="02:05", width=40),
             ]
         )
-        self.app.current_time_label.pack.assert_called_once_with(
-            side="left", padx=(0, 5)
-        )
-        self.app.total_duration_label.pack.assert_called_once_with(
-            side="left", padx=(5, 10)
-        )
+        self.app.current_time_label.pack.assert_called_once_with(side="left", padx=(0, 5))
+        self.app.total_duration_label.pack.assert_called_once_with(side="left", padx=(5, 10))
 
         self.mock_ctk.CTkSlider.assert_has_calls(
             [
@@ -362,12 +334,8 @@ class TestAudioPlayerInitialization(unittest.TestCase):
                 call("<ButtonRelease-1>", self.app._on_slider_release),
             ]
         )
-        self.app.playback_slider.pack.assert_called_once_with(
-            side="left", fill="x", expand=True
-        )
-        self.app.volume_slider_widget.pack.assert_called_once_with(
-            side="left", padx=(0, 5)
-        )
+        self.app.playback_slider.pack.assert_called_once_with(side="left", fill="x", expand=True)
+        self.app.volume_slider_widget.pack.assert_called_once_with(side="left", padx=(0, 5))
 
         self.mock_ctk.CTkCheckBox.assert_called_once_with(
             self.app.playback_controls_frame,
@@ -408,9 +376,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
     def test_update_playback_progress_playing_loop_enabled(self):
         self.app.is_audio_playing = True
-        self.mock_pygame.mixer.music.get_pos.return_value = (
-            0  # Simulate end of playback
-        )
+        self.mock_pygame.mixer.music.get_pos.return_value = 0  # Simulate end of playback
         self.app.loop_playback_var.get.return_value = True
         self.app.play_selected_audio_gui = MagicMock()
         self.app._update_playback_progress()
@@ -418,9 +384,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
     def test_update_playback_progress_playing_loop_disabled(self):
         self.app.is_audio_playing = True
-        self.mock_pygame.mixer.music.get_pos.return_value = (
-            0  # Simulate end of playback
-        )
+        self.mock_pygame.mixer.music.get_pos.return_value = 0  # Simulate end of playback
         self.app.loop_playback_var.get.return_value = False
         self.app._stop_audio_playback = MagicMock()
         self.app._update_playback_progress()
@@ -428,9 +392,7 @@ class TestAudioPlayerInitialization(unittest.TestCase):
 
     def test_update_playback_progress_user_dragging_slider(self):
         self.app.is_audio_playing = True
-        self.app._user_is_dragging_slider = (
-            True  # Corrected: use self._user_is_dragging_slider
-        )
+        self.app._user_is_dragging_slider = True  # Corrected: use self._user_is_dragging_slider
         self.app.playback_slider = MagicMock()
         self.app.current_time_label = MagicMock()
         self.app._update_playback_progress()
@@ -488,14 +450,10 @@ class TestAudioPlayerInitialization(unittest.TestCase):
         self.app._user_is_dragging_slider = True
         self.app.playback_slider = MagicMock()
         self.app.playback_slider.get.return_value = 45.0
-        self.mock_pygame.mixer.music.set_pos.side_effect = self.mock_pygame.error(
-            "Seek Error"
-        )
+        self.mock_pygame.mixer.music.set_pos.side_effect = self.mock_pygame.error("Seek Error")
         self.app._on_slider_release(None)
         self.assertFalse(self.app._user_is_dragging_slider)
-        self.mock_logger.error.assert_called_once_with(
-            "GUI", "_on_slider_release", "Error seeking audio: Seek Error"
-        )
+        self.mock_logger.error.assert_called_once_with("GUI", "_on_slider_release", "Error seeking audio: Seek Error")
 
     def test_on_volume_change_no_pygame_init(self):
         self.mock_pygame.mixer.get_init.return_value = False
