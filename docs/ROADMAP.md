@@ -8,7 +8,7 @@ This roadmap outlines the planned development phases and features for both the d
 
 - ✅ Complete Jensen protocol implementation
 - ✅ Full device management (connect, list, download, delete, format)
-- ✅ Modern CustomTkinter GUI with theming
+
 - ✅ Audio playback with full controls
 - ✅ Comprehensive settings management
 - ✅ Robust error handling and logging

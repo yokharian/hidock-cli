@@ -8,7 +8,7 @@ HiDock Next is a comprehensive audio management platform that provides direct, l
 
 ### 1.2 Scope
 
-- **Desktop Application**: Full-featured Python GUI application with CustomTkinter
+- **CLI Application**: Full-featured Python CLI application
 - **Web Application**: Modern React-based web app with WebUSB integration
 - **AI Integration**: Gemini AI-powered transcription and insight extraction
 - **Device Support**: HiDock H1, H1E, and P1 models
@@ -47,9 +47,6 @@ HiDock Next is a comprehensive audio management platform that provides direct, l
 ### 2.2 Desktop Application Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│              GUI Layer                  │
-│  (CustomTkinter, Font Awesome Icons)   │
 ├─────────────────────────────────────────┤
 │            Business Logic               │
 │   (File Management, Device Control)    │
@@ -136,7 +133,7 @@ The HiDock devices use a custom protocol called "Jensen" for USB communication.
 ### 4.1 Technology Stack
 
 - **Language**: Python 3.8+
-- **GUI Framework**: CustomTkinter
+
 - **USB Communication**: PyUSB with libusb backend
 - **Icons**: Font Awesome integration
 - **Configuration**: JSON-based settings storage

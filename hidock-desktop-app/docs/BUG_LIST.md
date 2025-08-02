@@ -953,7 +953,7 @@ _All low-priority issues have been resolved and moved to the Fixed Issues sectio
   - **Files to Blame:** @hidock_device.py, @file_operations_manager.py, @gui_actions_file.py
   - **Resolution:**
     - **Protocol Desync:** A latent bug in `hidock_device.py` was fixed. The `get_file_block` method incorrectly cleared the global USB receive buffer in its `finally` block. While this method may not have been directly used for downloads, this pattern is dangerous for any streaming command. The line `self.receive_buffer.clear()` was removed to prevent it from discarding data from subsequent USB packets, which would cause protocol desynchronization.
-    - **UI Freeze:** The UI freeze was caused by progress update callbacks from the `FileOperationsManager`'s worker thread directly manipulating `tkinter` UI elements, which is not thread-safe. The fix was implemented in `gui_actions_file.py`:
+
       1. The `_update_operation_progress` callback now immediately schedules a new method, `_perform_gui_update_for_operation`, to run on the main GUI thread using `self.after(0, ...)`.
       2. The new `_perform_gui_update_for_operation` method contains all the original UI update logic (updating the status bar and treeview).
       3. Comparisons in the update logic were changed from using raw strings (e.g., `"in_progress"`) to using the `FileOperationStatus` enum for correctness and robustness.
@@ -1139,7 +1139,7 @@ _All low-priority issues have been resolved and moved to the Fixed Issues sectio
   - **Evidence:** User report indicating scrollbar is missing from the file list, confirmed recurring issue despite previous attempts
   - **Files to Blame:** @gui_treeview.py, @gui_main_window.py
   - **Resolution:**
-    - Root cause identified: The existing TTK scrollbar styling used "transparent" trough color from CustomTkinter theme, making the scrollbar invisible
+
     - Replaced the problematic theme-based styling with explicit, visible colors in \_create_file_tree_frame()
     - Applied custom "FileTree.Vertical.TScrollbar" style with dark gray trough (#2b2b2b), medium gray thumb (#4a4a4a), and light gray arrows (#cccccc)
     - Added hover effects for better user feedback (lighter colors on active state)

@@ -9,20 +9,20 @@ refreshing file lists, and other device-specific commands.
 import asyncio
 import os
 import threading
-import tkinter
 import traceback
 from datetime import datetime
-from tkinter import messagebox
 
 import usb.core
 
 from config_and_logger import logger
-from ctk_custom_widgets import CTkBanner
 from file_operations_manager import FileMetadata
 
 
 class DeviceActionsMixin:
     """A mixin for handling device-related actions."""
+
+    def after(self, time: int, callback):
+        return callback(*args, **kwargs)
 
     def _initialize_backend_early(self):  # Identical to original
         error_to_report, local_backend_instance = None, None
@@ -124,16 +124,14 @@ class DeviceActionsMixin:
         """Connects to the HiDock device using the selected VID, PID, and interface."""
         if not self.backend_initialized_successfully:
             logger.error("GUI", "connect_device", "Cannot connect: USB backend not initialized.")
-            self.update_status_bar(connection_status="Status: USB Backend FAILED!")
             if self.backend_init_error_message:
-                messagebox.showerror("USB Backend Error", self.backend_init_error_message, parent=self)
-            self._update_menu_states()
+                logger.error(
+                    "GUI",
+                    "connect_device",
+                    f"USB Backend Error: {self.backend_init_error_message}",
+                )
             return
-        if not self.winfo_exists():
-            logger.warning("GUI", "connect_device", "Master window gone, aborting.")
-            return
-        self.update_status_bar(connection_status="Status: Connecting...")
-        self._update_menu_states()
+        connection_status = "Status: Connecting..."
         threading.Thread(target=self._connect_device_thread, daemon=True).start()
 
     def _connect_device_thread(self):  # Identical to original logic, uses self.after
@@ -164,9 +162,13 @@ class DeviceActionsMixin:
                         progress_text="Fetching file list...",
                     ),
                 )
-                self.after(0, self._update_menu_states)
-                # Update UI to show connected state immediately
-                self.after(0, self._show_connected_state)
+                self.after(  # _show_connected_state
+                    0,
+                    lambda: self.update_status_bar(
+                        connection_status="Status: Connected",
+                        progress_text="Loading files...",
+                    ),
+                )
                 # Show cached files immediately if available, then refresh
                 if hasattr(self, "_show_cached_files_if_available"):
                     self.after(50, self._show_cached_files_if_available)
@@ -191,83 +193,15 @@ class DeviceActionsMixin:
                     "_connect_device_thread",
                     "Connection attempt failed.",
                 )
-                if self.winfo_exists():
-                    # Remove previous banner if it exists
-                    if (
-                        hasattr(self, "_connection_error_banner")
-                        and self._connection_error_banner
-                        and self._connection_error_banner.winfo_exists()
-                    ):
-                        self._connection_error_banner.dismiss()
-
-                    # Use the error_message from dock.connect() for the banner
-                    banner_message = (
-                        f"HiDock device "
-                        f"(VID={hex(self.selected_vid_var.get())}, "
-                        f"PID={hex(self.selected_pid_var.get())}) not found or "
-                        f"connection failed. Ensure it's connected, powered on, "
-                        f"and you have permissions."
-                    )
-
-                    self._connection_error_banner = CTkBanner(
-                        master=self,
-                        state="warning",  # "error" or "info" could also be used
-                        title=banner_message,
-                        # btn1 removed as banner now only has 'X'
-                        side="bottom_right",
-                        auto_dismiss_after_ms=10000,  # Increased for potentially longer messages
-                        width=550,  # Adjusted width
-                    )
-                    self._connection_error_banner.show()
+                self.after(0, self._show_connection_error_banner)
                 self.after(
                     0,
-                    lambda: (self.handle_auto_disconnect_ui() if self.winfo_exists() else None),
+                    lambda: (self.handle_auto_disconnect_ui()),
                 )
         except (usb.core.USBError, ConnectionError, OSError, RuntimeError) as e:
-            # Log the technical error for debugging
-            logger.error(
-                "GUI",
-                "_connect_device_thread",
-                f"Connection error: {e}",
-            )
-
-            # Determine user-friendly error message
-            error_str = str(e).lower()
-            if "not found" in error_str or "no device" in error_str:
-                user_message = "No HiDock device found. Please check that your device is connected and powered on."
-                status_message = "Status: Device Not Found"
-            elif "health check failed" in error_str or "timeout" in error_str:
-                user_message = "Connection failed. Please disconnect and reconnect your device, then try again."
-                status_message = "Status: Connection Failed"
-            elif "access denied" in error_str or "permission" in error_str:
-                user_message = "USB access denied. Please check device permissions or try running as administrator."
-                status_message = "Status: Access Denied"
-            else:
-                user_message = f"Connection failed: {str(e)}"
-                status_message = "Status: Connection Error"
-
-            if self.winfo_exists():
-                # Show user-friendly error dialog
-                self.after(
-                    0,
-                    lambda: messagebox.showerror(
-                        "Connection Error",
-                        user_message,
-                        parent=self,
-                    ),
-                )
-                self.after(
-                    0,
-                    lambda: self.update_status_bar(connection_status=status_message),
-                )
-                if not self.device_manager.device_interface.is_connected():
-                    self.after(
-                        0,
-                        lambda: (self.handle_auto_disconnect_ui() if self.winfo_exists() else None),
-                    )
+            logger.error("GUI", "_connect_device_thread", f"Connection error: {e}")
         finally:
-            if self.winfo_exists():
-                self.after(0, self._update_menu_states)
+            self.after(0, self._update_menu_states())
 
     def handle_auto_disconnect_ui(self):  # Identical to original
         """Handles the UI updates when the device is auto-disconnected or connection is lost."""
@@ -277,10 +211,6 @@ class DeviceActionsMixin:
             "Device auto-disconnected or connection lost.",
         )
         self.update_status_bar(connection_status="Status: Disconnected (Error/Lost)")
-        if hasattr(self, "file_tree") and self.file_tree.winfo_exists():
-            for item in self.file_tree.get_children():
-                self.file_tree.delete(item)
-        self.displayed_files_details.clear()
         self.update_all_status_info()
         self.stop_auto_file_refresh_periodic_check()
         self.stop_recording_status_check()
@@ -297,7 +227,6 @@ class DeviceActionsMixin:
         if hasattr(self, "file_tree") and self.file_tree.winfo_exists():
             for item in self.file_tree.get_children():
                 self.file_tree.delete(item)
-        self.displayed_files_details.clear()
         self.stop_auto_file_refresh_periodic_check()
         self.stop_recording_status_check()
         self.update_all_status_info()
@@ -309,7 +238,7 @@ class DeviceActionsMixin:
             logger.warning("GUI", "refresh_file_list_gui", "Backend not init.")
             return
         if not self.device_manager.device_interface.is_connected():
-            messagebox.showerror("Error", "Not connected.", parent=self)
+            logger.error("GUI", "refresh_file_list_gui", "Not connected.")
             self._update_menu_states()
             return
         if self._is_ui_refresh_in_progress:
@@ -366,20 +295,6 @@ class DeviceActionsMixin:
                 "_update_downloaded_file_status",
                 f"Found {found_count} downloaded files",
             )
-
-    def _show_connected_state(self):
-        """Update UI to show connected state without waiting for file list."""
-        try:
-            if hasattr(self, "update_status_bar"):
-                self.update_status_bar(
-                    connection_status="Status: Connected",
-                    progress_text="Loading files...",
-                )
-            # Update any other UI elements that need to show connected state
-            if hasattr(self, "_update_menu_states"):
-                self._update_menu_states()
-        except Exception as e:
-            logger.warning("GUI", "_show_connected_state", f"Error updating UI: {e}")
 
     def _show_cached_files_if_available(self):
         """Show cached files immediately if available to improve perceived performance."""
@@ -686,7 +601,7 @@ class DeviceActionsMixin:
         except ConnectionError as ce:
             logger.error("GUI", "_refresh_thread", f"ConnErr: {ce}")
             self.after(0, self.handle_auto_disconnect_ui)
-        except (usb.core.USBError, tkinter.TclError) as e:
+        except usb.core.USBError as e:
             logger.error("GUI", "_refresh_thread", f"Error: {e}\n{traceback.format_exc()}")
             self.after(0, lambda: self.update_status_bar(progress_text="Error loading files."))
         finally:
@@ -768,15 +683,14 @@ class DeviceActionsMixin:
                     self.device_lock.release()
             else:
                 logger.debug("GUI", "_check_rec_status", "Skipping check, device is busy.")
-        except (ConnectionError, usb.core.USBError, tkinter.TclError) as e:
+        except (ConnectionError, usb.core.USBError) as e:
             logger.error("GUI", "_check_rec_status", f"Unhandled: {e}\n{traceback.format_exc()}")
         finally:
-            if self.winfo_exists():  # Check if window still exists
-                interval_ms = self.recording_check_interval_var.get() * 1000
-                if interval_ms <= 0:
-                    self.stop_recording_status_check()
-                else:
-                    self._recording_check_timer_id = self.after(interval_ms, self._check_recording_status_periodically)
+            interval_ms = self.recording_check_interval_var.get() * 1000
+            if interval_ms <= 0:
+                self.stop_recording_status_check()
+            else:
+                self._recording_check_timer_id = self.after(interval_ms, self._check_recording_status_periodically)
 
     def start_auto_file_refresh_periodic_check(self):  # Identical to original
         """Starts periodic checking for file list refresh based on the auto-refresh settings."""
@@ -813,26 +727,23 @@ class DeviceActionsMixin:
             if self.is_long_operation_active:
                 return
             self.refresh_file_list_gui()
-        except (ConnectionError, usb.core.USBError, tkinter.TclError) as e:
+        except (ConnectionError, usb.core.USBError) as e:
             logger.error(
                 "GUI",
                 "_check_auto_refresh",
                 f"Unhandled: {e}\n{traceback.format_exc()}",
             )
         finally:
-            if self.winfo_exists():
-                interval_ms = self.auto_refresh_interval_s_var.get() * 1000
-                if interval_ms <= 0:
-                    self.stop_auto_file_refresh_periodic_check()
-                else:
-                    self._auto_file_refresh_timer_id = self.after(
-                        interval_ms, self._check_auto_file_refresh_periodically
-                    )
+            interval_ms = self.auto_refresh_interval_s_var.get() * 1000
+            if interval_ms <= 0:
+                self.stop_auto_file_refresh_periodic_check()
+            else:
+                self._auto_file_refresh_timer_id = self.after(interval_ms, self._check_auto_file_refresh_periodically)
 
     def format_sd_card_gui(self):  # Uses CTkInputDialog, parent=self for dialogs
         """Handles the formatting of the SD card in the GUI."""
         if not self.device_manager.device_interface.is_connected():
-            messagebox.showerror("Error", "Not connected.", parent=self)
+            logger.error("GUI", "format_sd_card_gui", "Not connected.")
             return
         if not messagebox.askyesno(
             "Confirm Format",
@@ -864,15 +775,15 @@ class DeviceActionsMixin:
         if status and status.get("result") == "success":
             self.after(
                 0,
-                lambda: messagebox.showinfo("Format Success", "Storage formatted successfully.", parent=self),
+                lambda: logger.info("_format_sd_card_thread", "Format Success", "Storage formatted successfully."),
             )
         else:
             self.after(
                 0,
-                lambda s=status: messagebox.showerror(
-                    "Format Failed",
-                    f"Failed to format storage: {s.get('error', s.get('result', 'Unknown'))}",
-                    parent=self,
+                lambda s=status: logger.error(
+                    "GUI",
+                    "_format_sd_card_thread",
+                    f"Format Failed: Failed to format storage: {s.get('error', s.get('result', 'Unknown'))}",
                 ),
             )
         self.after(
@@ -885,7 +796,7 @@ class DeviceActionsMixin:
     def sync_device_time_gui(self):  # Identical to original, parent=self for dialogs
         """Synchronizes the device time with the computer's current time."""
         if not self.device_manager.device_interface.is_connected():
-            messagebox.showerror("Error", "Not connected.", parent=self)
+            logger.error("GUI", "sync_device_time_gui", "Not connected.")
             return
         if not messagebox.askyesno(
             "Confirm Sync Time",
@@ -913,7 +824,11 @@ class DeviceActionsMixin:
                 err += f" (Dev code: {result['device_code']})"
             self.after(
                 0,
-                lambda e=err: messagebox.showerror("Time Sync Error", f"Failed to sync time: {e}", parent=self),
+                lambda e=err: logger.error(
+                    "GUI",
+                    "_sync_device_time_thread",
+                    f"Time Sync Error: Failed to sync time: {e}",
+                ),
             )
         self.after(0, self._set_long_operation_active_state, False, "Time Sync")
         self.after(0, lambda: self.update_status_bar(progress_text="Time sync finished."))

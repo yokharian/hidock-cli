@@ -289,7 +289,7 @@ def test_app_launches():
             python_cmd = ".venv/bin/python"
 
         # Test basic imports
-        test_cmd = f"{python_cmd} -c \"import customtkinter; import pygame; print('Desktop dependencies OK')\""
+        test_cmd = f"{python_cmd} -c \"import pygame; print('Desktop dependencies OK')\""
         result = run_command(test_cmd, cwd=desktop_dir, check=False)
         if result.returncode == 0:
             print("✓ Desktop app dependencies working")

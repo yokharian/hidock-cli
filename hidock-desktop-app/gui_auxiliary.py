@@ -5,9 +5,7 @@ Auxiliary Mixin for the HiDock Explorer Tool GUI.
 This module provides the `AuxiliaryMixin` class, which contains methods
 for handling the settings dialog, GUI logging, and other helper functions.
 """
-import tkinter
 import traceback
-from tkinter import filedialog, messagebox
 
 import usb.core
 
@@ -17,101 +15,6 @@ from settings_window import SettingsDialog
 
 class AuxiliaryMixin:
     """A mixin for auxiliary GUI functions like settings and logging."""
-
-    def open_settings_window(self):
-        """Opens the application settings dialog window.
-
-        Ensures only one settings dialog is open at a time and focuses it
-        if it already exists. Passes a snapshot of the current configuration
-        and the HiDockJensen instance to the dialog.
-        """
-
-        # Ensure the dialog is not already open
-        if (
-            hasattr(self, "_settings_dialog_instance")
-            and self._settings_dialog_instance
-            and self._settings_dialog_instance.winfo_exists()
-        ):
-            self._settings_dialog_instance.focus()  # If already open, focus it
-
-        # Pass a copy of the current config for the dialog to work with
-        # The dialog will handle its own state and apply changes back to self.config and self (GUI vars)
-        current_config_snapshot = self.config.copy()
-
-        # Pass necessary CTk Variables (or their names/accessors) that SettingsDialog needs to read/write
-        # For simplicity, pass self (parent_gui) and let SettingsDialog access vars like self.parent_gui.autoconnect_var
-        if (
-            hasattr(self, "_settings_dialog_instance")
-            and self._settings_dialog_instance
-            and self._settings_dialog_instance.winfo_exists()
-        ):
-            self._settings_dialog_instance.focus()  # If already open, focus it
-            return
-
-        self._settings_dialog_instance = SettingsDialog(
-            parent_gui=self,
-            initial_config=current_config_snapshot,
-            hidock_instance=self.device_manager.device_interface,
-        )
-        self._settings_dialog_instance.protocol(
-            "WM_DELETE_WINDOW",
-            lambda: self._on_settings_dialog_close(self._settings_dialog_instance),
-        )
-
-    def _update_default_progressbar_colors(self):
-        """
-        Updates the default colors for the progress bar based on the current theme.
-
-        This is used to restore the progress bar's appearance after it has been
-        changed to indicate an error or warning state.
-        """
-        if hasattr(self, "status_file_progress_bar") and self.status_file_progress_bar.winfo_exists():
-            self.default_progressbar_fg_color = (self.status_file_progress_bar.cget("fg_color"),)
-            self.default_progressbar_progress_color = (self.status_file_progress_bar.cget("progress_color"),)
-
-    def update_log_colors_gui(self):
-        """Updates the log text area to reflect the new filter level."""
-        logger.info(
-            "GUI",
-            "on_gui_log_filter_change",
-            f"GUI log display filter to {self.gui_log_filter_level_var.get()}.",
-        )
-
-    def _update_log_text_area_tag_colors(
-        self,
-    ):
-        """Updates the foreground colors for different log levels in the GUI log text area."""
-        if not hasattr(self, "log_text_area") or not self.log_text_area.winfo_exists():
-            return
-        log_levels_to_configure = ["ERROR", "WARNING", "INFO", "DEBUG", "CRITICAL"]
-        for level_name_upper in log_levels_to_configure:
-            level_name_lower = level_name_upper.lower()
-            light_var = getattr(self, f"log_color_{level_name_lower}_light_var", None)
-            dark_var = getattr(self, f"log_color_{level_name_lower}_dark_var", None)
-            if light_var and dark_var:
-                color_tuple = (light_var.get(), dark_var.get())
-                try:
-                    self.log_text_area.tag_config(
-                        level_name_upper,
-                        foreground=self.apply_appearance_mode_theme_color(color_tuple),
-                    )
-                except tkinter.TclError as e:
-                    logger.error(
-                        "GUI",
-                        "_update_log_text_area_tag_colors",
-                        f"Error applying color for {level_name_upper} with {color_tuple}: {e}",
-                    )
-            else:
-                logger.warning(
-                    "GUI",
-                    "_update_log_text_area_tag_colors",
-                    f"Color StringVars for log level {level_name_upper} not found.",
-                )
-        logger.debug(
-            "GUI",
-            "_update_log_text_area_tag_colors",
-            "Log text area tag colors updated.",
-        )
 
     def _get_device_display_info(self, dev):
         """
@@ -135,19 +38,12 @@ class AuxiliaryMixin:
             desc = f"[Error Reading Info ({error_type_name})] " f"(VID={hex(dev.idVendor)}, PID={hex(dev.idProduct)})"
         return desc, dev.idVendor, dev.idProduct, is_problem
 
-    def _update_settings_device_combobox(self, devices, parent_window, initial_load, change_callback):
-        """Updates the device selection combobox in the settings dialog."""
-        if not (
-            hasattr(parent_window, "settings_device_combobox") and parent_window.settings_device_combobox.winfo_exists()
-        ):
-            return
-
-        combobox = parent_window.settings_device_combobox
+    def _update_settings_device_combobox(self, devices, initial_load, change_callback):
+        """Updates the device selection"""
         combo_list = [d[0] for d in devices]
-        combobox.configure(values=combo_list if combo_list else ["No devices accessible"])
-
-        settings_vid_var = parent_window.local_vars["selected_vid_var"]
-        settings_pid_var = parent_window.local_vars["selected_pid_var"]
+        values = combo_list if combo_list else ["No devices accessible"]
+        settings_vid_var = self.local_vars["selected_vid_var"]
+        settings_pid_var = self.local_vars["selected_pid_var"]
 
         current_sel_str = next(
             (d for d, v, p, _ in devices if v == settings_vid_var.get() and p == settings_pid_var.get()),
@@ -155,10 +51,10 @@ class AuxiliaryMixin:
         )
 
         if current_sel_str and current_sel_str in combo_list:
-            combobox.set(current_sel_str)
+            self.settings_device_combobox = current_sel_str
         elif combo_list and "---" not in combo_list[0]:
             if not initial_load:
-                combobox.set(combo_list[0])
+                self.settings_device_combobox = combo_list[0]
                 sel_info = next((d for d in devices if d[0] == combo_list[0]), None)
                 if sel_info:
                     settings_vid_var.set(sel_info[1])
@@ -166,23 +62,15 @@ class AuxiliaryMixin:
                 if change_callback:
                     change_callback()
         elif not combo_list:
-            combobox.set("No devices accessible")
-
-    def _on_settings_dialog_close(self, dialog_instance):
-        """Logic for when settings dialog is closed with 'x' (behaves like cancel)
-        The SettingsDialog's _cancel_close_action handles reset if changes were made."""
-        if dialog_instance and dialog_instance.winfo_exists():
-            dialog_instance.destroy()
-        self._settings_dialog_instance = None
+            self.settings_device_combobox = "No devices accessible"
 
     # scan_usb_devices_for_settings is called by SettingsDialog,
     # but defined here as it relates to main app's available_usb_devices
     def scan_usb_devices_for_settings(
-        self, parent_window_for_dialogs, initial_load=False, change_callback=None
+        self, initial_load=False, change_callback=None
     ):  # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         """This method is called by the SettingsDialog. It updates self.available_usb_devices
-        and then configures the combobox *in the SettingsDialog*.
-        The parent_window_for_dialogs will be the SettingsDialog instance."""
+        and then configures the combobox *in the SettingsDialog*."""
         try:
             # If device is connected, use existing device info instead of scanning
             if self.device_manager.device_interface.is_connected():
@@ -203,17 +91,9 @@ class AuxiliaryMixin:
                         f"PID={hex(device_info.product_id)})"
                     )
 
-                    # Update combobox with connected device
-                    if (
-                        hasattr(parent_window_for_dialogs, "settings_device_combobox")
-                        and parent_window_for_dialogs.settings_device_combobox.winfo_exists()
-                    ):
-                        parent_window_for_dialogs.settings_device_combobox.configure(values=[connected_device_desc])
-                        parent_window_for_dialogs.settings_device_combobox.set(connected_device_desc)
-
-                        # Update the selected VID/PID to match connected device
-                        parent_window_for_dialogs.local_vars["selected_vid_var"].set(device_info.vendor_id)
-                        parent_window_for_dialogs.local_vars["selected_pid_var"].set(device_info.product_id)
+                    # Update local_vars with connected device
+                    self.local_vars["selected_vid_var"].set(device_info.vendor_id)
+                    self.local_vars["selected_pid_var"].set(device_info.product_id)
 
                     if change_callback:
                         change_callback()
@@ -233,20 +113,11 @@ class AuxiliaryMixin:
             )
             self.available_usb_devices.clear()
             if not self.backend_initialized_successfully:
-                if parent_window_for_dialogs and parent_window_for_dialogs.winfo_exists():
-                    messagebox.showerror(
-                        "USB Error",
-                        "Libusb backend not initialized.",
-                        parent=parent_window_for_dialogs,
-                    )  # type: ignore
-                if (
-                    hasattr(parent_window_for_dialogs, "settings_device_combobox")
-                    and parent_window_for_dialogs.settings_device_combobox.winfo_exists()
-                ):
-                    parent_window_for_dialogs.settings_device_combobox.configure(
-                        values=["USB Backend Error"]
-                    )  # type: ignore
-                    parent_window_for_dialogs.settings_device_combobox.set("USB Backend Error")
+                logger.error(
+                    "GUI",
+                    "Scan_USBDevicesForSettings",
+                    "Libusb backend not initialized.",
+                )
                 return
 
             # Try to acquire the USB lock with a timeout to prevent deadlocks during downloads
@@ -260,27 +131,16 @@ class AuxiliaryMixin:
                     "scan_usb_devices_for_settings",
                     "USB lock is busy (downloads active), skipping device scan",
                 )
-                if (
-                    hasattr(parent_window_for_dialogs, "settings_device_combobox")
-                    and parent_window_for_dialogs.settings_device_combobox.winfo_exists()
-                ):
-                    parent_window_for_dialogs.settings_device_combobox.configure(
-                        values=["Device busy - downloads active"]
-                    )
-                    parent_window_for_dialogs.settings_device_combobox.set("Device busy - downloads active")
                 return
 
             try:
                 found_devices = usb.core.find(find_all=True, backend=self.usb_backend_instance)
                 if not found_devices:
-                    if (
-                        hasattr(parent_window_for_dialogs, "settings_device_combobox")
-                        and parent_window_for_dialogs.settings_device_combobox.winfo_exists()
-                    ):
-                        parent_window_for_dialogs.settings_device_combobox.configure(
-                            values=["No devices found"]
-                        )  # type: ignore
-                        parent_window_for_dialogs.settings_device_combobox.set("No devices found")
+                    logger.info(
+                        "GUI",
+                        "scan_usb_devices_for_settings",
+                        "No USB devices found.",
+                    )
                     return
 
                 processed_devices = []
@@ -326,7 +186,6 @@ class AuxiliaryMixin:
 
             self._update_settings_device_combobox(
                 all_devices_for_combo,
-                parent_window_for_dialogs,
                 initial_load,
                 change_callback,
             )
@@ -336,18 +195,12 @@ class AuxiliaryMixin:
                 "scan_usb_devices",
                 f"Found {len(good_devs)} good, {len(problem_devs)} problem devices.",
             )  # pylint: disable=broad-except
-        except (usb.core.USBError, AttributeError, TypeError, tkinter.TclError) as e:
+        except (usb.core.USBError, AttributeError, TypeError) as e:
             logger.error(
                 "GUI",
                 "scan_usb_devices_for_settings",
                 f"Unhandled exception: {e}\n{traceback.format_exc()}",
             )
-            if parent_window_for_dialogs and parent_window_for_dialogs.winfo_exists():
-                messagebox.showerror(
-                    "Scan Error",
-                    f"Error during USB scan: {e}",
-                    parent=parent_window_for_dialogs,
-                )
 
     def _apply_device_settings_thread(self, settings_to_apply):  # This is called by SettingsDialog
         if not settings_to_apply:
@@ -389,68 +242,3 @@ class AuxiliaryMixin:
         # This method provides a public interface for the SettingsDialog
         # to request device settings application.
         self._apply_device_settings_thread(settings_to_apply)
-
-    def log_to_gui_widget(self, message, level_name="INFO"):  # Identical to original
-        """Logs a message to the GUI log text area.
-        Args:
-            message (str): The log message to display.
-            level_name (str): The log level (e.g., "INFO", "DEBUG", "ERROR").
-        """
-
-        def _update_log_task(msg, lvl):
-            if not (hasattr(self, "log_text_area") and self.log_text_area.winfo_exists()):
-                return
-            gui_filter_val = Logger.LEVELS.get(self.gui_log_filter_level_var.get().upper(), Logger.LEVELS["DEBUG"])
-            msg_level_val = Logger.LEVELS.get(lvl.upper(), 0)
-            if msg_level_val < gui_filter_val:
-                return
-            self.log_text_area.configure(state="normal")
-            self.log_text_area.insert("end", msg, lvl)
-            self.log_text_area.see("end")
-            self.log_text_area.configure(state="disabled")
-
-        if self.winfo_exists():
-            self.after(0, _update_log_task, message, level_name)
-
-    def clear_log_gui(self):  # Identical to original
-        """Clears the log display in the GUI."""
-        logger.info("GUI", "clear_log_gui", "Clearing log display.")
-        if hasattr(self, "log_text_area") and self.log_text_area.winfo_exists():
-            self.log_text_area.configure(state="normal")
-            self.log_text_area.delete(1.0, "end")
-            self.log_text_area.configure(state="disabled")
-            logger.info("GUI", "clear_log_gui", "Log display cleared.")
-
-    def on_gui_log_filter_change(self, _):  # Argument passed by CTkComboBox, not used
-        """Handles changes to the GUI log filter level.
-        Updates the log text area to reflect the new filter level.
-        """
-        logger.info(
-            "GUI",
-            "on_gui_log_filter_change",
-            f"GUI log display filter to {self.gui_log_filter_level_var.get()}.",
-        )
-
-    def download_gui_logs(self):  # Identical to original, parent=self for dialogs
-        """Downloads the GUI logs to a file."""
-        if not (hasattr(self, "log_text_area") and self.log_text_area.winfo_exists()):
-            return
-        log_content = self.log_text_area.get(1.0, "end")
-        if not log_content.strip():
-            messagebox.showinfo("Download Logs", "Log display is empty.", parent=self)
-            return
-        filepath = filedialog.asksaveasfilename(
-            defaultextension=".log",
-            filetypes=[("Log files", "*.log"), ("Text", "*.txt")],
-            title="Save GUI Logs",
-            parent=self,
-        )
-        if filepath:
-            try:
-                with open(filepath, "w", encoding="utf-8") as f:
-                    f.write(log_content)
-                logger.info("GUI", "download_gui_logs", f"GUI logs saved to {filepath}")
-                messagebox.showinfo("Download Logs", f"Logs saved to:\n{filepath}", parent=self)  # type: ignore
-            except (IOError, OSError, tkinter.TclError) as e:
-                logger.error("GUI", "download_gui_logs", f"Error saving logs: {e}")
-                messagebox.showerror("Download Logs Error", f"Failed to save logs: {e}", parent=self)

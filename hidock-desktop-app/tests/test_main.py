@@ -11,8 +11,6 @@ from main import main
 
 class TestMain(unittest.TestCase):
     @patch("main.HiDockToolGUI")
-    @patch("main.ctk.set_appearance_mode")
-    @patch("main.ctk.set_default_color_theme")
     def test_main_initialization(self, mock_set_theme, mock_set_appearance, mock_main_window):
         # Arrange
         mock_app = MagicMock()
@@ -29,7 +27,6 @@ class TestMain(unittest.TestCase):
 
     @patch("main.HiDockToolGUI")
     @patch("main.logger.error")
-    @patch("main.tkinter.messagebox.showerror")
     @patch("main.sys.exit")
     def test_main_exception(self, mock_exit, mock_showerror, mock_logger_error, mock_main_window):
         # Arrange

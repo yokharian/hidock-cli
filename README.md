@@ -25,7 +25,6 @@ The HiDock hardware is innovative, but users face challenges with official softw
 - **💰 Cost Control:** BYOK model with competitive pricing options
 - **🏠 Offline Capable:** Full functionality without internet using local AI
 - **⚡ Advanced Features:** Speed control, waveform visualization, background processing
-- **🎯 Professional UI:** Modern CustomTkinter interface with comprehensive settings
 - **🔧 Code Quality:** Pre-commit hooks, comprehensive testing, 120-char line length standard
 
 ## **🚀 Key Features Overview**
@@ -86,7 +85,6 @@ The HiDock hardware is innovative, but users face challenges with official softw
 
 **Full-featured professional desktop application**
 
-- **Framework:** CustomTkinter with Font Awesome icons
 - **AI Integration:** All 11 providers with unified interface
 - **Audio Processing:** Advanced playback and visualization
 - **Device Management:** Complete HiDock device control
@@ -348,7 +346,6 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) for 
 ## **🙏 Acknowledgements**
 
 - **libusb developers** for USB communication foundation
-- **CustomTkinter team** for modern Python GUI framework
 - **AI Provider teams** for API access and documentation
 - **Open source community** for tools and libraries
 - **HiDock users** for feedback and feature requests

@@ -27,9 +27,7 @@ This automated setup handles:
 
 The HiDock Next platform consists of three main applications:
 
-1. **Desktop Application** (Python/CustomTkinter) - Full-featured with 11 AI providers
-2. **Web Application** (React/TypeScript) - Browser-based interface
-3. **Audio Insights Extractor** (React/TypeScript) - Standalone analysis tool
+1. **CLI Application** (Python) - Full-featured with 11 AI providers
 
 All applications communicate with HiDock devices using USB protocols (pyusb/WebUSB).
 
@@ -38,10 +36,9 @@ All applications communicate with HiDock devices using USB protocols (pyusb/WebU
 ### Technology Stack
 
 - **Python 3.12+** (minimum 3.8)
-- **CustomTkinter** - Modern GUI framework
+
 - **PyUSB** - USB device communication
 - **Pygame** - Audio playback
-- **Pillow** - Image processing
 
 ### Key Components
 
@@ -394,7 +391,7 @@ export default defineConfig({
    - macOS: No special setup required
 
 2. **GUI Rendering Issues**
-   - Check CustomTkinter version
+
    - Verify theme files are present
    - Test with different appearance modes
 

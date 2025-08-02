@@ -142,7 +142,7 @@ def mock_device(mocker):
 
 - Minimum coverage: 80%
 - Critical paths: 95%
-- GUI components: 70% (due to tkinter limitations)
+- CLI components: 90%
 
 ## Web Application Testing
 

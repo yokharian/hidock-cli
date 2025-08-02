@@ -51,7 +51,6 @@ def get_default_config():
         "color_theme": "blue",
         "suppress_console_output": False,
         "suppress_gui_log_output": False,
-        "window_geometry": "950x850+100+100",  # Default window size and position
         "treeview_columns_display_order": "name,size,duration,date,time,status",
         "logs_pane_visible": False,
         "gui_log_filter_level": "DEBUG",

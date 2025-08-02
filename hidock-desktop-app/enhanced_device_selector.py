@@ -10,12 +10,7 @@ Requirements: 6.1, 6.2, 6.3
 
 import os
 import threading
-
-# import tkinter  # Commented out - not used, customtkinter is used instead
 from typing import Callable, List, Optional  # Removed Dict - not used
-
-import customtkinter as ctk
-from PIL import Image
 
 from config_and_logger import logger
 
@@ -66,7 +61,7 @@ class DeviceInfo:
         return "\n".join(details)
 
 
-class EnhancedDeviceSelector(ctk.CTkFrame):
+class EnhancedDeviceSelector:
     """Enhanced device selector with status indicators and detailed information."""
 
     def __init__(
@@ -84,95 +79,14 @@ class EnhancedDeviceSelector(ctk.CTkFrame):
         self.selected_device: Optional[DeviceInfo] = None
         self.is_scanning = False
 
-        # Load icons
-        self._load_icons()
-
-        # Create UI
-        self._create_widgets()
-
-    def _load_icons(self):
-        """Load device-related icons."""
-        self.icons = {}
-        try:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            icons_dir = os.path.join(script_dir, "icons", "black", "16")
-
-            icon_files = {
-                "refresh": "refresh.png",
-                "usb": "usb.png",
-                "check": "check-circle.png",
-                "alert": "alert-circle.png",
-                "info": "info-circle.png",
-            }
-
-            for name, filename in icon_files.items():
-                icon_path = os.path.join(icons_dir, filename)
-                if os.path.exists(icon_path):
-                    image = Image.open(icon_path)
-                    self.icons[name] = ctk.CTkImage(light_image=image, dark_image=image, size=(16, 16))
-
-        except Exception as e:
-            logger.warning("EnhancedDeviceSelector", "_load_icons", f"Error loading icons: {e}")
-
-    def _create_widgets(self):
-        """Create the device selector interface."""
-        # Header with scan button
-        header_frame = ctk.CTkFrame(self)
-        header_frame.pack(fill="x", padx=5, pady=5)
-
-        ctk.CTkLabel(
-            header_frame,
-            text="🔌 USB Device Selection",
-            font=ctk.CTkFont(size=14, weight="bold"),
-        ).pack(side="left", padx=10, pady=5)
-
-        self.scan_button = ctk.CTkButton(
-            header_frame,
-            text="Scan Devices",
-            image=self.icons.get("refresh"),
-            compound="left",
-            width=120,
-            height=28,
-            command=self._scan_devices,
-        )
-        self.scan_button.pack(side="right", padx=10, pady=5)
-
-        # Device list frame
-        self.device_list_frame = ctk.CTkScrollableFrame(self, height=200)
-        self.device_list_frame.pack(fill="both", expand=True, padx=5, pady=(0, 5))
-
-        # Status bar
-        self.status_frame = ctk.CTkFrame(self)
-        self.status_frame.pack(fill="x", padx=5, pady=(0, 5))
-
-        self.status_label = ctk.CTkLabel(
-            self.status_frame,
-            text="Click 'Scan Devices' to detect available devices",
-            anchor="w",
-        )
-        self.status_label.pack(fill="x", padx=10, pady=5)
-
-        # Progress bar (initially hidden)
-        self.progress_bar = ctk.CTkProgressBar(self.status_frame)
-        self.progress_bar.pack_forget()
-
     def _scan_devices(self):
         """Start device scanning process."""
         if self.is_scanning:
             return
 
+        self.devices = []  # Clear existing devices
         self.is_scanning = True
-        self.scan_button.configure(state="disabled", text="Scanning...")
-
-        # Show progress bar
-        self.progress_bar.pack(fill="x", padx=10, pady=(0, 5))
-        self.progress_bar.configure(mode="indeterminate")
-        self.progress_bar.start()
-
-        self.status_label.configure(text="🔍 Scanning for USB devices...")
-
-        # Clear existing devices
-        self._clear_device_list()
+        text = "🔍 Scanning for USB devices..."
 
         # Start scanning in background thread
         threading.Thread(target=self._scan_devices_thread, daemon=True).start()
@@ -279,18 +193,10 @@ class EnhancedDeviceSelector(ctk.CTkFrame):
         self.is_scanning = False
         self.devices = devices
 
-        # Update UI
-        self.scan_button.configure(state="normal", text="Scan Devices")
-        self.progress_bar.stop()
-        self.progress_bar.pack_forget()
-
-        # Update device list
-        self._populate_device_list()
-
         # Update status
         hidock_count = sum(1 for d in devices if d.is_hidock)
         total_count = len(devices)
-        self.status_label.configure(text=f"✅ Found {total_count} devices ({hidock_count} HiDock devices)")
+        text = f"✅ Found {total_count} devices ({hidock_count} HiDock devices)"
 
         # Call scan callback if provided
         if self.scan_callback:
@@ -299,82 +205,12 @@ class EnhancedDeviceSelector(ctk.CTkFrame):
     def _on_scan_error(self, error_message: str):
         """Handle device scan error."""
         self.is_scanning = False
-
-        # Update UI
-        self.scan_button.configure(state="normal", text="Scan Devices")
-        self.progress_bar.stop()
-        self.progress_bar.pack_forget()
-
-        self.status_label.configure(text=f"❌ Scan failed: {error_message}")
-
-    def _clear_device_list(self):
-        """Clear the device list display."""
-        for widget in self.device_list_frame.winfo_children():
-            widget.destroy()
-
-    def _populate_device_list(self):
-        """Populate the device list with found devices."""
-        self._clear_device_list()
-
-        if not self.devices:
-            no_devices_label = ctk.CTkLabel(self.device_list_frame, text="No devices found", text_color="gray")
-            no_devices_label.pack(pady=20)
-            return
-
-        for device in self.devices:
-            self._create_device_item(device)
-
-    def _create_device_item(self, device: DeviceInfo):
-        """Create a device item widget."""
-        # Device item frame
-        item_frame = ctk.CTkFrame(self.device_list_frame)
-        item_frame.pack(fill="x", padx=5, pady=2)
-
-        # Selection state tracking
-        is_selected = device == self.selected_device
-
-        # Main device button
-        device_button = ctk.CTkButton(
-            item_frame,
-            text=device.get_display_name(),
-            anchor="w",
-            height=40,
-            command=lambda d=device: self._select_device(d),
-            fg_color="green" if is_selected else None,
-            hover_color="darkgreen" if is_selected else None,
-        )
-        device_button.pack(fill="x", padx=5, pady=5)
-
-        # Device details (shown for HiDock devices or selected devices)
-        if device.is_hidock or is_selected:
-            details_label = ctk.CTkLabel(
-                item_frame,
-                text=device.get_detail_text(),
-                font=ctk.CTkFont(size=10),
-                anchor="w",
-                text_color="gray70",
-            )
-            details_label.pack(fill="x", padx=15, pady=(0, 5))
-
-        # Store references for selection updates
-        device_button._device = device
-        item_frame._device_button = device_button
+        text = f"❌ Scan failed: {error_message}"
 
     def _select_device(self, device: DeviceInfo):
         """Select a device."""
         self.selected_device = device
-
-        # Update button appearances
-        for item_frame in self.device_list_frame.winfo_children():
-            if hasattr(item_frame, "_device_button"):
-                button = item_frame._device_button
-                if button._device == device:
-                    button.configure(fg_color="green", hover_color="darkgreen")
-                else:
-                    button.configure(fg_color=None, hover_color=None)
-
-        # Update status
-        self.status_label.configure(text=f"📱 Selected: {device.name} ({device.status})")
+        text = f"📱 Selected: {device.name} ({device.status})"
 
         # Call command callback if provided
         if self.command:
@@ -393,7 +229,6 @@ class EnhancedDeviceSelector(ctk.CTkFrame):
     def set_devices(self, devices: List[DeviceInfo]):
         """Set devices externally (for testing or manual population)."""
         self.devices = devices
-        self._populate_device_list()
 
     def refresh_devices(self):
         """Refresh the device list."""
@@ -412,12 +247,3 @@ if __name__ == "__main__":
 
     def on_scan_complete(devices):
         print(f"Scan complete: {len(devices)} devices found")
-
-    root = ctk.CTk()
-    root.title("Enhanced Device Selector Test")
-    root.geometry("600x400")
-
-    selector = EnhancedDeviceSelector(root, command=on_device_selected, scan_callback=on_scan_complete)
-    selector.pack(fill="both", expand=True, padx=10, pady=10)
-
-    root.mainloop()

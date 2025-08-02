@@ -120,7 +120,7 @@ conda install pygame -c conda-forge
 
 2. **Verify all dependencies installed:**
    ```bash
-   pip list  # Check if customtkinter, pygame, etc. are listed
+   pip list  # Check if pygame, etc. are listed
    ```
 
 3. **Run with verbose logging:**

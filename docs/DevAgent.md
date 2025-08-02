@@ -2,7 +2,7 @@
 
 ## Overview
 
-The HiDock Desktop App is a Python-based GUI application for managing audio recordings from HiDock devices, built with the CustomTkinter framework. This document outlines the mandatory standards and procedures for its development. Adherence to these rules is not optional.
+The HiDock Desktop App is a Python-based GUI application for managing audio recordings from HiDock devices. This document outlines the mandatory standards and procedures for its development. Adherence to these rules is not optional.
 
 ## Initial Setup
 

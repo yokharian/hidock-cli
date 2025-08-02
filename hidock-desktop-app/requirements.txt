@@ -1,6 +1,4 @@
 pyusb
-customtkinter
-Pillow
 pygame
 google-generativeai
 numpy

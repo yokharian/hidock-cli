@@ -138,7 +138,7 @@ This mixin orchestrates the UI based on user actions and callbacks from the `Aud
 
 ### `gui_main_window.py`
 
-- [ ] Test `MainWindow` initialization and UI element creation (mock `customtkinter`).
+
 - [ ] Test that button click events call the correct backend logic (e.g., `play_button` calls `audio_player.play_audio`).
 - [ ] Test UI state changes in response to application events (e.g., a "recording" label appears when recording starts).
 - [ ] Test the file selection dialog logic (mock `filedialog`).

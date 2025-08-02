@@ -2,10 +2,10 @@
 
 **Professional Desktop Audio Management with 11 AI Provider Support**
 
-The HiDock Desktop Application is a full-featured Python desktop GUI for managing HiDock recording devices with advanced AI transcription capabilities. Built with CustomTkinter, it provides comprehensive local control over your HiDock devices while supporting both cloud and local AI providers for audio transcription and analysis.
+The HiDock Desktop Application is a full-featured Python desktop GUI for managing HiDock recording devices with advanced AI transcription capabilities. it provides comprehensive local control over your HiDock devices while supporting both cloud and local AI providers for audio transcription and analysis.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
-[![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-green.svg)](https://github.com/TomSchimansky/CustomTkinter)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🌟 Key Features
@@ -62,7 +62,7 @@ python main.py
 
 ### 🎨 Modern GUI Experience
 
-- **CustomTkinter Interface**: Professional dark/light theme support
+
 - **Responsive Design**: Adaptive layout with collapsible panels
 - **Icon Integration**: Font Awesome icons throughout the interface
 - **Settings Management**: Comprehensive configuration with persistent state
@@ -153,7 +153,7 @@ hidock-desktop-app/
 ├── tests/                       # Test suite
 ├── docs/                        # Documentation
 ├── icons/                       # UI icons (Font Awesome)
-└── themes/                      # CustomTkinter themes
+
 ```
 
 ## 🎛️ Core Components
@@ -352,13 +352,12 @@ set HIDOCK_DEBUG=1     # Windows
 ### Core Dependencies
 
 - **pyusb**: USB device communication
-- **customtkinter**: Modern GUI framework
+
 - **pygame**: Audio playback system
 - **pydub**: Audio processing and conversion
 - **matplotlib**: Visualization and plotting
 - **numpy/scipy**: Numerical computing
 - **google-generativeai**: Gemini API integration
-- **Pillow**: Image processing for GUI
 
 ### Optional Dependencies
 
