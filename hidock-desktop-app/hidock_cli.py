@@ -244,7 +244,6 @@ class HiDockCLI(DeviceActionsMixin, FileActionsMixin, TreeViewMixin):
             return ""
 
         try:
-
             import base64
 
             from cryptography.fernet import Fernet
@@ -762,9 +761,8 @@ class HiDockCLI(DeviceActionsMixin, FileActionsMixin, TreeViewMixin):
                     original_filename,
                 )
 
-    def _set_long_operation_active_state(
-        self, state=False, text="Transcription"
-    ): ...  # Placeholder for the method that sets the long operation state
+    def _set_long_operation_active_state(self, state=False, text="Transcription"):
+        ...  # Placeholder for the method that sets the long operation state
 
     def _on_transcription_complete_for_panel(self, results, original_filename):
         """Handle completion of transcription and update the panel."""
