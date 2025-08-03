@@ -11,6 +11,7 @@ from unittest.mock import Mock, patch
 import pytest
 import usb.core
 import usb.util
+
 from constants import (  # CMD_DELETE_FILE,  # Future: delete command tests; CMD_GET_FILE_LIST,  # Future: file list command tests
     CMD_GET_DEVICE_INFO,
     CMD_TRANSFER_FILE,
