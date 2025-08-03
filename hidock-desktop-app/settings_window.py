@@ -253,13 +253,7 @@ class SettingsDialog:
         return True
 
     def _perform_apply_settings_logic(self, update_dialog_baseline=False):
-        """
-        Applies the settings from the dialog's local variables to the parent GUI's state and config.
-
-        Args:
-        update_dialog_baseline (bool): If True, updates the dialog's internal snapshot
-        to the newly applied settings (used for the 'Apply' button).
-        """
+        raise NotImplementedError()
         # Validate numeric settings first
         if not self._validate_numeric_settings():
             return  # Don't apply if validation fails
@@ -282,7 +276,7 @@ class SettingsDialog:
                 ]:
                     value = int(value.strip())
 
-                parent_var.set(value)  # This will trigger traces on parent if any
+                parent_var = value  # This will trigger traces on parent if any
 
                 # Update the main config dictionary directly for saving
                 # Need to map var_name (e.g. "autoconnect_var") to config key (e.g. "autoconnect")
@@ -632,35 +626,17 @@ class SettingsDialog:
 
             settings = asyncio.run(self.dock.get_device_settings())
 
-            def safe_update(task):
-                self.after(0, task)
-
             if settings:
                 self._fetched_device_settings_for_dialog = settings.copy()
-                safe_update(
-                    lambda: self.local_vars["device_setting_auto_record_var"].set(settings.get("autoRecord", False))
-                )
-                safe_update(
-                    lambda: self.local_vars["device_setting_auto_play_var"].set(settings.get("autoPlay", False))
-                )
-                safe_update(
-                    lambda: self.local_vars["device_setting_bluetooth_tone_var"].set(
-                        settings.get("bluetoothTone", False)
-                    )
-                )
-                safe_update(
-                    lambda: self.local_vars["device_setting_notification_sound_var"].set(
-                        settings.get("notificationSound", False)
-                    )
-                )
-                for cb in [
-                    self.auto_record_checkbox,
-                    self.auto_play_checkbox,
-                    self.bt_tone_checkbox,
-                    self.notification_sound_checkbox,
-                ]:
-                    if cb and cb.winfo_exists():
-                        safe_update(lambda widget=cb: widget.configure(state="normal"))
+
+                self.local_vars["device_setting_auto_record_var"] = settings.get("autoRecord", False)
+
+                self.local_vars["device_setting_auto_play_var"] = settings.get("autoPlay", False)
+
+                self.local_vars["device_setting_bluetooth_tone_var"] = settings.get("bluetoothTone", False)
+
+                self.local_vars["device_setting_notification_sound_var"] = settings.get("notificationSound", False)
+
             else:
                 logger.warning(
                     "SettingsDialog",

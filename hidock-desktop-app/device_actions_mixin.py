@@ -10,6 +10,7 @@ import asyncio
 import os
 import platform
 import threading
+import time
 import traceback
 from datetime import datetime
 
@@ -71,8 +72,8 @@ class DeviceActionsMixin:
                     )
 
                     # Update local_vars with connected device
-                    self.local_vars["selected_vid_var"].set(device_info.vendor_id)
-                    self.local_vars["selected_pid_var"].set(device_info.product_id)
+                    self.local_vars["selected_vid_var"] = device_info.vendor_id
+                    self.local_vars["selected_pid_var"] = device_info.product_id
 
                     if change_callback:
                         change_callback()
@@ -181,9 +182,10 @@ class DeviceActionsMixin:
                 f"Unhandled exception: {e}\n{traceback.format_exc()}",
             )
 
-    def after(self, time: int, callback):
+    def after(self, seconds: int, callback, *args, **kwargs):
+        time.sleep(seconds / 1000)  # Convert milliseconds to seconds
         if callback:
-            return callback()
+            return callback(*args, **kwargs)
 
     def initialize_backend(self):  # Identical to original
         error_to_report, local_backend_instance = None, None
@@ -273,8 +275,8 @@ class DeviceActionsMixin:
                     )
 
                     # Update the selected VID/PID to match the discovered device
-                    self.selected_vid_var.set(first_device.vendor_id)
-                    self.selected_pid_var.set(first_device.product_id)
+                    self.selected_vid_var = first_device.vendor_id
+                    self.selected_pid_var = first_device.product_id
 
                     self.connect_device()
                 else:
@@ -304,7 +306,7 @@ class DeviceActionsMixin:
                 )
             return
         self.update_status_bar(
-            connection_status="Status: Connected",
+            connection_status="Status: Connecting",
             progress_text="Connecting to device...",
         )
         threading.Thread(target=self._connect_device_thread, daemon=True).start()
@@ -370,7 +372,6 @@ class DeviceActionsMixin:
                     "_connect_device_thread",
                     "Connection attempt failed.",
                 )
-                self.after(0, self._show_connection_error_banner)
                 self.after(
                     0,
                     lambda: (self.handle_auto_disconnect_ui()),
@@ -431,9 +432,6 @@ class DeviceActionsMixin:
         self._is_ui_refresh_in_progress = True
         self.update_status_bar(progress_text="Fetching file list...")
         self._update_menu_states()
-
-        # Show loading state only if no files are currently displayed
-        self.show_loading_state()
 
         threading.Thread(target=self._refresh_file_list_thread, daemon=True).start()
 
@@ -769,11 +767,8 @@ class DeviceActionsMixin:
                     )
                 self.after(0, self._populate_treeview_from_data, all_files_to_display)
             else:
-                self.after(
-                    0,
-                    lambda: self.update_status_bar(
-                        progress_text=("Error: Failed to list files" if not files else "Ready. No files found.")
-                    ),
+                self.update_status_bar(
+                    progress_text=("Error: Failed to list files" if not files else "Ready. No files found.")
                 )
         except ConnectionError as ce:
             logger.error("GUI", "_refresh_thread", f"ConnErr: {ce}")

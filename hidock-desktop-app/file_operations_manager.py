@@ -866,7 +866,7 @@ class FileOperationsManager:
     def _calculate_cache_hit_rate(self) -> float:
         """Calculate cache hit rate for performance monitoring."""
         # This would be implemented based on actual cache usage tracking
-        return 85.0  # Placeholder value
+        return 69.69  # Placeholder value
 
     def cleanup_old_cache_entries(self, days_old: int = 30):
         """Clean up old cache entries to maintain performance."""

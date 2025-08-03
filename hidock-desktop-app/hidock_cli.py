@@ -17,9 +17,10 @@ from file_actions_mixin import FileActionsMixin
 from file_operations_manager import FileOperationsManager
 from storage_management import StorageMonitor, StorageOptimizer
 from transcription_module import process_audio_file_for_insights
+from tree_view_mixin import TreeViewMixin
 
 
-class HiDockCLI(DeviceActionsMixin, FileActionsMixin):
+class HiDockCLI(DeviceActionsMixin, FileActionsMixin, TreeViewMixin):
     def __init__(self, attempt_auto_connect=True):
         super().__init__()
         self.config = load_config()
@@ -354,8 +355,8 @@ class HiDockCLI(DeviceActionsMixin, FileActionsMixin):
                 self.settings_device_combobox = combo_list[0]
                 sel_info = next((d for d in devices if d[0] == combo_list[0]), None)
                 if sel_info:
-                    settings_vid_var.set(sel_info[1])
-                    settings_pid_var.set(sel_info[2])
+                    settings_vid_var = sel_info[1]
+                    settings_pid_var = sel_info[2]
                 if change_callback:
                     change_callback()
         elif not combo_list:
