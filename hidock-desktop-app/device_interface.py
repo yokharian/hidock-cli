@@ -513,7 +513,7 @@ class DeviceManager:
                 "features": ["Auto-record", "Bluetooth"],
             },
             DeviceModel.P1: {
-                "max_storage": "32GB",
+                "max_storage": "64GB",
                 "audio_format": "WAV/HDA/MP3",
                 "sample_rate": "48kHz",
                 "bit_depth": "24-bit",
