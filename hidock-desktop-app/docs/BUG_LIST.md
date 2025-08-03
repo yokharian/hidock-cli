@@ -857,7 +857,7 @@ _All low-priority issues have been resolved and moved to the Fixed Issues sectio
 - **P1 Device Not Supported (GitHub Issue):**
 
   - **Status:** FIXED
-  - **Problem:** The new P1 Device (PID: 45070 / 0xAF0E) is not working with the application out of the box. Users need to manually update the hidock_config.json file to set "selected_pid": 45070 to make it work.
+  - **Problem:** The new P1 Device (PID: 45070 / 0xB00E) is not working with the application out of the box. Users need to manually update the hidock_config.json file to set "selected_pid": 45070 to make it work.
   - **Evidence:** GitHub user report: "I just got the new P1 Device and it was not working with this project. To get it working, I only needed to update the hidock_config.json - 'selected_pid': 45070"
   - **Files to Blame:** @gui_actions_device.py
   - **Resolution:**
@@ -865,7 +865,7 @@ _All low-priority issues have been resolved and moved to the Fixed Issues sectio
     - The autoconnect process now calls `discover_devices()` to find available HiDock devices and automatically selects the first discovered device.
     - If a device is discovered, the application automatically updates the selected VID/PID variables to match the discovered device.
     - This eliminates the need for users to manually configure the PID for P1 devices, as the application will auto-detect and connect to any supported HiDock device.
-    - The P1 device (0xAF0E) was already supported in the device detection logic, but now the autoconnect feature properly utilizes this support.
+    - The P1 device (0xB00E) was already supported in the device detection logic, but now the autoconnect feature properly utilizes this support.
 
 - **Window Not Visible Due to Negative Coordinates (GitHub Issue):**
 

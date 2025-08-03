@@ -102,10 +102,10 @@ The HiDock devices use a custom protocol called "Jensen" for USB communication.
 
 - **Vendor ID**: `0x10D6` (Actions Semiconductor)
 - **Product IDs**:
-  - H1: `0xAF0C`
-  - H1E: `0xAF0D`
-  - P1: `0xAF0E`
-  - Default: `0xB00D`
+  - H1: `0xB00C` or `0xAF0C` ?
+  - H1E: `0xB00D` or `0xAF0D` ?
+  - P1: `0xB00E` or `0xAF0E` ?
+  - Default: `0xB00E`
 - **Interface**: 0
 - **Endpoint OUT**: `0x01`
 - **Endpoint IN**: `0x82`

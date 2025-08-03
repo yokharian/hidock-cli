@@ -5,9 +5,10 @@ This adapter wraps the existing HiDockJensen class to implement the unified
 IDeviceInterface, providing consistent API across platforms.
 """
 
-# import asyncio  # Commented out - async functions use async/await but don't use asyncio directly
 # import threading  # Commented out - not used in current implementation
 import time
+
+# import asyncio  # Commented out - async functions use async/await but don't use asyncio directly
 from datetime import datetime
 
 # from pathlib import Path  # Commented out - not used, may be needed for future file operations
@@ -15,12 +16,13 @@ from typing import Callable, Dict, List, Optional  # Removed Any - not used
 
 from config_and_logger import logger
 from constants import DEFAULT_PRODUCT_ID, DEFAULT_VENDOR_ID
-from device_interface import (  # DeviceModel,  # Commented out - not used directly, but detect_device_model returns it
+from device_interface import (
     AudioRecording,
     ConnectionStats,
     DeviceCapability,
     DeviceHealth,
     DeviceInfo,
+    DeviceModel,
     IDeviceInterface,
     OperationProgress,
     OperationStatus,
@@ -55,14 +57,22 @@ class DesktopDeviceAdapter(IDeviceInterface):
         Returns:
             List[DeviceInfo]: List of discovered devices
         """
+        for i in range(2):
+            logger.info("DesktopDeviceAdapter", "discover_devices", "[+] Starting device discovery!!")
         try:
             # For desktop, we can try to find devices by attempting connection
             # This is a simplified implementation - in practice, you might want
             # to scan USB devices more systematically
             devices = []
 
-            # Try common HiDock product IDs
-            product_ids = [0xAF0C, 0xAF0D, 0xAF0E, DEFAULT_PRODUCT_ID]
+            # Try with every HiDock product ID
+            # [45068, 44812, 45069, 44813, 45070, 44814 ...
+            product_ids_hex = set([product_id for model in DeviceModel for product_id in model.hex_numbers])
+
+            # attempt firstly with the default product ID
+            default_device_hex = set(detect_device_model(DEFAULT_VENDOR_ID, DEFAULT_PRODUCT_ID).hex_numbers)
+            product_ids_hex -= default_device_hex
+            product_ids = list(default_device_hex) + list(product_ids_hex)
 
             for pid in product_ids:
                 try:
@@ -84,9 +94,8 @@ class DesktopDeviceAdapter(IDeviceInterface):
                             last_seen=datetime.now(),
                         )
                         devices.append(device_info)
-
                 except Exception as e:
-                    logger.debug(
+                    logger.warning(
                         "DesktopDeviceAdapter",
                         "discover_devices",
                         f"No device found for PID {pid:04x}: {e}",
@@ -102,6 +111,9 @@ class DesktopDeviceAdapter(IDeviceInterface):
                 f"Device discovery failed: {e}",
             )
             return []
+        finally:
+            for i in range(2):
+                logger.info("DesktopDeviceAdapter", "discover_devices", "[-] Device discovery completed!!")
 
     async def connect(self, device_id: Optional[str] = None, auto_retry: bool = True) -> DeviceInfo:
         """

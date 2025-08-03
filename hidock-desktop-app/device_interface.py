@@ -25,6 +25,18 @@ class DeviceModel(Enum):
     P1 = "hidock-p1"
     UNKNOWN = "unknown"
 
+    @property
+    def hex_numbers(self) -> List[int]:
+        """Get the hex numbers associated with this device model."""
+        if self == DeviceModel.H1:
+            return [0xB00C, 0xAF0C]
+        elif self == DeviceModel.H1E:
+            return [0xB00D, 0xAF0D]
+        elif self == DeviceModel.P1:
+            return [0xB00E, 0xAF0E]
+        else:
+            return []
+
 
 class DeviceCapability(Enum):
     """Enumeration of device capabilities."""
@@ -664,14 +676,10 @@ def detect_device_model(vendor_id: int, product_id: int) -> DeviceModel:
     Returns:
         DeviceModel: Detected device model
     """
-    model_map = {
-        0xAF0C: DeviceModel.H1,
-        0xAF0D: DeviceModel.H1E,
-        0xB00D: DeviceModel.H1E,  # Add PID from logs for H1E
-        0xAF0E: DeviceModel.P1,
-    }
-
-    return model_map.get(product_id, DeviceModel.UNKNOWN)
+    for model in DeviceModel:
+        if product_id in model.hex_numbers:
+            return model
+    return DeviceModel.UNKNOWN
 
 
 def get_model_capabilities(model: DeviceModel) -> List[DeviceCapability]:
