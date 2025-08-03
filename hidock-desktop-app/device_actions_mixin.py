@@ -8,6 +8,7 @@ refreshing file lists, and other device-specific commands.
 """
 import asyncio
 import os
+import platform
 import threading
 import traceback
 from datetime import datetime
@@ -20,10 +21,171 @@ from file_operations_manager import FileMetadata
 class DeviceActionsMixin:
     """A mixin for handling device-related actions."""
 
-    def after(self, time: int, callback):
-        return callback(*args, **kwargs)
+    def _get_device_display_info(self, dev):
+        """
+        Fetches display information for a given PyUSB device object.
+        Returns a tuple containing the description, VID, PID, and a boolean indicating if there was a problem.
+        """
+        is_problem = False
+        try:
+            mfg = usb.util.get_string(dev, dev.iManufacturer, 1000) if dev.iManufacturer else "N/A"
+            prod = usb.util.get_string(dev, dev.iProduct, 1000) if dev.iProduct else "N/A"
+            desc = f"{mfg} - {prod} (VID: {hex(dev.idVendor)}, " f"PID: {hex(dev.idProduct)})"
+        except (usb.core.USBError, NotImplementedError, ValueError) as e_str_fetch:
+            is_problem = True
+            logger.warning(
+                "GUI",
+                "scan_usb_devices",
+                f"Error getting string for VID={hex(dev.idVendor)} PID={hex(dev.idProduct)} "
+                f"({type(e_str_fetch).__name__}): {e_str_fetch}",
+            )
+            error_type_name = type(e_str_fetch).__name__
+            desc = f"[Error Reading Info ({error_type_name})] " f"(VID={hex(dev.idVendor)}, PID={hex(dev.idProduct)})"
+        return desc, dev.idVendor, dev.idProduct, is_problem
 
-    def _initialize_backend_early(self):  # Identical to original
+    # scan_usb_devices_for_settings is called by SettingsDialog,
+    # but defined here as it relates to main app's available_usb_devices
+    def scan_usb_devices_for_settings(
+        self, initial_load=False, change_callback=None
+    ):  # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+        """This method is called by the SettingsDialog. It updates self.available_usb_devices
+        and then configures the combobox *in the SettingsDialog*."""
+        try:
+            # If device is connected, use existing device info instead of scanning
+            if self.device_manager.device_interface.is_connected():
+                logger.info(
+                    "GUI",
+                    "scan_usb_devices_for_settings",
+                    "Device already connected, using existing device info instead of scanning...",
+                )
+
+                # Get current device info
+                try:
+                    import asyncio
+
+                    device_info = asyncio.run(self.device_manager.device_interface.get_device_info())
+                    connected_device_desc = (
+                        f"Currently Connected: {device_info.name} "
+                        f"(VID={hex(device_info.vendor_id)}, "
+                        f"PID={hex(device_info.product_id)})"
+                    )
+
+                    # Update local_vars with connected device
+                    self.local_vars["selected_vid_var"].set(device_info.vendor_id)
+                    self.local_vars["selected_pid_var"].set(device_info.product_id)
+
+                    if change_callback:
+                        change_callback()
+                    return
+
+                except Exception as e:
+                    logger.warning(
+                        "GUI",
+                        "scan_usb_devices_for_settings",
+                        f"Failed to get connected device info: {e}, falling back to scan",
+                    )
+
+            logger.info(
+                "GUI",
+                "scan_usb_devices_for_settings",
+                "Scanning for USB devices (for settings dialog)...",
+            )
+            self.available_usb_devices.clear()
+            if not self.backend_initialized_successfully:
+                logger.error(
+                    "GUI",
+                    "Scan_USBDevicesForSettings",
+                    "Libusb backend not initialized.",
+                )
+                return
+
+            # Try to acquire the USB lock with a timeout to prevent deadlocks during downloads
+            usb_lock = self.device_manager.device_interface.jensen_device.get_usb_lock()
+            lock_acquired = usb_lock.acquire(blocking=False)
+
+            if not lock_acquired:
+                # If we can't get the lock immediately, it means downloads are active
+                logger.info(
+                    "GUI",
+                    "scan_usb_devices_for_settings",
+                    "USB lock is busy (downloads active), skipping device scan",
+                )
+                return
+
+            try:
+                found_devices = usb.core.find(find_all=True, backend=self.usb_backend_instance)
+                if not found_devices:
+                    logger.info(
+                        "GUI",
+                        "scan_usb_devices_for_settings",
+                        "No USB devices found.",
+                    )
+                    return
+
+                processed_devices = []
+                for dev in found_devices:
+                    desc, vid, pid, is_problem = self._get_device_display_info(dev)
+                    processed_devices.append((desc, vid, pid, is_problem))
+            finally:
+                usb_lock.release()
+
+            good_devs = sorted([d for d in processed_devices if not d[3]], key=lambda x: x[0])
+            problem_devs = sorted([d for d in processed_devices if d[3]], key=lambda x: x[0])
+
+            # If a device is currently connected, move it to the top of the 'good' list
+            if self.device_manager.device_interface.is_connected():
+                for i, (desc, vid, pid, _) in enumerate(good_devs):
+                    if (
+                        vid == self.device_manager.device_interface.jensen_device.device.idVendor
+                        and pid == self.device_manager.device_interface.jensen_device.device.idProduct
+                    ):
+                        name_disp = (
+                            self.device_manager.device_interface.jensen_device.model
+                            if self.device_manager.device_interface.jensen_device.model != "unknown"
+                            else "HiDock Device"
+                        )
+                        active_desc = f"Currently Connected: {name_disp} (VID={hex(vid)}, PID={hex(pid)})"
+                        good_devs[i] = (active_desc, vid, pid, False)
+                        good_devs.insert(0, good_devs.pop(i))
+                        break
+
+            self.available_usb_devices = good_devs + problem_devs
+
+            if good_devs and "Currently Connected" in good_devs[0][0]:
+                good_devs = [good_devs[0]] + sorted(good_devs[1:], key=lambda x: x[0])
+            else:
+                good_devs.sort(key=lambda x: x[0])
+            problem_devs.sort(key=lambda x: x[0])
+
+            all_devices_for_combo = list(good_devs)
+            if problem_devs:
+                if all_devices_for_combo:
+                    all_devices_for_combo.append(("--- Devices with Issues ---", 0, 0, True))
+                all_devices_for_combo.extend(problem_devs)
+
+            self._update_settings_device_combobox(
+                all_devices_for_combo,
+                initial_load,
+                change_callback,
+            )
+
+            logger.info(
+                "GUI",
+                "scan_usb_devices",
+                f"Found {len(good_devs)} good, {len(problem_devs)} problem devices.",
+            )  # pylint: disable=broad-except
+        except (usb.core.USBError, AttributeError, TypeError) as e:
+            logger.error(
+                "GUI",
+                "scan_usb_devices_for_settings",
+                f"Unhandled exception: {e}\n{traceback.format_exc()}",
+            )
+
+    def after(self, time: int, callback):
+        if callback:
+            return callback()
+
+    def initialize_backend(self):  # Identical to original
         error_to_report, local_backend_instance = None, None
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -47,7 +209,7 @@ class DeviceActionsMixin:
             if not dll_path:
                 logger.warning(
                     "GUI",
-                    "_initialize_backend_early",
+                    "initialize_backend",
                     "libusb-1.0.dll not found locally. Trying system paths.",
                 )
                 local_backend_instance = usb.backend.libusb1.get_backend()
@@ -56,19 +218,19 @@ class DeviceActionsMixin:
             else:
                 logger.info(
                     "GUI",
-                    "_initialize_backend_early",
+                    "initialize_backend",
                     f"Attempting backend with DLL: {dll_path}",
                 )
                 local_backend_instance = usb.backend.libusb1.get_backend(find_library=lambda x: dll_path)
                 if not local_backend_instance:
                     error_to_report = f"Failed with DLL: {dll_path}. Check 32/64 bit."
             if error_to_report:
-                logger.error("GUI", "_initialize_backend_early", error_to_report)
+                logger.error("GUI", "initialize_backend", error_to_report)
                 return False, error_to_report, None
             logger.info(
                 "GUI",
-                "_initialize_backend_early",
-                f"Backend initialized: {local_backend_instance}",
+                "initialize_backend",
+                f"Backend initialized!: {local_backend_instance}",
             )
             return True, None, local_backend_instance
         except (
@@ -81,17 +243,17 @@ class DeviceActionsMixin:
             error_to_report = f"Unexpected error initializing libusb: {e}"
             logger.error(
                 "GUI",
-                "_initialize_backend_early",
+                "initialize_backend",
                 f"{error_to_report}\n{traceback.format_exc()}",
             )
             return False, error_to_report, None
 
     def attempt_autoconnect_on_startup(self):  # Enhanced with auto-detection
-        """Attempts to autoconnect to the HiDock device on startup if autoconnect is enabled."""
         if not self.backend_initialized_successfully:
             logger.warning("GUI", "attempt_autoconnect", "Skipping autoconnect, USB backend error.")
             return
-        if self.autoconnect_var.get() and not self.device_manager.device_interface.jensen_device.is_connected():
+
+        if self.autoconnect_var and not self.device_manager.device_interface.jensen_device.is_connected():
             logger.info(
                 "GUI",
                 "attempt_autoconnect",
@@ -141,7 +303,10 @@ class DeviceActionsMixin:
                     f"USB Backend Error: {self.backend_init_error_message}",
                 )
             return
-        connection_status = "Status: Connecting..."
+        self.update_status_bar(
+            connection_status="Status: Connected",
+            progress_text="Connecting to device...",
+        )
         threading.Thread(target=self._connect_device_thread, daemon=True).start()
 
     def _connect_device_thread(self):  # Identical to original logic, uses self.after
@@ -150,8 +315,8 @@ class DeviceActionsMixin:
             device_info = None
             with self.device_lock:
                 vid, pid = (
-                    self.selected_vid_var.get(),
-                    self.selected_pid_var.get(),
+                    self.selected_vid_var,
+                    self.selected_pid_var,
                 )
                 device_id = f"{vid:04x}:{pid:04x}"
                 # The connect method returns DeviceInfo, eliminating the need for a separate get_device_info call
@@ -162,6 +327,8 @@ class DeviceActionsMixin:
                 conn_status_text = f"Status: Connected ({device_info.model.value or 'HiDock'})"
                 if device_info.serial_number != "N/A":
                     conn_status_text += f" SN: {device_info.serial_number}"
+
+                self.update_status_bar(connection_status="Status: Connected", progress_text=conn_status_text)
 
                 # Update the status bar immediately to show connection success
                 # and that we're about to fetch files. This provides instant feedback.
@@ -186,7 +353,7 @@ class DeviceActionsMixin:
                 self.after(300, self.refresh_file_list_gui)
                 # Start recording status check after file list loads to avoid conflicts
                 self.after(500, self.start_recording_status_check)
-                if self.auto_refresh_files_var.get():
+                if self.auto_refresh_files_var:
                     self.after(600, self.start_auto_file_refresh_periodic_check)
             elif self.device_manager.device_interface.is_connected() and not device_info:
                 self.after(
@@ -627,7 +794,7 @@ class DeviceActionsMixin:
 
     def start_recording_status_check(self):  # Identical to original
         """Starts periodic checking of the recording status."""
-        interval_s = self.recording_check_interval_var.get()
+        interval_s = self.recording_check_interval_var
         if interval_s <= 0:
             logger.info("GUI", "start_rec_check", "Rec check interval <= 0, disabled.")
             self.stop_recording_status_check()
@@ -696,7 +863,7 @@ class DeviceActionsMixin:
         except (ConnectionError, usb.core.USBError) as e:
             logger.error("GUI", "_check_rec_status", f"Unhandled: {e}\n{traceback.format_exc()}")
         finally:
-            interval_ms = self.recording_check_interval_var.get() * 1000
+            interval_ms = self.recording_check_interval_var * 1000
             if interval_ms <= 0:
                 self.stop_recording_status_check()
             else:
@@ -705,8 +872,8 @@ class DeviceActionsMixin:
     def start_auto_file_refresh_periodic_check(self):  # Identical to original
         """Starts periodic checking for file list refresh based on the auto-refresh settings."""
         self.stop_auto_file_refresh_periodic_check()
-        if self.auto_refresh_files_var.get() and self.device_manager.device_interface.is_connected():
-            interval_s = self.auto_refresh_interval_s_var.get()
+        if self.auto_refresh_files_var and self.device_manager.device_interface.is_connected():
+            interval_s = self.auto_refresh_interval_s_var
             if interval_s <= 0:
                 logger.info("GUI", "start_auto_refresh", "Interval <=0, disabled.")
                 return
@@ -731,7 +898,7 @@ class DeviceActionsMixin:
     ):  # Identical to original logic, uses self.after
         """Periodically checks if the file list needs to be refreshed."""
         try:
-            if not self.device_manager.device_interface.is_connected() or not self.auto_refresh_files_var.get():
+            if not self.device_manager.device_interface.is_connected() or not self.auto_refresh_files_var:
                 self.stop_auto_file_refresh_periodic_check()
                 return
             if self.is_long_operation_active:
@@ -744,7 +911,7 @@ class DeviceActionsMixin:
                 f"Unhandled: {e}\n{traceback.format_exc()}",
             )
         finally:
-            interval_ms = self.auto_refresh_interval_s_var.get() * 1000
+            interval_ms = self.auto_refresh_interval_s_var * 1000
             if interval_ms <= 0:
                 self.stop_auto_file_refresh_periodic_check()
             else:
@@ -755,20 +922,10 @@ class DeviceActionsMixin:
         if not self.device_manager.device_interface.is_connected():
             logger.error("GUI", "format_sd_card_gui", "Not connected.")
             return
-        if not messagebox.askyesno(
-            "Confirm Format",
-            "WARNING: This will erase ALL data. Continue?",
-            parent=self,
-        ) or not messagebox.askyesno(
-            "Final Confirmation",
-            "FINAL WARNING: Formatting will erase everything. Continue?",
-            parent=self,
-        ):
-            return
-        dialog = self.CTkInputDialog(text="Type 'FORMAT' to confirm formatting.", title="Type Confirmation")
-        confirm_text = dialog.get_input()  # This will show the dialog and return input
+
+        confirm_text = input(text="Type 'FORMAT' to confirm formatting.")
         if confirm_text is None or confirm_text.upper() != "FORMAT":
-            messagebox.showwarning("Format Cancelled", "Confirmation text mismatch.", parent=self)
+            logger.warning("CLI", "Format Cancelled", "Confirmation text mismatch.")
             return
         self._set_long_operation_active_state(True, "Formatting Storage")
         threading.Thread(target=self._format_sd_card_thread, daemon=True).start()
@@ -808,12 +965,6 @@ class DeviceActionsMixin:
         if not self.device_manager.device_interface.is_connected():
             logger.error("GUI", "sync_device_time_gui", "Not connected.")
             return
-        if not messagebox.askyesno(
-            "Confirm Sync Time",
-            "Set device time to computer's current time?",
-            parent=self,
-        ):
-            return
         self._set_long_operation_active_state(True, "Time Sync")
         threading.Thread(target=self._sync_device_time_thread, daemon=True).start()
 
@@ -826,7 +977,7 @@ class DeviceActionsMixin:
         if result and result.get("result") == "success":
             self.after(
                 0,
-                lambda: messagebox.showinfo("Time Sync", "Device time synchronized.", parent=self),
+                lambda: logger.info("CLI", "Time Sync", "Device time synchronized."),
             )
         else:
             err = result.get("error", "Unknown") if result else "Comm error"

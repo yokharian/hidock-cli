@@ -4,7 +4,6 @@ Hidock Cli - Comprehensive Setup Script
 Supports both end users (simple app setup) and developers (full environment).
 """
 
-import os
 import platform
 import subprocess
 import sys

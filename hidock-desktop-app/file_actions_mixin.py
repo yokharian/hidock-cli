@@ -31,14 +31,14 @@ class FileActionsMixin:
     def download_selected_files_gui(self, filenames_to_download):
         """Handles the download of selected files in the GUI by setting up a queue."""
         if not self.download_directory or not os.path.isdir(self.download_directory):
-            logger.error("GUI", "Error", "Invalid download directory.")
+            logger.error("CLI", "Error", "Invalid download directory.")
             return
         if self.is_long_operation_active:
-            logger.error("GUI", "Error", "Another operation in progress.")
+            logger.error("CLI", "Error", "Another operation in progress.")
             return
 
         # Immediately update status to "Queued" for selected files
-        for filename in filenames_to_delete:
+        for filename in filenames_to_download:
             # Check if file is already being downloaded
             if not self.file_operations_manager.is_file_operation_active(filename, FileOperationType.DOWNLOAD):
                 self._update_file_status_in_treeview(filename, "Queued", ("queued",))
@@ -101,25 +101,25 @@ class FileActionsMixin:
     def _transcribe_selected_audio_gemini(self, file_iid):
         file_detail = next((f for f in self.displayed_files_details if f["name"] == file_iid), None)
         if not file_detail:
-            messagebox.showerror("Transcription Error", "File details not found.", parent=self)
+            logger.error("CLI", "Transcription Error", "File details not found.")
             return
 
         local_filepath = self._get_local_filepath(file_detail["name"])
         if not os.path.exists(local_filepath):
-            messagebox.showwarning(
+            logger.warning(
+                "CLI",
                 "Transcription",
                 "File not downloaded. Please download it first.",
-                parent=self,
             )
             return
 
         # Get API key securely (e.g., from config or environment variable)
         gemini_api_key = os.environ.get("GEMINI_API_KEY")  # Or load from self.config
         if not gemini_api_key:
-            messagebox.showerror(
+            logger.error(
+                "CLI",
                 "API Key Missing",
                 "Gemini API Key not found. Please set GEMINI_API_KEY environment variable.",
-                parent=self,
             )
             return
 
@@ -141,7 +141,7 @@ class FileActionsMixin:
             # The exception is logged with a traceback and reported to the user via the UI,
             # preventing the thread from crashing silently.
             logger.error(
-                "GUI",
+                "CLI",
                 "_transcription_worker",
                 f"Error during transcription: {e}\n{traceback.format_exc()}",
             )
@@ -151,7 +151,7 @@ class FileActionsMixin:
         self._set_long_operation_active_state(False, "Transcription")
         if "error" in results:
             logger.error(
-                "GUI",
+                "CLI",
                 "Transcription Error",
                 f"Failed to transcribe {original_filename}: {results['error']}",
             )
@@ -179,7 +179,7 @@ class FileActionsMixin:
         ]
 
         if not download_operations:
-            messagebox.showinfo("No Downloads", "No active downloads to cancel.", parent=self)
+            logger.info("CLI", "No Downloads", "No active downloads to cancel.")
             return
 
         cancelled_count = 0
@@ -203,10 +203,10 @@ class FileActionsMixin:
         ]
 
         if not download_operations_to_cancel:
-            messagebox.showinfo(
-                "No Active Downloads",
+            logger.info(
+                "CLI",
+                "cancel_selected_downloads_gui",
                 "No active downloads found for the selected files.",
-                parent=self,
             )
             return
 

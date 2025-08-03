@@ -14,6 +14,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional  # Removed Union - not used
 
+from config_and_logger import logger
+
 
 class DeviceModel(Enum):
     """Enumeration of supported HiDock device models."""
@@ -424,6 +426,8 @@ class DeviceManager:
         self._health_monitor_thread: Optional[threading.Thread] = None
         self._health_check_interval = 30.0  # seconds
         self._health_callbacks: List[Callable[[DeviceHealth], None]] = []
+
+        logger.info("DeviceManager", "__init__", "Device manager initialized")
 
     async def initialize(self) -> None:
         """Initialize the device manager."""

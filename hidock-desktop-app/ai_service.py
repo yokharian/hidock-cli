@@ -785,6 +785,7 @@ class AIServiceManager:
 
     def __init__(self):
         self.providers = {}
+        logger.info("AIServiceManager", "__init__", "AI Service manager initialized")
 
     def configure_provider(self, provider_name: str, api_key: str, config: Dict[str, Any] = None) -> bool:
         """Configure an AI provider"""

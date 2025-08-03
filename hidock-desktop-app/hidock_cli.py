@@ -1,17 +1,3 @@
-# gui_main_window.py
-"""
-Main GUI Window for the HiDock Explorer Tool.
-
-This module defines the `HiDockToolGUI` class, which creates and manages
-the main application. It handles user interactions,
-displays device information and files, and orchestrates operations like
-file download, playback, and device settings management by interacting with
-the `HiDockJensen` (device communication) and `SettingsDialog` classes,
-as well as configuration and logging utilities.
-
-The GUI provides a menubar, toolbar, file list (Treeview), status bar,
-and optional log pane.
-"""
 import asyncio
 import os
 import subprocess
@@ -25,47 +11,21 @@ from audio_processing_advanced import AudioEnhancer
 from config_and_logger import Logger, load_config, logger, save_config
 from constants import DEFAULT_PRODUCT_ID, DEFAULT_VENDOR_ID
 from desktop_device_adapter import DesktopDeviceAdapter
+from device_actions_mixin import DeviceActionsMixin
 from device_interface import DeviceManager
+from file_actions_mixin import FileActionsMixin
 from file_operations_manager import FileOperationsManager
-from gui_actions_device import DeviceActionsMixin
-from gui_actions_file import FileActionsMixin
-from gui_auxiliary import AuxiliaryMixin
-from gui_event_handlers import EventHandlersMixin
 from storage_management import StorageMonitor, StorageOptimizer
 from transcription_module import process_audio_file_for_insights
 
 
-class HiDockToolGUI(
-    DeviceActionsMixin,
-    FileActionsMixin,
-    AuxiliaryMixin,
-    EventHandlersMixin,
-):
-    """
-    Main application window for the HiDock Explorer Tool.
-
-    This class initializes the main GUI, including widgets for device interaction,
-    file management, audio playback, and application settings. It handles
-    USB backend initialization, device connection/disconnection, and updates
-    the UI based on device status and user actions.
-
-    Attributes:
-        config (dict): Application configuration loaded from file.
-        dock (HiDockJensen): Instance for communicating with the HiDock device.
-        various ctk.Variable instances: For managing GUI state and settings.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class HiDockCLI(DeviceActionsMixin, FileActionsMixin):
+    def __init__(self, attempt_auto_connect=True):
+        super().__init__()
         self.config = load_config()
-
-        self.title("HiDock Explorer Tool")
 
         # Make the icon path relative to the script file's location
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.icon_base_path = os.path.join(script_dir, "icons")
-        self.icon_display_size = (20, 20)
-
         self.usb_backend_instance = None
         self.backend_initialized_successfully = False
         self.backend_init_error_message = "USB backend not yet initialized."
@@ -74,7 +34,7 @@ class HiDockToolGUI(
                 self.backend_initialized_successfully,
                 self.backend_init_error_message,
                 self.usb_backend_instance,
-            ) = self._initialize_backend_early()
+            ) = self.initialize_backend()
             if not self.backend_initialized_successfully:
                 logger.error(
                     "MainWindow",
@@ -145,7 +105,7 @@ class HiDockToolGUI(
             "status": "Status",
         }
         self.icons = {}
-        self._last_appearance_mode = self.appearance_mode_var.get()
+        self._last_appearance_mode = self.appearance_mode_var
         self.file_menu = None
         self.view_menu = None
         self.actions_menu = None
@@ -181,134 +141,15 @@ class HiDockToolGUI(
         self.download_logs_button = None
         self.log_text_area = None
 
-        self._load_icons()
-        self.create_widgets()
-        self._set_minimum_window_size()
-        self.apply_theme_and_color()
-        self.after(100, self.attempt_autoconnect_on_startup())
+        if attempt_auto_connect:
+            self.attempt_autoconnect_on_startup()
 
-    def _validate_window_geometry(self, geometry_string):
-        """
-        Validates and corrects window geometry to ensure the window is visible on screen.
-
-        Args:
-            geometry_string (str): Geometry string in format "WIDTHxHEIGHT+X+Y"
-
-        Returns:
-            str: Validated geometry string that ensures window visibility
-        """
-        try:
-            # Log initial state
-            logger.debug(
-                "MainWindow",
-                "_validate_window_geometry",
-                f"Initial geometry string: {geometry_string}",
-            )
-
-            # Parse the geometry string
-            import re
-
-            match = re.match(r"(\d+)x(\d+)([-+]\d+)([-+]\d+)", geometry_string)
-            if not match:
-                logger.warning(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"Invalid geometry format: {geometry_string}. Using default.",
-                )
-                return "950x850+100+100"  # Default fallback
-
-            width, height, x_str, y_str = match.groups()
-            width, height = int(width), int(height)
-            x, y = int(x_str), int(y_str)
-            logger.debug(
-                "MainWindow",
-                "_validate_window_geometry",
-                f"Parsed geometry: w={width}, h={height}, x={x}, y={y}",
-            )
-
-            # Get screen dimensions
-            screen_width = self.winfo_screenwidth()
-            screen_height = self.winfo_screenheight()
-            logger.debug(
-                "MainWindow",
-                "_validate_window_geometry",
-                f"Screen dimensions: {screen_width}x{screen_height}",
-            )
-
-            # Validate and correct coordinates
-            # Ensure window is not positioned off-screen
-            min_visible_pixels = 100  # Minimum pixels that should be visible
-
-            if x < -width + min_visible_pixels:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"X coordinate {x} is off-screen to the left.",
-                )
-                x = 0
-            elif x > screen_width - min_visible_pixels:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"X coordinate {x} is off-screen to the right.",
-                )
-                x = screen_width - width
-
-            if y < 0:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"Y coordinate {y} is off-screen to the top.",
-                )
-                y = 0
-            elif y > screen_height - min_visible_pixels:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"Y coordinate {y} is off-screen to the bottom.",
-                )
-                y = screen_height - height
-
-            logger.debug(
-                "MainWindow",
-                "_validate_window_geometry",
-                f"Corrected coordinates: x={x}, y={y}",
-            )
-
-            # Ensure reasonable window size
-            min_width, min_height = 400, 300
-            if width < min_width:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"Width {width} is too small, setting to {min_width}",
-                )
-                width = min_width
-            if height < min_height:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"Height {height} is too small, setting to {min_height}",
-                )
-                height = min_height
-
-            validated_geometry = f"{width}x{height}+{x}+{y}"
-            if validated_geometry != geometry_string:
-                logger.info(
-                    "MainWindow",
-                    "_validate_window_geometry",
-                    f"Final corrected geometry: '{validated_geometry}'",
-                )
-
-            return validated_geometry
-
-        except Exception as e:
-            logger.error(
-                "MainWindow",
-                "_validate_window_geometry",
-                f"Error validating geometry '{geometry_string}': {e}",
-            )
-            return "950x850+100+100"  # Safe fallback
+    def update_status_bar(self, connection_status=None, progress_text=None):
+        logger.info(
+            "MainWindow",
+            "update_status_bar",
+            f"Updating status bar with connection: {connection_status}, progress: {progress_text}",
+        )
 
     def _initialize_vars_from_config(self):
         """
@@ -392,14 +233,10 @@ class HiDockToolGUI(
         self.ai_lmstudio_base_url_var = get_conf("ai_lmstudio_base_url", "http://localhost:1234/v1")
         # API key is stored encrypted and handled separately
 
-        # Visualizer pin state
-        self.visualizer_pinned_var = get_conf("visualizer_pinned", False)
-        self.visualizer_pinned = self.visualizer_pinned_var.get()  # Initialize from config
-
     def get_decrypted_api_key(self, provider=None):
         """Get the decrypted API key for the specified provider."""
         if provider is None:
-            provider = self.ai_api_provider_var.get()
+            provider = self.ai_api_provider_var
 
         encrypted_key = self.config.get(f"ai_api_key_{provider}_encrypted", "")
         if not encrypted_key:
@@ -497,6 +334,71 @@ class HiDockToolGUI(
 
     def _update_gui_with_status_info(self, conn_status_text, storage_text):
         self.update_status_bar(connection_status=conn_status_text, progress_text=storage_text)
+
+    def _update_settings_device_combobox(self, devices, initial_load, change_callback):
+        """Updates the device selection"""
+        combo_list = [d[0] for d in devices]
+        values = combo_list if combo_list else ["No devices accessible"]
+        settings_vid_var = self.local_vars["selected_vid_var"]
+        settings_pid_var = self.local_vars["selected_pid_var"]
+
+        current_sel_str = next(
+            (d for d, v, p, _ in devices if v == settings_vid_var and p == settings_pid_var),
+            None,
+        )
+
+        if current_sel_str and current_sel_str in combo_list:
+            self.settings_device_combobox = current_sel_str
+        elif combo_list and "---" not in combo_list[0]:
+            if not initial_load:
+                self.settings_device_combobox = combo_list[0]
+                sel_info = next((d for d in devices if d[0] == combo_list[0]), None)
+                if sel_info:
+                    settings_vid_var.set(sel_info[1])
+                    settings_pid_var.set(sel_info[2])
+                if change_callback:
+                    change_callback()
+        elif not combo_list:
+            self.settings_device_combobox = "No devices accessible"
+
+    def _apply_device_settings_thread(self, settings_to_apply):  # This is called by SettingsDialog
+        if not settings_to_apply:
+            logger.info(
+                "GUI",
+                "_apply_device_settings_thread",
+                "No device behavior settings changed.",
+            )
+            return
+        all_successful = True
+        for name, value in settings_to_apply.items():
+            result = self.device_manager.device_interface.jensen_device.set_device_setting(name, value)
+            if not result or result.get("result") != "success":
+                all_successful = False
+                logger.error(
+                    "GUI",
+                    "_apply_device_settings_thread",
+                    f"Failed to set '{name}' to {value}.",
+                )
+                self.after(
+                    0,
+                    lambda n=name: logger.warning("CLI", "Settings Error", f"Failed to apply setting: {n}"),
+                )
+        if all_successful:
+            logger.info(
+                "GUI",
+                "_apply_device_settings_thread",
+                "All changed device settings applied.",
+            )
+
+    def apply_device_settings_from_dialog(self, settings_to_apply):
+        """Public wrapper to apply device settings from the settings dialog.
+
+        Args:
+        settings_to_apply (dict): A dictionary of settings to apply to the device.
+        """
+        # This method provides a public interface for the SettingsDialog
+        # to request device settings application.
+        self._apply_device_settings_thread(settings_to_apply)
 
     def _update_menu_states(self):
         """
@@ -825,17 +727,17 @@ class HiDockToolGUI(
             import asyncio
 
             # Get AI provider configuration
-            provider = self.ai_api_provider_var.get()
+            provider = self.ai_api_provider_var
             config = {
-                "model": self.ai_model_var.get(),
-                "temperature": self.ai_temperature_var.get(),
-                "max_tokens": self.ai_max_tokens_var.get(),
+                "model": self.ai_model_var,
+                "temperature": self.ai_temperature_var,
+                "max_tokens": self.ai_max_tokens_var,
                 "base_url": getattr(self, f"ai_{provider}_base_url_var", None),
                 "region": getattr(self, f"ai_{provider}_region_var", None),
             }
             # Clean up None values
-            config = {k: v.get() if hasattr(v, "get") else v for k, v in config.items() if v is not None}
-            language = self.ai_language_var.get()
+            config = {k: v if hasattr(v, "get") else v for k, v in config.items() if v is not None}
+            language = self.ai_language_var
 
             # Since process_audio_file_for_insights is async, we need to run it in an event loop
             results = asyncio.run(process_audio_file_for_insights(file_path, provider, api_key, config, language))
@@ -1094,27 +996,27 @@ class HiDockToolGUI(
             logger.info("MainWindow", "on_closing", "Quit cancelled by user.")
             return
         self.config["window_geometry"] = self.geometry()
-        self.config["autoconnect"] = self.autoconnect_var.get()
+        self.config["autoconnect"] = self.autoconnect_var
         self.config["download_directory"] = self.download_directory
-        self.config["log_level"] = self.logger_processing_level_var.get()
-        self.config["selected_vid"] = self.selected_vid_var.get()
-        self.config["selected_pid"] = self.selected_pid_var.get()
-        self.config["target_interface"] = self.target_interface_var.get()
-        self.config["recording_check_interval_s"] = self.recording_check_interval_var.get()
-        self.config["default_command_timeout_ms"] = self.default_command_timeout_ms_var.get()
-        self.config["file_stream_timeout_s"] = self.file_stream_timeout_s_var.get()
-        self.config["auto_refresh_files"] = self.auto_refresh_files_var.get()
-        self.config["auto_refresh_interval_s"] = self.auto_refresh_interval_s_var.get()
-        self.config["quit_without_prompt_if_connected"] = self.quit_without_prompt_var.get()
-        self.config["appearance_mode"] = self.appearance_mode_var.get()
-        self.config["color_theme"] = self.color_theme_var.get()
-        self.config["suppress_console_output"] = self.suppress_console_output_var.get()
-        self.config["suppress_gui_log_output"] = self.suppress_gui_log_output_var.get()
-        self.config["gui_log_filter_level"] = self.gui_log_filter_level_var.get()
-        self.config["treeview_columns_display_order"] = ",".join(self.file_tree["displaycolumns"])
-        self.config["logs_pane_visible"] = self.logs_visible_var.get()
-        self.config["loop_playback"] = self.loop_playback_var.get()
-        self.config["playback_volume"] = self.volume_var.get()
+        self.config["log_level"] = self.logger_processing_level_var
+        self.config["selected_vid"] = self.selected_vid_var
+        self.config["selected_pid"] = self.selected_pid_var
+        self.config["target_interface"] = self.target_interface_var
+        self.config["recording_check_interval_s"] = self.recording_check_interval_var
+        self.config["default_command_timeout_ms"] = self.default_command_timeout_ms_var
+        self.config["file_stream_timeout_s"] = self.file_stream_timeout_s_var
+        self.config["auto_refresh_files"] = self.auto_refresh_files_var
+        self.config["auto_refresh_interval_s"] = self.auto_refresh_interval_s_var
+        self.config["quit_without_prompt_if_connected"] = self.quit_without_prompt_var
+        self.config["appearance_mode"] = self.appearance_mode_var
+        self.config["color_theme"] = self.color_theme_var
+        self.config["suppress_console_output"] = self.suppress_console_output_var
+        self.config["suppress_gui_log_output"] = self.suppress_gui_log_output_var
+        self.config["gui_log_filter_level"] = self.gui_log_filter_level_var
+        # self.config["treeview_columns_display_order"] = ",".join(self.file_tree["displaycolumns"])
+        self.config["logs_pane_visible"] = self.logs_visible_var
+        self.config["loop_playback"] = self.loop_playback_var
+        self.config["playback_volume"] = self.volume_var
         self.config["treeview_sort_col_id"] = self.saved_treeview_sort_column
         self.config["treeview_sort_descending"] = self.saved_treeview_sort_reverse
         log_colors_to_save = {}
@@ -1122,7 +1024,7 @@ class HiDockToolGUI(
             light_var = getattr(self, f"log_color_{level.lower()}_light_var", None)
             dark_var = getattr(self, f"log_color_{level.lower()}_dark_var", None)
             if light_var and dark_var:
-                log_colors_to_save[level] = [light_var.get(), dark_var.get()]
+                log_colors_to_save[level] = [light_var, dark_var]
         self.config["log_colors"] = log_colors_to_save
         self.config["icon_theme_color_light"] = self.icon_pref_light_color
         self.config["icon_theme_color_dark"] = self.icon_pref_dark_color
